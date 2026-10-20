@@ -1,0 +1,33 @@
+<div class="ap-thread-head">
+  {{#if otherWho.rotom}}<span class="ap-rotom-face avatar"><i></i><i></i></span>{{else}}<img class="ap-avatar" src="{{otherWho.img}}" alt="">{{/if}}
+  <div><strong>{{otherWho.name}}</strong>{{#if otherNumber}}<small>{{otherNumber}}</small>{{/if}}</div>
+</div>
+
+<div class="ap-bubbles">
+  {{#each msgs}}
+  {{#if showDay}}<div class="ap-dayline">{{day}}</div>{{/if}}
+  <div class="ap-msg {{#if mine}}mine{{else}}theirs{{/if}}">
+    {{#if img}}<img class="ap-msg-img" src="{{img}}" alt="" data-action="apPhotoFull" data-src="{{img}}">{{/if}}
+    {{#if text}}<span class="ap-msg-text">{{text}}</span>{{/if}}
+    <small>{{time}}</small>
+  </div>
+  {{else}}
+  <p class="ap-hint-center">Say g'day.</p>
+  {{/each}}
+</div>
+
+<div class="ap-composer">
+  {{#if showAttach}}
+  <div class="ap-strip">
+    {{#each galleryStrip}}<img src="{{src}}" alt="" data-action="apAttachPick" data-src="{{src}}">{{else}}<span class="ap-hint">No photos yet. Use the Camera app.</span>{{/each}}
+  </div>
+  {{/if}}
+  {{#if attachImg}}
+  <div class="ap-attached"><img src="{{attachImg}}" alt=""><button type="button" class="ap-x" data-action="apAttachClear"><i class="fa-solid fa-xmark"></i></button></div>
+  {{/if}}
+  <div class="ap-composer-row">
+    <button type="button" class="ap-round" data-action="apAttachToggle" data-tooltip="Attach a photo"><i class="fa-solid fa-image"></i></button>
+    <input type="text" data-draft="msg-{{other}}" data-enter="apSend" value="{{draft}}" placeholder="Message" {{#unless signal}}disabled{{/unless}}>
+    <button type="button" class="ap-round send" data-action="apSend" data-tooltip="Send" {{#unless signal}}disabled{{/unless}}><i class="fa-solid fa-arrow-up"></i></button>
+  </div>
+</div>

@@ -1,0 +1,49 @@
+{{#if grid}}
+<div class="ap-cal-head">
+  <button type="button" class="ap-round" data-action="apCalShift" data-delta="-1"><i class="fa-solid fa-chevron-left"></i></button>
+  <button type="button" class="ap-cal-title" data-action="apCalShift" data-delta="0" data-tooltip="Back to today">{{grid.title}}</button>
+  <button type="button" class="ap-round" data-action="apCalShift" data-delta="1"><i class="fa-solid fa-chevron-right"></i></button>
+</div>
+<div class="ap-cal" style="--cols: {{grid.weekdays.length}}">
+  {{#each grid.weekdays}}<span class="ap-cal-wd">{{this}}</span>{{/each}}
+  {{#each grid.blanks}}<span></span>{{/each}}
+  {{#each grid.cells}}
+  <button type="button" class="ap-cal-day {{#if isToday}}today{{/if}} {{#if selected}}selected{{/if}}" data-action="apCalDay" data-start="{{start}}">{{day}}{{#if dot}}<i></i>{{/if}}</button>
+  {{/each}}
+</div>
+{{else}}
+<p class="ap-warn">No calendar is running, so only the list is shown.</p>
+{{/if}}
+
+<h4 class="ap-subhead">{{selectedLabel}}</h4>
+<ul class="ap-agenda">
+  {{#each dayItems}}
+  <li class="{{#if isEvent}}event{{/if}} {{#if done}}done{{/if}}">
+    {{#if isEvent}}<i class="fa-solid fa-flag"></i>{{else}}<button type="button" class="ap-tick" data-action="apToggleReminder" data-id="{{id}}"><i class="fa-{{#if done}}solid fa-circle-check{{else}}regular fa-circle{{/if}}"></i></button>{{/if}}
+    <span class="ap-what">{{text}}<small>{{when}}</small></span>
+    {{#if isEvent}}{{#if @root.isGM}}<button type="button" class="ap-x" data-action="apDeleteEvent" data-id="{{id}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+    {{else}}<button type="button" class="ap-x" data-action="apDeleteReminder" data-id="{{id}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+  </li>
+  {{else}}
+  <li class="ap-hint">Nothing on.</li>
+  {{/each}}
+</ul>
+
+<div class="ap-cal-add">
+  <input type="time" data-reminder-time value="09:00">
+  {{#if remindersAllowed}}
+  <div class="ap-row"><input type="text" data-draft="reminder" data-enter="apAddReminder" placeholder="Remind me to..."><button type="button" class="ap-pill" data-action="apAddReminder"><i class="fa-solid fa-bell"></i></button></div>
+  {{else}}
+  <p class="ap-hint"><i class="fa-solid fa-lock"></i> Reminders need a Rotom Phone.</p>
+  {{/if}}
+  {{#if isGM}}
+  <div class="ap-row"><input type="text" data-draft="event" data-enter="apAddEvent" placeholder="Public event for everyone"><button type="button" class="ap-pill gm" data-action="apAddEvent"><i class="fa-solid fa-flag"></i></button></div>
+  {{/if}}
+</div>
+
+{{#if upcoming.length}}
+<h4 class="ap-subhead">Next two weeks</h4>
+<ul class="ap-agenda compact">
+  {{#each upcoming}}<li class="{{#if isEvent}}event{{/if}} {{#if done}}done{{/if}}"><span class="ap-what">{{text}}<small>{{when}}</small></span></li>{{/each}}
+</ul>
+{{/if}}

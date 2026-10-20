@@ -1,8 +1,10 @@
 import { MODULE_ID, DEFAULT_BADGES } from "./constants.js";
 import * as Registry from "./registry.js";
 import * as Time from "./time.js";
-import { RegistryPhone } from "./phone-app.js";
+import { RegistryPhone, APP_PARTIALS, TEMPLATE_ROOT } from "./phone-app.js";
 import { postToDiscord } from "./discord.js";
+import * as Data from "./phone-data.js";
+import * as Notify from "./notify.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -39,6 +41,17 @@ async function openMine(tab) {
     rejectClose: false
   });
   if (id) RegistryPhone.open(game.actors.get(id), { tab });
+}
+
+function resolveActor(a) {
+  if (!a) return null;
+  if (typeof a !== "string") return a;
+  return game.actors.get(a) ?? game.actors.getName(a) ?? null;
+}
+
+function resolveKey(k) {
+  if (typeof k === "string" && Data.isRotomKey(k)) return k;
+  return resolveActor(k)?.id ?? k;
 }
 
 let sweepTimer = null;
@@ -86,22 +99,81 @@ Hooks.once("init", () => {
     scope: userScope, config: true, type: String, default: "",
     restricted: true
   });
+  // Phone
+  game.settings.register(MODULE_ID, "defaultContacts", {
+    name: "Phone: default contacts",
+    hint: "Actor names every phone starts with, separated by commas.",
+    scope: "world", config: true, type: String, default: "Professor Manuka",
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "rotomOnlyPokegram", {
+    name: "Phone: PokéGram needs a Rotom Phone",
+    scope: "world", config: true, type: Boolean, default: false,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "rotomOnlyCamera", {
+    name: "Phone: Camera needs a Rotom Phone",
+    scope: "world", config: true, type: Boolean, default: false,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "rotomOnlyReminders", {
+    name: "Phone: Calendar reminders need a Rotom Phone",
+    hint: "Everyone can still see the calendar and your public events.",
+    scope: "world", config: true, type: Boolean, default: true,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "pokegramToDiscord", {
+    name: "Phone: post PokéGram to Discord",
+    hint: "New PokéGram posts are copied to a Discord channel through the webhook below.",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "pokegramWebhookUrl", {
+    name: "Phone: PokéGram Discord webhook URL",
+    hint: "Stored on your user account only. Make a webhook in the channel you want PokéGram posts in.",
+    scope: userScope, config: true, type: String, default: "",
+    restricted: true
+  });
+  game.settings.register(MODULE_ID, "pokegramToasts", {
+    name: "Phone: pop up new PokéGram posts",
+    hint: "Show a notification on your screen when someone posts.",
+    scope: "client", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "notificationSound", {
+    name: "Phone: notification sound",
+    scope: "client", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "messages", {
+    scope: "world", config: false, type: Array, default: [],
+    onChange: () => Notify.onMessagesChanged()
+  });
+  game.settings.register(MODULE_ID, "posts", {
+    scope: "world", config: false, type: Array, default: [],
+    onChange: () => Notify.onPostsChanged()
+  });
+  game.settings.register(MODULE_ID, "events", {
+    scope: "world", config: false, type: Array, default: [],
+    onChange: () => RegistryPhone.refresh()
+  });
+
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
   game.keybindings.register(MODULE_ID, "openPhone", {
     name: "Open my phone",
-    hint: "Opens your trainer's phone with their Trainer Card and Riding Licence.",
+    hint: "Opens your trainer's phone.",
     editable: [{ key: "KeyP", modifiers: ["Shift"] }],
     onDown: () => { openMine(); return true; }
   });
+
+  const load = foundry.applications.handlebars?.loadTemplates ?? globalThis.loadTemplates;
+  load([`${TEMPLATE_ROOT}/phone.hbs`, ...APP_PARTIALS]);
 });
 
 Hooks.once("ready", () => {
   const module = game.modules.get(MODULE_ID);
   module.api = {
-    /** Open a trainer's phone. tab: "card", "licence" or "admin". */
-    open: (actor, tab) => RegistryPhone.open(typeof actor === "string" ? game.actors.get(actor) ?? game.actors.getName(actor) : actor, { tab }),
+    /** Open a trainer's phone. app: "home", "messages", "pokegram", "camera", "gallery", "calendar", "card", "licence" or "admin". */
+    open: (actor, app) => RegistryPhone.open(resolveActor(actor), { app }),
     openMine,
     getRecord: Registry.getRecord,
     issueOffence: Registry.issueOffence,
@@ -109,8 +181,16 @@ Hooks.once("ready", () => {
     communityService: Registry.communityService,
     sweep: Registry.sweep,
     testDiscord: () => postToDiscord("🧪 **Antipodea Trainer Registry** is connected. Notices will post here."),
+    /** Text a trainer as any actor (or as their Rotom with "rotom:<actorId>"). GM only. */
+    text: (from, to, text) => Data.request("message", { from: resolveKey(from), to: resolveKey(to), text }),
+    rotomSay: (actor, text) => {
+      const a = resolveActor(actor);
+      return a ? Data.request("message", { from: Data.rotomKey(a.id), to: a.id, text }) : false;
+    },
     time: Time
   };
+  game.socket.on(Data.SOCKET, Data.onSocket);
+  Notify.init(RegistryPhone);
   queueSweep();
 });
 
@@ -118,8 +198,9 @@ Hooks.once("ready", () => {
 /*  World clock                                 */
 /* -------------------------------------------- */
 
-Hooks.on("updateWorldTime", () => {
+Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
+  Notify.onTimeChanged(worldTime, delta);
   RegistryPhone.refresh();
 });
 

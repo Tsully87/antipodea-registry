@@ -56,13 +56,31 @@
 .antipodea-phone .ap-icons i { margin-left: 4px; }
 
 .antipodea-phone .ap-appbar {
-  display: flex; align-items: center; gap: 8px;
-  padding: 10px 16px;
+  display: flex; align-items: center; gap: 6px;
+  padding: 6px 10px;
   background: linear-gradient(90deg, var(--ap-teal-deep), var(--ap-teal));
   color: #fff;
   font-weight: 700;
   letter-spacing: .5px;
+  min-height: 40px;
 }
+.antipodea-phone .app-pokegram .ap-appbar,
+.antipodea-phone .app-compose .ap-appbar { background: linear-gradient(90deg, #a61e4d, #d6336c, #f08c00); }
+.antipodea-phone .app-messages .ap-appbar,
+.antipodea-phone .app-thread .ap-appbar { background: linear-gradient(90deg, #237a36, #2fb34a); }
+.antipodea-phone .app-calendar .ap-appbar { background: linear-gradient(90deg, #a51111, #e03131); }
+.antipodea-phone .app-camera .ap-appbar,
+.antipodea-phone .app-gallery .ap-appbar,
+.antipodea-phone .app-photo .ap-appbar { background: #1c1d1f; }
+.antipodea-phone .ap-appbar-title { flex: 1; }
+.antipodea-phone .ap-back,
+.antipodea-phone .ap-appbar-btn {
+  flex: 0 0 30px; width: 30px; height: 30px; padding: 0;
+  border: none; background: rgba(255,255,255,.15); color: #fff; border-radius: 50%;
+  line-height: 1;
+}
+.antipodea-phone .ap-back:hover,
+.antipodea-phone .ap-appbar-btn:hover { box-shadow: none; background: rgba(255,255,255,.3); }
 
 .antipodea-phone .ap-content {
   flex: 1;
@@ -90,8 +108,11 @@
 .antipodea-phone .ap-nav button.active { color: var(--ap-teal); }
 .antipodea-phone .ap-nav button:hover { box-shadow: none; color: var(--ap-teal-deep); }
 .antipodea-phone .ap-homebar {
-  height: 5px; width: 110px; margin: 6px auto 8px; border-radius: 3px; background: #222;
+  display: block; flex: 0 0 auto;
+  height: 6px; width: 120px; margin: 8px auto 10px; padding: 0;
+  border: none; border-radius: 3px; background: #222; cursor: pointer;
 }
+.antipodea-phone .ap-homebar:hover { background: var(--ap-teal); box-shadow: none; }
 
 /* Shared card frame */
 .antipodea-phone .ap-card {
@@ -335,3 +356,284 @@
 .antipodea-chat header img { border-radius: 6px; border: none; }
 .antipodea-chat h3 { margin: 0; font-size: 14px; border: none; }
 .antipodea-chat .ap-red { color: #c0392b; }
+
+/* ============================================ */
+/*  Phone OS                                    */
+/* ============================================ */
+
+.antipodea-phone .ap-content { position: relative; }
+.antipodea-phone .app-home .ap-content {
+  background:
+    radial-gradient(circle at 20% 15%, rgba(255,255,255,.18), transparent 40%),
+    linear-gradient(170deg, #0f4f55 0%, #1f7a7a 45%, #c4622d 100%);
+  color: #fff;
+}
+.antipodea-phone .is-rotom.app-home .ap-content {
+  background:
+    radial-gradient(circle at 80% 10%, rgba(255,200,120,.35), transparent 45%),
+    linear-gradient(170deg, #4a1d05 0%, #c4622d 55%, #f08c00 100%);
+}
+.antipodea-phone .is-rotom { box-shadow: inset 0 0 0 2px #000, 0 0 0 3px #f08c00, 0 0 18px rgba(240,140,0,.7); }
+.antipodea-phone .ap-nosignal { font-size: 10px; color: #ff8787; margin-right: 4px; }
+
+.antipodea-phone .ap-busy {
+  position: absolute; left: 50%; bottom: 60px; transform: translateX(-50%);
+  padding: 6px 12px; border-radius: 14px; background: rgba(0,0,0,.8); color: #fff; font-size: 12px;
+}
+
+/* Rotom face */
+.ap-rotom-face {
+  --s: 46px;
+  position: relative; display: inline-flex; align-items: center; justify-content: center; gap: calc(var(--s) * .14);
+  width: var(--s); height: var(--s); flex: 0 0 var(--s);
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffb366, #f08c00 55%, #b35900);
+  box-shadow: 0 0 calc(var(--s) * .25) rgba(255,160,40,.8);
+}
+.ap-rotom-face i {
+  width: calc(var(--s) * .2); height: calc(var(--s) * .3);
+  border-radius: 50%; background: #5ad1ff; box-shadow: inset 0 0 0 calc(var(--s) * .04) #fff;
+  animation: ap-blink 4s infinite;
+}
+.ap-rotom-face.avatar { --s: 38px; }
+.ap-rotom-face.small { --s: 32px; }
+.ap-rotom-face.tiny { --s: 14px; box-shadow: none; }
+@keyframes ap-blink { 0%, 94%, 100% { transform: scaleY(1); } 96% { transform: scaleY(.1); } }
+
+/* Home */
+.antipodea-phone .ap-home { display: flex; flex-direction: column; gap: 14px; min-height: 100%; }
+.antipodea-phone .ap-widget { text-align: center; padding: 8px 0 2px; text-shadow: 0 2px 6px rgba(0,0,0,.35); }
+.antipodea-phone .ap-widget-time { font-size: 52px; font-weight: 200; line-height: 1; }
+.antipodea-phone .ap-widget-date { font-size: 14px; opacity: .9; }
+.antipodea-phone .ap-rotom-home {
+  display: flex; align-items: center; gap: 10px;
+  padding: 8px 10px; border: none; border-radius: 16px;
+  background: rgba(0,0,0,.25); color: #fff; text-align: left;
+}
+.antipodea-phone .ap-rotom-home:hover { box-shadow: none; background: rgba(0,0,0,.35); }
+.antipodea-phone .ap-bubble {
+  position: relative; flex: 1;
+  padding: 8px 10px; border-radius: 14px; background: #fff; color: var(--ap-ink); font-size: 13px; line-height: 1.3;
+}
+.antipodea-phone .ap-bubble.quiet { background: rgba(255,255,255,.15); color: #fff; font-style: italic; }
+.antipodea-phone .ap-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px 6px; }
+.antipodea-phone .ap-icon {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 0; border: none; background: none; color: #fff;
+}
+.antipodea-phone .ap-icon:hover { box-shadow: none; }
+.antipodea-phone .ap-icon:hover .ap-icon-tile { transform: scale(1.06); }
+.antipodea-phone .ap-icon-tile {
+  position: relative; width: 54px; height: 54px; border-radius: 15px;
+  display: flex; align-items: center; justify-content: center;
+  background: linear-gradient(160deg, color-mix(in srgb, var(--tile) 75%, #fff), var(--tile));
+  box-shadow: 0 3px 8px rgba(0,0,0,.3);
+  font-size: 24px; transition: transform .1s;
+}
+.antipodea-phone .ap-icon.locked .ap-icon-tile { filter: grayscale(.8) brightness(.7); }
+.antipodea-phone .ap-lock { position: absolute; right: 4px; bottom: 4px; font-size: 12px; }
+.antipodea-phone .ap-icon-label { font-size: 11px; text-shadow: 0 1px 3px rgba(0,0,0,.6); white-space: nowrap; }
+.antipodea-phone .ap-count {
+  position: absolute; top: -5px; right: 8px; min-width: 20px; height: 20px; padding: 0 5px;
+  border-radius: 10px; background: #fa5252; color: #fff; font-size: 11px; font-weight: 700;
+  display: flex; align-items: center; justify-content: center; border: 2px solid #fff;
+}
+.antipodea-phone .ap-count.inline { position: static; border: none; }
+.antipodea-phone .ap-upnext { margin-top: auto; padding: 10px; border-radius: 16px; background: rgba(0,0,0,.25); }
+.antipodea-phone .ap-upnext h5 { margin: 0 0 6px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; border: none; }
+.antipodea-phone .ap-upnext-row { display: flex; justify-content: space-between; gap: 8px; font-size: 12px; padding: 2px 0; }
+.antipodea-phone .ap-upnext-row small { opacity: .8; white-space: nowrap; }
+.antipodea-phone .ap-upnext-row.event span::before { content: "\f024"; font-family: "Font Awesome 6 Pro", "Font Awesome 6 Free"; font-weight: 900; margin-right: 5px; font-size: 10px; }
+
+/* Shared bits */
+.antipodea-phone .ap-avatar { width: 38px; height: 38px; flex: 0 0 38px; border-radius: 50%; object-fit: cover; border: none; background: #ddd; }
+.antipodea-phone .ap-avatar.small { width: 28px; height: 28px; flex-basis: 28px; }
+.antipodea-phone .ap-pill {
+  display: inline-flex; align-items: center; justify-content: center; gap: 6px; width: auto;
+  padding: 6px 12px; border: none; border-radius: 16px; background: var(--ap-teal); color: #fff; font-weight: 700;
+}
+.antipodea-phone .ap-pill.small { padding: 4px 10px; font-size: 12px; }
+.antipodea-phone .ap-pill.ghost { background: rgba(0,0,0,.08); color: var(--ap-ink); }
+.antipodea-phone .ap-pill.gm { background: var(--ap-ochre); }
+.antipodea-phone .ap-pill[disabled] { opacity: .4; }
+.antipodea-phone .ap-round {
+  flex: 0 0 34px; width: 34px; height: 34px; padding: 0; border-radius: 50%; border: none;
+  background: rgba(0,0,0,.07); color: var(--ap-ink); line-height: 1;
+}
+.antipodea-phone .ap-round.send { background: #2fb34a; color: #fff; }
+.antipodea-phone .ap-emptystate { text-align: center; padding: 50px 20px; color: #777; }
+.antipodea-phone .ap-emptystate > i { font-size: 40px; color: #bbb; }
+.antipodea-phone .ap-emptystate.small { padding: 20px; }
+.antipodea-phone .ap-hint-center { text-align: center; color: #888; font-size: 12px; list-style: none; }
+.antipodea-phone .ap-link.danger { color: var(--ap-red); }
+.antipodea-phone .ap-row input,
+.antipodea-phone .ap-row select { flex: 1; min-width: 0; }
+.antipodea-phone input[type=text], .antipodea-phone input[type=time],
+.antipodea-phone select, .antipodea-phone textarea { color: var(--ap-ink); background: #fff; }
+
+/* Messages list */
+.antipodea-phone .ap-threads, .antipodea-phone .ap-contacts { list-style: none; margin: 0 -14px; padding: 0; }
+.antipodea-phone .ap-threads li button,
+.antipodea-phone .ap-contact-main {
+  display: flex; align-items: center; gap: 10px; width: 100%;
+  padding: 10px 14px; border: none; border-radius: 0; background: none; text-align: left; color: var(--ap-ink);
+  border-bottom: 1px solid rgba(0,0,0,.06);
+}
+.antipodea-phone .ap-threads li button:hover,
+.antipodea-phone .ap-contact-main:hover { background: rgba(0,0,0,.04); box-shadow: none; }
+.antipodea-phone .ap-thread-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.antipodea-phone .ap-thread-text small { color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.antipodea-phone .ap-thread-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: #999; }
+
+/* Contacts */
+.antipodea-phone .ap-mynumber { text-align: center; font-size: 12px; color: #777; margin-bottom: 8px; }
+.antipodea-phone .ap-mynumber strong { color: var(--ap-ink); font-family: "Courier New", monospace; }
+.antipodea-phone .ap-contacts li { display: flex; align-items: center; }
+.antipodea-phone .ap-contacts li .ap-x { margin-right: 10px; }
+.antipodea-phone .ap-contacts.directory li { gap: 10px; padding: 8px 14px; border-bottom: 1px solid rgba(0,0,0,.06); }
+.antipodea-phone .ap-contact-go { color: #2fb34a; }
+
+/* Thread */
+.antipodea-phone .app-thread .ap-content { display: flex; flex-direction: column; padding: 0; background: #fff; }
+.antipodea-phone .ap-thread-head {
+  display: flex; align-items: center; gap: 10px; padding: 8px 14px; border-bottom: 1px solid #eee;
+}
+.antipodea-phone .ap-thread-head small { display: block; color: #888; font-family: "Courier New", monospace; }
+.antipodea-phone .ap-bubbles { flex: 1; display: flex; flex-direction: column; gap: 4px; padding: 10px 12px; }
+.antipodea-phone .ap-dayline { align-self: center; font-size: 10px; color: #999; margin: 8px 0 4px; text-transform: uppercase; letter-spacing: 1px; }
+.antipodea-phone .ap-msg {
+  max-width: 78%; padding: 7px 10px; border-radius: 16px; font-size: 13px; line-height: 1.35;
+  display: flex; flex-direction: column; gap: 4px; word-wrap: break-word;
+}
+.antipodea-phone .ap-msg small { font-size: 9px; opacity: .6; align-self: flex-end; }
+.antipodea-phone .ap-msg.theirs { align-self: flex-start; background: #e9ecef; color: var(--ap-ink); border-bottom-left-radius: 4px; }
+.antipodea-phone .ap-msg.mine { align-self: flex-end; background: #2fb34a; color: #fff; border-bottom-right-radius: 4px; }
+.antipodea-phone .is-rotom .ap-msg.mine { background: #1f7a7a; }
+.antipodea-phone .ap-msg-img { max-width: 100%; border-radius: 10px; border: none; cursor: zoom-in; }
+.antipodea-phone .ap-composer { position: sticky; bottom: 0; background: #fff; border-top: 1px solid #eee; padding: 8px 10px; }
+.antipodea-phone .ap-composer-row { display: flex; align-items: center; gap: 6px; }
+.antipodea-phone .ap-composer-row input { flex: 1; border-radius: 16px; padding: 0 12px; height: 34px; }
+.antipodea-phone .ap-attached { position: relative; display: inline-block; margin-bottom: 6px; }
+.antipodea-phone .ap-attached img { height: 70px; border-radius: 8px; border: none; }
+.antipodea-phone .ap-attached .ap-x { position: absolute; top: -6px; right: -6px; background: #fff; border-radius: 50%; }
+
+/* Photo strips and gallery */
+.antipodea-phone .ap-strip { display: flex; gap: 6px; overflow-x: auto; padding: 4px 0 8px; }
+.antipodea-phone .ap-strip img {
+  flex: 0 0 64px; width: 64px; height: 64px; object-fit: cover; border-radius: 8px; border: 3px solid transparent; cursor: pointer;
+}
+.antipodea-phone .ap-strip img.selected { border-color: #d6336c; }
+.antipodea-phone .ap-strip-add { flex: 0 0 64px; width: 64px; height: 64px; border-radius: 8px; font-size: 20px; }
+.antipodea-phone .app-gallery .ap-content, .antipodea-phone .app-photo .ap-content,
+.antipodea-phone .app-camera .ap-content { background: #111; color: #eee; }
+.antipodea-phone .ap-gallery { display: grid; grid-template-columns: repeat(3, 1fr); gap: 3px; margin: -14px; }
+.antipodea-phone .ap-gallery button { padding: 0; border: none; border-radius: 0; aspect-ratio: 1; background: #222; }
+.antipodea-phone .ap-gallery img { width: 100%; height: 100%; object-fit: cover; border: none; display: block; }
+.antipodea-phone .ap-photo-full { width: 100%; border-radius: 10px; border: none; cursor: zoom-in; }
+.antipodea-phone .ap-photo-actions { display: flex; flex-direction: column; gap: 10px; }
+.antipodea-phone .ap-photo-actions .ap-row { display: flex; gap: 6px; }
+
+/* Camera */
+.antipodea-phone .ap-camera { display: flex; flex-direction: column; align-items: center; gap: 18px; height: 100%; }
+.antipodea-phone .ap-viewfinder {
+  position: relative; width: 100%; flex: 1; min-height: 300px; border-radius: 14px;
+  background: linear-gradient(160deg, #222, #333);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 20px; color: #aaa;
+}
+.antipodea-phone .ap-viewfinder > i { font-size: 46px; margin-bottom: 10px; }
+.antipodea-phone .ap-viewfinder .c { position: absolute; width: 24px; height: 24px; border: 3px solid #fff; opacity: .7; }
+.antipodea-phone .ap-viewfinder .tl { top: 12px; left: 12px; border-right: none; border-bottom: none; }
+.antipodea-phone .ap-viewfinder .tr { top: 12px; right: 12px; border-left: none; border-bottom: none; }
+.antipodea-phone .ap-viewfinder .bl { bottom: 12px; left: 12px; border-right: none; border-top: none; }
+.antipodea-phone .ap-viewfinder .br { bottom: 12px; right: 12px; border-left: none; border-top: none; }
+.antipodea-phone .ap-shutter {
+  width: 70px; height: 70px; flex: 0 0 70px; padding: 0; border-radius: 50%; border: 4px solid #fff; background: none;
+  display: flex; align-items: center; justify-content: center;
+}
+.antipodea-phone .ap-shutter span { width: 54px; height: 54px; border-radius: 50%; background: #fff; transition: transform .1s; }
+.antipodea-phone .ap-shutter:active span { transform: scale(.85); }
+.antipodea-phone .ap-shutter[disabled] { opacity: .3; }
+.antipodea-phone .ap-camera-row { display: flex; gap: 8px; }
+.antipodea-phone .ap-camera .ap-pill.ghost { background: rgba(255,255,255,.12); color: #fff; }
+
+/* PokéGram */
+.antipodea-phone .app-pokegram .ap-content { padding: 0 0 10px; background: #fafafa; }
+.antipodea-phone .ap-pg-brand {
+  padding: 10px 14px 6px; font-size: 24px; font-weight: 800; font-style: italic;
+  background: linear-gradient(90deg, #a61e4d, #f08c00); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.antipodea-phone .ap-pg-filter { display: flex; justify-content: space-between; align-items: center; padding: 4px 14px 8px; font-weight: 700; }
+.antipodea-phone .ap-pg-filter small { color: #888; font-weight: 400; }
+.antipodea-phone .ap-post { background: #fff; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin-bottom: 10px; }
+.antipodea-phone .ap-post header { display: flex; align-items: center; gap: 8px; padding: 8px 12px; }
+.antipodea-phone .ap-post header small { margin-left: auto; color: #999; }
+.antipodea-phone .ap-post-author { display: flex; align-items: center; gap: 8px; width: auto; padding: 0; border: none; background: none; color: var(--ap-ink); }
+.antipodea-phone .ap-post-author:hover { box-shadow: none; text-decoration: underline; }
+.antipodea-phone .ap-post-img { width: 100%; display: block; border: none; border-radius: 0; max-height: 420px; object-fit: cover; cursor: zoom-in; }
+.antipodea-phone .ap-post-actions { display: flex; align-items: center; gap: 8px; padding: 6px 12px 0; }
+.antipodea-phone .ap-heart { width: auto; padding: 0; border: none; background: none; font-size: 22px; color: var(--ap-ink); }
+.antipodea-phone .ap-heart:hover { box-shadow: none; }
+.antipodea-phone .ap-heart.liked { color: #e03131; }
+.antipodea-phone .ap-likes { font-weight: 700; font-size: 13px; }
+.antipodea-phone .ap-caption, .antipodea-phone .ap-comment { margin: 4px 12px; font-size: 13px; }
+.antipodea-phone .ap-comment { color: #444; }
+.antipodea-phone .ap-comment-row { display: flex; align-items: center; gap: 6px; padding: 6px 12px 8px; }
+.antipodea-phone .ap-comment-row input { flex: 1; border: none; border-bottom: 1px solid #eee; border-radius: 0; background: transparent; }
+.antipodea-phone .ap-compose-preview { width: 100%; border-radius: 10px; border: none; margin-bottom: 6px; }
+.antipodea-phone .ap-caption-input { width: 100%; resize: none; border-radius: 10px; padding: 8px; font-family: inherit; }
+.antipodea-phone .app-compose .ap-share,
+.antipodea-phone .ap-photo-actions .ap-share { background: linear-gradient(90deg, #d6336c, #f08c00); }
+
+/* Calendar */
+.antipodea-phone .ap-cal-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.antipodea-phone .ap-cal-title { width: auto; border: none; background: none; font-size: 17px; font-weight: 800; color: var(--ap-ink); }
+.antipodea-phone .ap-cal-title:hover { box-shadow: none; color: #e03131; }
+.antipodea-phone .ap-cal { display: grid; grid-template-columns: repeat(var(--cols, 7), 1fr); gap: 3px; }
+.antipodea-phone .ap-cal-wd { text-align: center; font-size: 10px; color: #999; text-transform: uppercase; }
+.antipodea-phone .ap-cal-day {
+  position: relative; aspect-ratio: 1; padding: 0; border: none; border-radius: 50%;
+  background: none; color: var(--ap-ink); font-size: 13px; line-height: 1;
+}
+.antipodea-phone .ap-cal-day:hover { box-shadow: none; background: rgba(0,0,0,.06); }
+.antipodea-phone .ap-cal-day.today { color: #e03131; font-weight: 800; }
+.antipodea-phone .ap-cal-day.selected { background: #e03131; color: #fff; }
+.antipodea-phone .ap-cal-day i { position: absolute; bottom: 4px; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #1f7a7a; }
+.antipodea-phone .ap-cal-day.selected i { background: #fff; }
+.antipodea-phone .ap-agenda { list-style: none; margin: 0; padding: 0; }
+.antipodea-phone .ap-agenda li {
+  display: flex; align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 5px;
+  border-radius: 10px; background: #fff; border-left: 4px solid #1f7a7a;
+}
+.antipodea-phone .ap-agenda li.event { border-left-color: var(--ap-ochre); }
+.antipodea-phone .ap-agenda li.event > i { color: var(--ap-ochre); }
+.antipodea-phone .ap-agenda li.done .ap-what { text-decoration: line-through; opacity: .5; }
+.antipodea-phone .ap-agenda li.ap-hint { background: none; border: none; color: #999; }
+.antipodea-phone .ap-agenda.compact li { padding: 4px 8px; }
+.antipodea-phone .ap-tick { width: 22px; height: 22px; flex: 0 0 22px; padding: 0; border: none; background: none; color: #1f7a7a; font-size: 18px; line-height: 1; }
+.antipodea-phone .ap-cal-add { display: flex; flex-direction: column; gap: 6px; margin: 8px 0; }
+.antipodea-phone .ap-cal-add .ap-row { display: flex; gap: 6px; }
+.antipodea-phone .ap-cal-add input[type=time] { width: 110px; }
+
+/* Toasts */
+#antipodea-toasts {
+  position: fixed; top: 12px; left: 50%; transform: translateX(-50%); z-index: 10000;
+  display: flex; flex-direction: column; gap: 8px; pointer-events: none;
+}
+.ap-toast {
+  pointer-events: auto; cursor: pointer;
+  display: flex; align-items: center; gap: 10px;
+  width: 340px; padding: 10px 12px; border-radius: 18px;
+  background: rgba(30,30,32,.92); color: #fff; backdrop-filter: blur(6px);
+  box-shadow: 0 8px 24px rgba(0,0,0,.4);
+  font-family: "Signika", system-ui, sans-serif;
+  animation: ap-toast-in .25s ease-out;
+}
+.ap-toast.out { opacity: 0; transform: translateY(-10px); transition: all .5s; }
+.ap-toast.rotom { background: linear-gradient(90deg, rgba(179,89,0,.95), rgba(240,140,0,.95)); }
+.ap-toast img { width: 36px; height: 36px; border-radius: 50%; object-fit: cover; border: none; flex: 0 0 36px; }
+.ap-toast-icon { width: 36px; height: 36px; flex: 0 0 36px; border-radius: 10px; background: #1f7a7a; display: flex; align-items: center; justify-content: center; }
+.ap-toast-text { display: flex; flex-direction: column; min-width: 0; font-size: 13px; }
+.ap-toast-text span { opacity: .9; overflow: hidden; text-overflow: ellipsis; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+@keyframes ap-toast-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
+.antipodea-phone .ap-hint { font-size: 12px; color: #888; }
+.antipodea-phone .ap-msg-img { width: 200px; }

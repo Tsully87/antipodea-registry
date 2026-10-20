@@ -1,0 +1,36 @@
+<div class="ap-pg-brand">PokéGram</div>
+{{#if filterName}}
+<div class="ap-pg-filter">
+  <span>@{{filterName}} <small>{{filterPosts}} posts</small></span>
+  <button type="button" class="ap-link" data-action="apFeedAuthor" data-author="">Show everyone</button>
+</div>
+{{/if}}
+
+{{#each feed}}
+<article class="ap-post">
+  <header>
+    <button type="button" class="ap-post-author" data-action="apFeedAuthor" data-author="{{author}}">
+      <img class="ap-avatar small" src="{{authorImg}}" alt=""><strong>{{authorName}}</strong>
+    </button>
+    <small>{{date}}</small>
+    {{#if canDelete}}<button type="button" class="ap-x" data-action="apDeletePost" data-post="{{id}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>{{/if}}
+  </header>
+  <img class="ap-post-img" src="{{img}}" alt="" data-action="apPhotoFull" data-src="{{img}}">
+  <div class="ap-post-actions">
+    <button type="button" class="ap-heart {{#if liked}}liked{{/if}}" data-action="apLike" data-post="{{id}}"><i class="fa-{{#if liked}}solid{{else}}regular{{/if}} fa-heart"></i></button>
+    <span class="ap-likes">{{likeLabel}}</span>
+  </div>
+  {{#if caption}}<p class="ap-caption"><strong>{{authorName}}</strong> {{caption}}</p>{{/if}}
+  {{#each comments}}<p class="ap-comment"><strong>{{name}}</strong> {{text}}</p>{{/each}}
+  <div class="ap-comment-row">
+    <input type="text" data-draft="comment-{{id}}" data-enter="apComment" data-post="{{id}}" value="{{draft}}" placeholder="Add a comment...">
+    <button type="button" class="ap-link" data-action="apComment" data-post="{{id}}">Post</button>
+  </div>
+</article>
+{{else}}
+<div class="ap-emptystate">
+  <i class="fa-solid fa-camera-retro"></i>
+  <p>Nothing on the feed yet.</p>
+  <button type="button" class="ap-pill" data-action="apCompose">Make the first post</button>
+</div>
+{{/each}}

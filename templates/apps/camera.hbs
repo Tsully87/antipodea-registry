@@ -1,0 +1,13 @@
+<div class="ap-camera">
+  <div class="ap-viewfinder">
+    <span class="c tl"></span><span class="c tr"></span><span class="c bl"></span><span class="c br"></span>
+    <i class="fa-solid fa-camera"></i>
+    <p>{{#if canSnap}}Snaps what you can see on the map right now.{{else}}No scene open to photograph.{{/if}}</p>
+  </div>
+  <button type="button" class="ap-shutter" data-action="apSnap" data-tooltip="Take photo" {{#unless canSnap}}disabled{{/unless}}><span></span></button>
+  <div class="ap-camera-row">
+    <button type="button" class="ap-pill" data-action="apUpload"><i class="fa-solid fa-upload"></i> Upload a picture</button>
+    <button type="button" class="ap-pill ghost" data-action="apGo" data-app="gallery"><i class="fa-solid fa-images"></i> Gallery</button>
+  </div>
+  {{#unless signal}}<p class="ap-warn">No signal. Photos save once the GM is online.</p>{{/unless}}
+</div>

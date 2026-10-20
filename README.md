@@ -1,8 +1,25 @@
 # Antipodea Trainer Registry
 
-Digital Trainer Cards and Riding Licences for the Antipodea Pokémon Westmarch, shown on an in-game phone in Foundry VTT v13.
+The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13.
 
-## What it does
+## Apps
+
+- **Messages:** text other trainers. Open an NPC's phone to text as them. Attach photos.
+- **Contacts:** everyone's number, plus the Antipodea directory (player trainers and NPCs you mark as listed).
+- **PokéGram:** shared photo feed with likes and comments, mirrored to Discord if you set a webhook.
+- **Camera:** snap what you can see on the map, or upload a picture.
+- **Gallery:** view, post, send or delete photos.
+- **Calendar:** month view on the world clock, reminders, and GM public events.
+- **Trainer Card** and **Licence** (below).
+- **Registry:** GM only. Card, licence, fines and the phone settings for that trainer.
+
+### Rotom Phones
+Tick **Rotom Phone** in a trainer's Registry tab. Their phone glows orange, their Rotom sits on the home screen, and you can type in **Rotom says** to pop a message up on their screen. Their replies come to you.
+
+### Needs a GM online
+Texts, posts and photos are saved by the GM's client. If no GM is logged in, phones show **No signal** and can only read.
+
+## Registry
 
 - **Trainer Card:** photo, Trainer ID, Home Town, Tier and 12 badge slots.
 - **Riding Licence:** Land, Water and Sky endorsements (None, Learner, Full), riding days logged toward the practical test, demerit points and suspensions.
@@ -18,8 +35,10 @@ Digital Trainer Cards and Riding Licences for the Antipodea Pokémon Westmarch, 
 
 ```js
 const reg = game.modules.get("antipodea-registry").api;
-reg.open("Trainer Name");            // opens their phone
-reg.open("Trainer Name", "licence"); // straight to the licence
+reg.open("Trainer Name");               // opens their phone
+reg.open("Trainer Name", "licence");    // straight to an app
+reg.text("Jax Harlow", "Tazz", "lol");  // text as an NPC
+reg.rotomSay("Tazz", "Oi! Look out!");  // speak as their Rotom
 reg.openMine();                      // GM gets a picker
 reg.testDiscord();                   // posts a test message to the webhook
 ```
@@ -34,6 +53,12 @@ reg.testDiscord();                   // posts a test message to the webhook
 | Badge names | Badge 1 to Badge 12, separated by commas |
 | Post to Discord | On |
 | Discord webhook URL | Stored on your user only |
+| Phone: default contacts | Professor Manuka |
+| Phone: PokéGram / Camera / reminders need a Rotom Phone | Off / Off / On |
+| Phone: post PokéGram to Discord | On |
+| Phone: PokéGram Discord webhook URL | Stored on your user only |
+| Phone: pop up new PokéGram posts | On (per player) |
+| Phone: notification sound | On (per player) |
 
 ## Offence table
 

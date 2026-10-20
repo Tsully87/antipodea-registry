@@ -1,0 +1,11 @@
+{{#if gallery.length}}
+<div class="ap-gallery">
+  {{#each gallery}}<button type="button" data-action="apViewPhoto" data-id="{{id}}"><img src="{{src}}" alt=""></button>{{/each}}
+</div>
+{{else}}
+<div class="ap-emptystate">
+  <i class="fa-solid fa-images"></i>
+  <p>No photos yet.</p>
+  <button type="button" class="ap-pill" data-action="apGo" data-app="camera">Open Camera</button>
+</div>
+{{/if}}

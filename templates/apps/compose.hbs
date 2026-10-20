@@ -1,0 +1,13 @@
+{{#if composeImg}}
+<img class="ap-compose-preview" src="{{composeImg}}" alt="">
+{{else}}
+<div class="ap-emptystate small"><i class="fa-solid fa-image"></i><p>Pick a photo below.</p></div>
+{{/if}}
+
+<div class="ap-strip">
+  {{#each galleryStrip}}<img class="{{#if selected}}selected{{/if}}" src="{{src}}" alt="" data-action="apComposePick" data-src="{{src}}">{{/each}}
+  <button type="button" class="ap-strip-add" data-action="apGo" data-app="camera" data-tooltip="Take a photo"><i class="fa-solid fa-camera"></i></button>
+</div>
+
+<textarea class="ap-caption-input" data-draft="caption" placeholder="Write a caption..." rows="3">{{draft}}</textarea>
+<button type="button" class="ap-share" data-action="apPublish" {{#unless signal}}disabled{{/unless}}><i class="fa-solid fa-paper-plane"></i> Share to PokéGram</button>
