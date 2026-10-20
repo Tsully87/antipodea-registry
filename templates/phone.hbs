@@ -1,0 +1,181 @@
+<div class="ap-device">
+  <div class="ap-screen">
+
+    <div class="ap-statusbar">
+      <span class="ap-clock">{{clock}}</span>
+      <span class="ap-notch"></span>
+      <span class="ap-icons"><i class="fa-solid fa-signal"></i><i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-three-quarters"></i></span>
+    </div>
+
+    <div class="ap-appbar">
+      <i class="fa-solid fa-landmark"></i>
+      <span>Antipodea Registry</span>
+    </div>
+
+    <div class="ap-content">
+
+      {{!-- ============ TRAINER CARD ============ --}}
+      {{#if tabs.card}}
+      <section class="ap-card ap-trainer tier-{{card.tierClass}}">
+        <div class="ap-card-pattern"></div>
+        <header class="ap-card-head">
+          <span class="ap-ball"></span>
+          <div>
+            <div class="ap-kicker">ANTIPODEA</div>
+            <div class="ap-title">TRAINER CARD</div>
+          </div>
+        </header>
+        <div class="ap-card-body">
+          <img class="ap-photo" src="{{photo}}" alt="">
+          <dl class="ap-fields">
+            <dt>Name</dt><dd>{{name}}</dd>
+            <dt>Trainer ID</dt><dd class="ap-mono">{{card.trainerId}}</dd>
+            <dt>Home Town</dt><dd>{{card.homeTown}}</dd>
+            <dt>Tier</dt><dd><span class="ap-tier">{{card.tier}} Tier</span></dd>
+          </dl>
+        </div>
+        <div class="ap-badges-label">Badges <span>{{card.badgeCount}} / {{card.badgeTotal}}</span></div>
+        <div class="ap-badges">
+          {{#each card.badges}}
+          <span class="ap-badge {{#if earned}}earned{{/if}}" data-tooltip="{{name}}">{{#if earned}}<i class="fa-solid fa-star"></i>{{/if}}</span>
+          {{/each}}
+        </div>
+        <div class="ap-holo"><i class="fa-solid fa-leaf"></i> Issued by Bunya Research Station</div>
+      </section>
+      <button type="button" class="ap-share" data-action="share"><i class="fa-solid fa-share-from-square"></i> Show to the table</button>
+      {{/if}}
+
+      {{!-- ============ RIDING LICENCE ============ --}}
+      {{#if tabs.licence}}
+      {{#if licence.has}}
+      <section class="ap-card ap-licence style-{{licence.style}} {{#if licence.suspended}}is-suspended{{/if}}">
+        <div class="ap-card-pattern"></div>
+        <header class="ap-card-head">
+          {{#if (eq licence.style "learner")}}<span class="ap-lplate">L</span>{{else}}<span class="ap-crest"><i class="fa-solid fa-id-card"></i></span>{{/if}}
+          <div>
+            <div class="ap-kicker">ANTIPODEA RIDING LICENCE</div>
+            <div class="ap-title">{{licence.heading}}</div>
+          </div>
+        </header>
+        <div class="ap-card-body">
+          <img class="ap-photo" src="{{photo}}" alt="">
+          <dl class="ap-fields">
+            <dt>Name</dt><dd>{{name}}</dd>
+            <dt>Licence No.</dt><dd class="ap-mono">{{licence.licenceNo}}</dd>
+            <dt>First issued</dt><dd>{{licence.issued}}</dd>
+          </dl>
+        </div>
+        <div class="ap-endorsements">
+          {{#each licence.endorsements}}
+          <div class="ap-endo status-{{status}}" data-tooltip="{{label}}: {{statusLabel}}{{#if office}} ({{office}}){{/if}}">
+            <i class="fa-solid {{icon}}"></i>
+            <span class="ap-endo-label">{{label}}</span>
+            <span class="ap-endo-status">{{#if isLearner}}L{{else}}{{#if isFull}}FULL{{else}}n/a{{/if}}{{/if}}</span>
+            {{#if isLearner}}<span class="ap-endo-days {{#if daysDone}}done{{/if}}">{{days}}/{{daysNeeded}} days</span>{{/if}}
+          </div>
+          {{/each}}
+        </div>
+        <div class="ap-demerit-bar">
+          <div class="ap-demerit-label">Demerit points <span>{{licence.points}} / {{licence.limit}}</span></div>
+          <div class="ap-segments">
+            {{#each licence.segments}}<span class="ap-seg {{#if filled}}filled{{/if}} {{#if danger}}danger{{/if}}"></span>{{/each}}
+          </div>
+        </div>
+        {{#if licence.suspended}}
+        <div class="ap-stamp">SUSPENDED<small>until {{licence.suspendedUntil}} ({{licence.suspendedDaysLeft}} day{{#unless (eq licence.suspendedDaysLeft 1)}}s{{/unless}})</small></div>
+        {{/if}}
+        <div class="ap-holo"><i class="fa-solid fa-shield-halved"></i> Antipodea Trainer Registry</div>
+      </section>
+
+      <h4 class="ap-subhead">Active demerits</h4>
+      {{#if licence.demerits.length}}
+      <ul class="ap-list">
+        {{#each licence.demerits}}
+        <li>
+          <span class="ap-pts">{{points}}</span>
+          <span class="ap-what">{{offence}}<small>{{issuedLabel}}, drops off {{expiresLabel}} ({{daysLeft}}d)</small></span>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="ap-empty">Clean record. Keep it that way, legend.</p>
+      {{/if}}
+      <button type="button" class="ap-share" data-action="share"><i class="fa-solid fa-share-from-square"></i> Show to the table</button>
+      {{else}}
+      <section class="ap-nolicence">
+        <i class="fa-solid fa-person-walking"></i>
+        <h3>No riding licence on file</h3>
+        <p>Pass the written test at any Registry office ($200) to get your L-plates for Land, Water or Sky.</p>
+      </section>
+      {{/if}}
+      {{/if}}
+
+      {{!-- ============ GM ADMIN ============ --}}
+      {{#if tabs.admin}}
+      <section class="ap-admin">
+        {{#unless admin.discordOn}}<p class="ap-warn"><i class="fa-brands fa-discord"></i> Discord posting is off or has no webhook. Set it in module settings.</p>{{/unless}}
+
+        <h4>Trainer Card</h4>
+        <label>Trainer ID <input type="text" data-field="trainerId" value="{{admin.trainerIdRaw}}"></label>
+        <label>Home Town <input type="text" data-field="homeTown" value="{{admin.homeTownRaw}}" placeholder="Where they came from"></label>
+        <label>Tier
+          <select data-field="tier">{{#each admin.tiers}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{value}} Tier</option>{{/each}}</select>
+        </label>
+        <label>Card photo
+          <span class="ap-row"><input type="text" data-field="photo" value="{{admin.photoRaw}}" placeholder="Uses the actor image"><button type="button" data-action="pickPhoto"><i class="fa-solid fa-image"></i></button></span>
+        </label>
+        <div class="ap-badge-grid">
+          {{#each card.badges}}
+          <label class="ap-check"><input type="checkbox" data-badge="{{index}}" {{#if earned}}checked{{/if}}> {{name}}</label>
+          {{/each}}
+        </div>
+
+        <h4>Riding Licence</h4>
+        <label>Registry office (for notices) <input type="text" name="office" placeholder="Bunya City"></label>
+        <label>Licence No. <input type="text" data-field="licenceNo" value="{{admin.licenceNoRaw}}"></label>
+        {{#each licence.endorsements}}
+        <div class="ap-endo-admin">
+          <span><i class="fa-solid {{icon}}"></i> {{label}}</span>
+          <select data-licence="{{key}}">{{#each options}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+          <span class="ap-days">
+            <button type="button" data-action="ridingDays" data-key="{{key}}" data-delta="-1">-</button>
+            {{days}}/{{daysNeeded}}
+            <button type="button" data-action="ridingDays" data-key="{{key}}" data-delta="1">+</button>
+          </span>
+        </div>
+        {{/each}}
+        <p class="hint">Changing an endorsement to Learner or Full posts the issue notice.</p>
+
+        <h4>Offences</h4>
+        <div class="ap-btns">
+          <button type="button" class="ap-danger" data-action="issueFine"><i class="fa-solid fa-gavel"></i> Issue fine</button>
+          <button type="button" data-action="communityService"><i class="fa-solid fa-broom"></i> Community Service (-1 pt)</button>
+        </div>
+        {{#if licence.suspended}}
+        <button type="button" data-action="clearSuspension"><i class="fa-solid fa-unlock"></i> End suspension now</button>
+        {{/if}}
+        <p class="hint">Unlicensed riding fines so far: {{admin.unlicensedFines}} <button type="button" class="ap-link" data-action="resetUnlicensed">reset</button></p>
+        {{#if admin.allDemerits.length}}
+        <ul class="ap-list ap-list-admin">
+          {{#each admin.allDemerits}}
+          <li class="{{#if expired}}expired{{/if}}">
+            <span class="ap-pts">{{points}}</span>
+            <span class="ap-what">{{offence}}<small>{{issuedLabel}} to {{expiresLabel}}{{#if officer}}, {{officer}}{{/if}}</small></span>
+            <button type="button" class="ap-x" data-action="removeDemerit" data-id="{{id}}" data-tooltip="Remove"><i class="fa-solid fa-xmark"></i></button>
+          </li>
+          {{/each}}
+        </ul>
+        {{/if}}
+        <button type="button" class="ap-link" data-action="newIds">Regenerate Trainer ID and Licence No.</button>
+      </section>
+      {{/if}}
+    </div>
+
+    <nav class="ap-nav">
+      <button type="button" data-action="tab" data-tab="card" class="{{#if tabs.card}}active{{/if}}"><i class="fa-solid fa-id-badge"></i><span>Trainer Card</span></button>
+      <button type="button" data-action="tab" data-tab="licence" class="{{#if tabs.licence}}active{{/if}}"><i class="fa-solid fa-id-card"></i><span>Licence</span></button>
+      {{#if isGM}}<button type="button" data-action="tab" data-tab="admin" class="{{#if tabs.admin}}active{{/if}}"><i class="fa-solid fa-user-shield"></i><span>Registry</span></button>{{/if}}
+    </nav>
+    <div class="ap-homebar"></div>
+  </div>
+</div>

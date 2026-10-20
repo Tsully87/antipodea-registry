@@ -1,0 +1,28 @@
+{
+  "id": "antipodea-registry",
+  "title": "Antipodea Trainer Registry",
+  "description": "Digital Trainer Cards and Riding Licences for the Antipodea Pokémon Westmarch, shown on an in-game phone. Tracks badges, Land, Water and Sky endorsements, demerit points and suspensions, runs off the Seasons & Stars world clock and posts notices to Discord.",
+  "version": "1.0.0",
+  "authors": [
+    { "name": "Tony (RedSavage1987)" }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13"
+  },
+  "relationships": {
+    "recommends": [
+      {
+        "id": "seasons-and-stars",
+        "type": "module",
+        "reason": "Shows in-game dates on cards and fines. The module still works off core world time without it."
+      }
+    ]
+  },
+  "esmodules": ["scripts/main.js"],
+  "styles": ["styles/registry.css"],
+  "url": "https://github.com/OWNER/REPO",
+  "manifest": "https://github.com/OWNER/REPO/releases/latest/download/module.json",
+  "download": "https://github.com/OWNER/REPO/releases/download/v1.0.0/module.zip",
+  "flags": {}
+}
