@@ -28,7 +28,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     window: { icon: "fa-solid fa-mobile-screen-button", resizable: false, minimizable: true },
     position: { width: 380, height: 780 },
     actions: {
-      tab: RegistryPhone.#onTab,
+      phoneTab: RegistryPhone.#onTab,
       share: RegistryPhone.#onShare,
       issueFine: RegistryPhone.#onIssueFine,
       communityService: RegistryPhone.#onCommunityService,
@@ -152,6 +152,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       licence: {
         has: hasFull || hasLearner,
         style: hasFull ? "full" : hasLearner ? "learner" : "none",
+        isLearnerStyle: !hasFull && hasLearner,
         heading: hasFull ? "FULL" : "LEARNER",
         licenceNo: record.licenceNo || "--------",
         issued: Time.formatLong(firstIssued),
@@ -160,6 +161,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
         suspended,
         suspendedUntil: Time.formatShort(record.suspendedUntil),
         suspendedDaysLeft: Time.daysUntil(record.suspendedUntil),
+        suspendedPlural: Time.daysUntil(record.suspendedUntil) !== 1,
         demerits
       },
       admin: {

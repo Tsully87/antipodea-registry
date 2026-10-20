@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.0.1
+- Fixed the bottom nav buttons on the phone not responding (Foundry v13 reserves the "tab" action).
+- Removed the template's reliance on the eq helper.
+
 ## 1.0.0
 - Phone window with a Trainer Card and a Riding Licence tab for every trainer.
 - Trainer Card: photo, Trainer ID, Home Town, Tier and 12 badge slots.

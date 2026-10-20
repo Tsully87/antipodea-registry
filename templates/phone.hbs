@@ -51,7 +51,7 @@
       <section class="ap-card ap-licence style-{{licence.style}} {{#if licence.suspended}}is-suspended{{/if}}">
         <div class="ap-card-pattern"></div>
         <header class="ap-card-head">
-          {{#if (eq licence.style "learner")}}<span class="ap-lplate">L</span>{{else}}<span class="ap-crest"><i class="fa-solid fa-id-card"></i></span>{{/if}}
+          {{#if licence.isLearnerStyle}}<span class="ap-lplate">L</span>{{else}}<span class="ap-crest"><i class="fa-solid fa-id-card"></i></span>{{/if}}
           <div>
             <div class="ap-kicker">ANTIPODEA RIDING LICENCE</div>
             <div class="ap-title">{{licence.heading}}</div>
@@ -82,7 +82,7 @@
           </div>
         </div>
         {{#if licence.suspended}}
-        <div class="ap-stamp">SUSPENDED<small>until {{licence.suspendedUntil}} ({{licence.suspendedDaysLeft}} day{{#unless (eq licence.suspendedDaysLeft 1)}}s{{/unless}})</small></div>
+        <div class="ap-stamp">SUSPENDED<small>until {{licence.suspendedUntil}} ({{licence.suspendedDaysLeft}} day{{#if licence.suspendedPlural}}s{{/if}})</small></div>
         {{/if}}
         <div class="ap-holo"><i class="fa-solid fa-shield-halved"></i> Antipodea Trainer Registry</div>
       </section>
@@ -172,9 +172,9 @@
     </div>
 
     <nav class="ap-nav">
-      <button type="button" data-action="tab" data-tab="card" class="{{#if tabs.card}}active{{/if}}"><i class="fa-solid fa-id-badge"></i><span>Trainer Card</span></button>
-      <button type="button" data-action="tab" data-tab="licence" class="{{#if tabs.licence}}active{{/if}}"><i class="fa-solid fa-id-card"></i><span>Licence</span></button>
-      {{#if isGM}}<button type="button" data-action="tab" data-tab="admin" class="{{#if tabs.admin}}active{{/if}}"><i class="fa-solid fa-user-shield"></i><span>Registry</span></button>{{/if}}
+      <button type="button" data-action="phoneTab" data-tab="card" class="{{#if tabs.card}}active{{/if}}"><i class="fa-solid fa-id-badge"></i><span>Trainer Card</span></button>
+      <button type="button" data-action="phoneTab" data-tab="licence" class="{{#if tabs.licence}}active{{/if}}"><i class="fa-solid fa-id-card"></i><span>Licence</span></button>
+      {{#if isGM}}<button type="button" data-action="phoneTab" data-tab="admin" class="{{#if tabs.admin}}active{{/if}}"><i class="fa-solid fa-user-shield"></i><span>Registry</span></button>{{/if}}
     </nav>
     <div class="ap-homebar"></div>
   </div>
