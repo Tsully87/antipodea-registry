@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.0.2
+- Badge names are now separated by commas, since Foundry text settings are single line.
+
 ## 1.0.1
 - Fixed the bottom nav buttons on the phone not responding (Foundry v13 reserves the "tab" action).
 - Removed the template's reliance on the eq helper.

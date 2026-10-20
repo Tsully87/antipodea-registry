@@ -71,8 +71,8 @@ Hooks.once("init", () => {
   });
   game.settings.register(MODULE_ID, "badgeNames", {
     name: "Badge names",
-    hint: "One per line, in order. These label the 12 badge slots on the Trainer Card.",
-    scope: "world", config: true, type: String, default: DEFAULT_BADGES.join("\n"),
+    hint: "Separate with commas, in slot order. These label the badge slots on the Trainer Card.",
+    scope: "world", config: true, type: String, default: DEFAULT_BADGES.join(", "),
     onChange: () => RegistryPhone.refresh()
   });
   game.settings.register(MODULE_ID, "postToDiscord", {

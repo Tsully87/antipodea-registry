@@ -31,7 +31,7 @@ reg.testDiscord();                   // posts a test message to the webhook
 | Demerit point limit | 6 |
 | Suspension length | 14 in-game days |
 | Points expire after | 30 in-game days |
-| Badge names | Badge 1 to Badge 12, one per line |
+| Badge names | Badge 1 to Badge 12, separated by commas |
 | Post to Discord | On |
 | Discord webhook URL | Stored on your user only |
 

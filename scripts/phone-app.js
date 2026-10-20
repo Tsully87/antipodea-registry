@@ -9,7 +9,7 @@ const FilePickerCls = foundry.applications.apps?.FilePicker?.implementation ?? g
 
 export function badgeNames() {
   const raw = game.settings.get(MODULE_ID, "badgeNames") ?? "";
-  const names = raw.split(/\r?\n/).map((s) => s.trim()).filter(Boolean);
+  const names = raw.split(/[\r\n,]+/).map((s) => s.trim()).filter(Boolean);
   return names.length ? names : DEFAULT_BADGES;
 }
 
