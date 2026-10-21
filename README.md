@@ -1,6 +1,6 @@
-# Antipodea Trainer Registry
+# Pokémon Phone
 
-The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13.
+The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13. (Module ID: `antipodea-registry`.)
 
 ## Apps
 
@@ -20,7 +20,7 @@ The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13.
 | Translator | $1,500 | Speak through the phone; posts to chat marked as translated into the chosen language. |
 | Weather | $500 | Today's and tomorrow's weather for your zone, from the Antipodea Weather macro. |
 | Pro Camera | $1,000 | Filters, sharper photos, Pro badge on posts, +1 Contest Introduction for promo content. |
-| PokéMaps | $750 | Region map with every town, your location, distance and travel days (1 Capability = 1 km/h, 8 hrs a day). |
+| PokéMaps | $750 | Region map with every town, your location, distance and travel days (1 Capability = 1 km/h, 8 hrs a day). City maps with labelled spots for places you've been. |
 | PokéPay | $250 | Balance, send money to other trainers, history. No transfers between one player's characters. |
 | Mart Express | $500 | Order items from the "Poké Mart" Items folder at +25%, delivered after 1 in-game day. |
 
@@ -28,6 +28,7 @@ Prices are in the **App Store: prices** setting. Tick or untick apps in a traine
 
 ### Setting up the paid apps
 - **PokéMaps:** set **PokéMaps: map image** to your Region Map. The pins are pre-loaded for every city and town. Set each trainer's location in their Registry tab, or open PokéMaps on their phone, tap a place and hit **Put them here**. Use **Edit pins** then click the map to add places.
+- **City maps:** upload the town or city map to your Forge assets. In PokéMaps, tap the place, hit **Add city map** and pick the image. Open it, hit **Edit spots** and click the map to drop labelled spots (Pokémon Centre, Gym, Mart, Police, Registry, Transport, Food, Landmark, Danger and more), each with a note players see when they tap it. Trainers can only open a city map once they've been there: anywhere you've put them with **Put them here** or their Registry location counts, and it stays unlocked after they leave.
 - **Mart Express:** make an Items folder called **Poké Mart** (subfolders become shop sections). Anything in it with a cost can be ordered.
 - **Weather:** add this block to your **ANTIPODEA WEATHER** macro, on the line just above `if (isAuto) {`:
 
@@ -43,8 +44,15 @@ if (scope?.forecast) {
 ### Rotom Phones
 Tick **Rotom Phone** in a trainer's Registry tab. Their phone glows orange, their Rotom sits on the home screen, and you can type in **Rotom says** to pop a message up on their screen. Their replies come to you.
 
-### Needs a GM online
-Texts, posts, photos, payments, orders and forecasts are handled by the GM's client. If no GM is logged in, phones show **No signal** and can only read. App Store purchases work without a GM.
+### Without a GM online
+Texts, DMs, all three social apps, follows, reminders, App Store purchases and the Weather app work with nobody else logged in. They're saved in the **📱 Pokémon Phone Network** journal, which every player owns. Don't delete or edit it.
+
+- **Photos:** turn on **Upload New Files** for Players (Game Settings > Configure Permissions) so phones can upload them directly. Without it, photos wait for a GM.
+- **PokéPay and Mart Express:** queue while no GM is on and go through when one logs in.
+- **Discord posts:** sent when a GM next logs in.
+- **Weather:** the GM's browser saves a week of forecasts each time it's on.
+
+Whichever GM is online does the queued work, so a bot GM account can take this over later.
 
 ## Registry
 

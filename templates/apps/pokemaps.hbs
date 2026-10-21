@@ -1,3 +1,45 @@
+{{#if city}}
+<div class="ap-maps ap-city">
+  {{#if city.image}}
+  <div class="ap-map-tools">
+    <button type="button" class="ap-round" data-action="apCityZoom" data-delta="-1" {{#unless city.canZoomOut}}disabled{{/unless}}><i class="fa-solid fa-minus"></i></button>
+    <span>{{city.zoom}}x</span>
+    <button type="button" class="ap-round" data-action="apCityZoom" data-delta="1"><i class="fa-solid fa-plus"></i></button>
+    {{#if isGM}}<button type="button" class="ap-pill small {{#unless city.edit}}ghost{{/unless}}" data-action="apCityEdit"><i class="fa-solid fa-location-dot"></i> {{#if city.edit}}Click map to add{{else}}Edit spots{{/if}}</button>{{/if}}
+  </div>
+  <div class="ap-map-scroll ap-city-scroll">
+    <div class="ap-map-wrap" style="width: {{city.width}}px">
+      <img class="ap-city-img {{#if city.edit}}editing{{/if}}" src="{{city.image}}" alt="{{city.pin.name}} map">
+      {{#each city.spots}}
+      <button type="button" class="ap-spot {{#if selected}}selected{{/if}}" style="left: {{left}}%; top: {{top}}%; --spot: {{color}}" data-action="apCitySpot" data-id="{{id}}" data-tooltip="{{name}}"><i class="fa-solid {{icon}}"></i></button>
+      {{/each}}
+    </div>
+  </div>
+  {{else}}
+  <p class="ap-warn">No map for {{city.pin.name}} yet.</p>
+  {{/if}}
+
+  <div class="ap-map-card">
+    {{#if city.here}}<div class="ap-map-here"><i class="fa-solid fa-location-crosshairs"></i> You're in {{city.pin.name}}</div>{{/if}}
+    {{#if city.spot}}
+    <h4><i class="fa-solid {{city.spot.icon}}" style="color: {{city.spot.color}}"></i> {{city.spot.name}}</h4>
+    <small>{{city.spot.typeLabel}}</small>
+    {{#if city.spot.note}}<p class="ap-spot-note">{{city.spot.note}}</p>{{/if}}
+    {{else}}
+    <h4>{{city.pin.name}}</h4>
+    <small>{{city.pin.zone}}</small>
+    <p class="ap-hint">{{#if city.spots.length}}Tap a spot to see what's there.{{else}}No spots marked yet.{{/if}}</p>
+    {{/if}}
+    {{#if isGM}}<div class="ap-row ap-city-gm"><button type="button" class="ap-link" data-action="apCityImage"><i class="fa-solid fa-image"></i> Change map image</button>{{#if city.spot}}<button type="button" class="ap-link danger" data-action="apCityDeleteSpot">Delete spot</button>{{/if}}</div>{{/if}}
+  </div>
+
+  {{#if city.spots.length}}
+  <ul class="ap-places ap-spot-list">
+    {{#each city.spots}}<li><button type="button" data-action="apCitySpot" data-id="{{id}}"><i class="fa-solid {{icon}}" style="color: {{color}}"></i> {{name}}</button></li>{{/each}}
+  </ul>
+  {{/if}}
+</div>
+{{else}}
 <div class="ap-maps">
   {{#if mapImage}}
   <div class="ap-map-tools">
@@ -32,6 +74,13 @@
     {{#if route.noSpeed}}<p class="ap-hint">No speed on the sheet for that, so enter one below.</p>{{/if}}
     <small class="ap-hint">As the Pidgey flies at {{route.kph}} km/h, 8 hours of travel a day.</small>
     {{/if}}
+    {{#if sel.cityOpen}}
+    <button type="button" class="ap-pill small ap-city-btn" data-action="apCityOpen" data-id="{{sel.id}}"><i class="fa-solid fa-map"></i> Open city map</button>
+    {{else if sel.cityLocked}}
+    <p class="ap-city-locked"><i class="fa-solid fa-lock"></i> Visit {{sel.name}} to unlock its city map.</p>
+    {{else if isGM}}
+    <button type="button" class="ap-link" data-action="apCityImage"><i class="fa-solid fa-image"></i> Add city map</button>
+    {{/if}}
     {{#if isGM}}
     <div class="ap-row">
       <button type="button" class="ap-pill small gm" data-action="apMapSetHere"><i class="fa-solid fa-person"></i> Put {{name}} here</button>
@@ -56,3 +105,4 @@
     {{#each placeList}}<li><button type="button" data-action="apMapPin" data-id="{{id}}">{{name}}{{#if here}} <i class="fa-solid fa-person"></i>{{/if}}</button></li>{{/each}}
   </ul>
 </div>
+{{/if}}

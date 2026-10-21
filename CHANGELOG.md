@@ -1,5 +1,17 @@
 # Changelog
 
+## 1.3.0
+- Renamed to **Pokémon Phone** (the module ID stays antipodea-registry, so nothing needs reinstalling).
+- New Phone Network: texts, DMs, posts, likes, comments, reposts, follows and profiles are saved in a hidden journal every player can write to, so they all work with no GM online.
+- Photos upload straight from the player's phone if they have Foundry's Upload New Files permission. Otherwise they queue until a GM is on.
+- PokéPay payments and Mart Express orders queue while no GM is online and go through when one logs in. If one fails (say, not enough money by then), the player gets told next time they're on.
+- Posts made while the GM was offline go to Discord when a GM next logs in (posts older than 2 days are skipped).
+- The GM's browser saves a week of forecasts for every zone, so the Weather app works with no GM online.
+- Existing texts, posts and profiles move into the Phone Network automatically the first time a GM logs in after updating.
+- Ready for a bot GM later: whichever GM is online picks up the queue.
+- PokéMaps city maps: GMs attach a town or city map to any pin and mark labelled spots on it (Pokémon Centre, Gym, Mart, Police, Registry, Transport, Food, Landmark, Danger and more), each with a note. Zoom in and tap a spot to see what's there.
+- City maps unlock once a trainer has been to that place. Every location the GM sets is remembered, so maps stay unlocked after they move on.
+
 ## 1.2.0
 - New social apps: PokéTube (videos with titles, lengths and subscribers) and TikTogepi (full-screen vertical feed with sounds), alongside PokéGram.
 - Social profiles with handles, bios, follower or subscriber counts, Follow/Subscribe, and a grid of posts.

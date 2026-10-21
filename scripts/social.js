@@ -1,5 +1,5 @@
-import { MODULE_ID } from "./constants.js";
 import * as Time from "./time.js";
+import * as Net from "./network.js";
 
 /**
  * Shared engine for the three social apps.
@@ -27,7 +27,6 @@ export const PLATFORMS = {
   }
 };
 
-const S = (key) => game.settings.get(MODULE_ID, key);
 const esc = (s) => foundry.utils.escapeHTML(String(s ?? ""));
 
 /* -------------------------------------------- */
@@ -51,7 +50,7 @@ export function rnd(id, salt) {
 /*  Profiles                                    */
 /* -------------------------------------------- */
 
-export const allProfiles = () => S("social") ?? {};
+export const allProfiles = () => Net.profiles();
 
 export function defaultHandle(actor) {
   return (actor?.name ?? "trainer").replace(/[^A-Za-z0-9_]/g, "").slice(0, 20) || "trainer";
@@ -88,7 +87,7 @@ export function isFollowing(fromId, toId, platform) {
 /* -------------------------------------------- */
 
 export const platformOf = (p) => p.platform || "pokegram";
-export const allPosts = () => S("posts") ?? [];
+export const allPosts = () => Net.posts();
 export const postsOn = (platform) => allPosts().filter((p) => platformOf(p) === platform);
 export const postById = (id) => allPosts().find((p) => p.id === id) ?? null;
 

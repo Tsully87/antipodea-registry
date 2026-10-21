@@ -26,7 +26,7 @@ export async function postToDiscord(content) {
     return true;
   } catch (err) {
     console.error(`${MODULE_ID} | Discord post failed`, err);
-    ui.notifications.warn("Antipodea Registry: couldn't post to Discord. Check the webhook URL in module settings.");
+    ui.notifications.warn("Pokémon Phone: couldn't post to Discord. Check the webhook URL in module settings.");
     return false;
   }
 }

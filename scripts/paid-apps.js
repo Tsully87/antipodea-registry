@@ -54,7 +54,33 @@ export function weatherContext(phone) {
   };
 }
 
+/** One city's map with its labelled spots. */
+function cityContext(phone) {
+  const pin = Maps.pinById(this.cityView);
+  const unlocked = Maps.cityUnlocked(phone, pin);
+  const zoom = this.cityZoom ?? 1;
+  const spots = (pin?.spots ?? []).map((s) => {
+    const t = Maps.SPOT_TYPES[s.type] ?? Maps.SPOT_TYPES.other;
+    return { ...s, icon: t.icon, color: t.color, typeLabel: t.label, left: (+s.x).toFixed(2), top: (+s.y).toFixed(2), selected: s.id === this.citySpot };
+  });
+  const spot = spots.find((s) => s.selected) ?? null;
+  const here = phone.location === pin?.id;
+  return {
+    city: {
+      pin, unlocked, here,
+      image: pin?.cityMap ?? "",
+      zoom, canZoomOut: zoom > 1, width: 352 * zoom,
+      spots, spot,
+      edit: !!this.cityEdit && game.user.isGM,
+      legend: Object.entries(Maps.SPOT_TYPES)
+        .filter(([k]) => spots.some((s) => s.type === k))
+        .map(([k, t]) => ({ key: k, ...t }))
+    }
+  };
+}
+
 export function mapsContext(phone) {
+  if (this.cityView) return cityContext.call(this, phone);
   const all = Maps.pins();
   const here = myPin(phone);
   const sel = all.find((p) => p.id === this.mapSel) ?? null;
@@ -88,7 +114,13 @@ export function mapsContext(phone) {
       selected: sel?.id === p.id
     })),
     here,
-    sel: sel ? { ...sel, kindLabel: Maps.KINDS[sel.kind]?.label ?? "" } : null,
+    sel: sel ? {
+      ...sel,
+      kindLabel: Maps.KINDS[sel.kind]?.label ?? "",
+      hasCity: !!sel.cityMap,
+      cityOpen: !!sel.cityMap && Maps.cityUnlocked(phone, sel),
+      cityLocked: !!sel.cityMap && !Maps.cityUnlocked(phone, sel)
+    } : null,
     route,
     modes: [
       { key: "land", label: `On foot (Overland ${sp.land})`, selected: mode === "land" },
@@ -191,9 +223,14 @@ export const paidActions = {
   async apForecast() {
     const zone = this.element.querySelector("[data-zone]")?.value ?? "Bunya Coast";
     this.weatherZone = zone;
-    const res = await this.withBusy("Checking the radar...", () => Data.ask("forecast", { zone }));
-    if (!res?.ok) return ui.notifications.warn(res?.error ?? "No forecast available.");
-    this.forecast = { zone, days: res.days.map((html, i) => ({ label: i === 0 ? "Today" : "Tomorrow", html })) };
+    // The GM's browser saves a week of forecasts, so this works with nobody else online.
+    let days = Data.cachedForecast(zone);
+    if (!days) {
+      const res = await this.withBusy("Checking the radar...", () => Data.ask("forecast", { zone }));
+      if (!res?.ok) return ui.notifications.warn(res?.error ?? "No forecast available. Try again when the GM's online.");
+      days = res.days;
+    }
+    this.forecast = { zone, days: days.map((html, i) => ({ label: i === 0 ? "Today" : "Tomorrow", html })) };
     this.render();
   },
 
@@ -214,7 +251,61 @@ export const paidActions = {
 
   async apMapSetHere() {
     if (!game.user.isGM || !this.mapSel) return;
-    await Data.setPhone(this.actor, "location", this.mapSel);
+    await Data.setLocation(this.actor, this.mapSel);
+  },
+
+  /* ---------- City maps ---------- */
+
+  apCityOpen(event, target) {
+    const id = target.dataset.id ?? this.mapSel;
+    const pin = Maps.pinById(id);
+    if (!pin?.cityMap && !game.user.isGM) return;
+    if (!Maps.cityUnlocked(this.phone, pin)) return ui.notifications.info(`Visit ${pin.name} to unlock its map.`);
+    this.cityView = id;
+    this.citySpot = null;
+    this.cityZoom = 1;
+    this.cityEdit = false;
+    this._scroll = null;
+    this.render();
+  },
+
+  apCitySpot(event, target) {
+    this.citySpot = this.citySpot === target.dataset.id ? null : target.dataset.id;
+    this.render();
+  },
+
+  apCityZoom(event, target) {
+    this.cityZoom = Math.max(1, Math.min(4, (this.cityZoom ?? 1) + Number(target.dataset.delta)));
+    this.render();
+  },
+
+  apCityEdit() {
+    this.cityEdit = !this.cityEdit;
+    this.render();
+  },
+
+  apCityImage() {
+    if (!game.user.isGM) return;
+    const id = this.cityView ?? this.mapSel;
+    const pin = Maps.pinById(id);
+    if (!pin) return;
+    const FP = foundry.applications.apps?.FilePicker?.implementation ?? globalThis.FilePicker;
+    new FP({
+      type: "image",
+      current: pin.cityMap ?? "",
+      callback: async (path) => {
+        await Maps.savePin(id, (p) => { p.cityMap = path; p.spots ??= []; });
+        this.cityView = id;
+        this.render();
+      }
+    }).render(true);
+  },
+
+  async apCityDeleteSpot() {
+    if (!game.user.isGM || !this.cityView || !this.citySpot) return;
+    const spotId = this.citySpot;
+    this.citySpot = null;
+    await Maps.savePin(this.cityView, (p) => { p.spots = (p.spots ?? []).filter((s) => s.id !== spotId); });
   },
 
   async apMapDeletePin() {
@@ -235,6 +326,11 @@ export const paidActions = {
     if (!ok) return;
     const res = await this.withBusy("Sending...", () => Data.ask("pay", { from: this.actor.id, to, amount, note }));
     if (!res?.ok) return ui.notifications.warn(res?.error ?? "Payment failed.");
+    if (res.queued) {
+      this.draft("pay-amount", true);
+      this.draft("pay-note", true);
+      return ui.notifications.info(`Payment to ${name} is queued. It goes through when the GM's next online.`);
+    }
     this.draft("pay-amount", true);
     this.draft("pay-note", true);
     ui.notifications.info(`Sent ${Store.fmtMoney(amount)} to ${name}.`);
@@ -254,6 +350,7 @@ export const paidActions = {
     if (!ok) return;
     const res = await this.withBusy("Placing order...", () => Data.ask("order", { actorId: this.actor.id, itemId: id, qty }));
     if (!res?.ok) return ui.notifications.warn(res?.error ?? "Order failed.");
+    if (res.queued) return ui.notifications.info(`Order for ${qty} x ${item.name} is queued. It's placed (and paid) when the GM's next online.`);
     ui.notifications.info(`Ordered ${qty} x ${item.name}. Arriving ${Time.dayLabel(res.due)}.`);
   }
 };
@@ -274,5 +371,26 @@ export async function addPinAt(x, y) {
   if (!data?.name) return null;
   const id = `${data.name.toLowerCase().replace(/[^a-z0-9]+/g, "-")}-${foundry.utils.randomID(4)}`;
   await game.settings.set(MODULE_ID, "mapPins", [...Maps.pins(), { id, name: data.name, x: Math.round(x), y: Math.round(y), kind: data.kind, zone: data.zone }]);
+  return id;
+}
+
+/** GM city editing: click the city map in edit mode to add a labelled spot. x and y are percentages. */
+export async function addSpotAt(pinId, x, y) {
+  const { DialogV2 } = foundry.applications.api;
+  const types = Object.entries(Maps.SPOT_TYPES).map(([k, v]) => `<option value="${k}">${v.label}</option>`).join("");
+  const data = await DialogV2.prompt({
+    window: { title: "New spot", icon: "fa-solid fa-location-dot" },
+    content: `<div class="form-group"><label>Name</label><input type="text" name="name" autofocus placeholder="The Gully"></div>
+      <div class="form-group"><label>Type</label><select name="type">${types}</select></div>
+      <div class="form-group"><label>Note</label><input type="text" name="note" placeholder="What players see when they tap it"></div>`,
+    ok: { label: "Add spot", callback: (ev, button) => ({ name: button.form.elements.name.value.trim(), type: button.form.elements.type.value, note: button.form.elements.note.value.trim() }) },
+    rejectClose: false
+  });
+  if (!data?.name) return null;
+  const id = foundry.utils.randomID();
+  await Maps.savePin(pinId, (p) => {
+    p.spots ??= [];
+    p.spots.push({ id, name: data.name, type: data.type, note: data.note, x: +x.toFixed(2), y: +y.toFixed(2) });
+  });
   return id;
 }

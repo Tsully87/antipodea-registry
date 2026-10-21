@@ -10,6 +10,7 @@ let seenPosts = new Map(); // postId -> comment count
 let seenFollowers = new Map(); // "actorId:platform" -> Set of follower ids
 let seenPhone = new Map(); // actorId -> { ledger: Set, delivered: Set }
 let RegistryPhoneRef = null;
+let started = false;
 
 function followerSnapshot() {
   const map = new Map();
@@ -31,6 +32,7 @@ export function init(PhoneClass) {
   seenPosts = new Map(Data.posts().map((p) => [p.id, p.comments.length]));
   seenFollowers = followerSnapshot();
   seenPhone = new Map(game.actors.filter((a) => a.type !== "pokemon").map((a) => [a.id, phoneSnapshot(a)]));
+  started = true;
 }
 
 function container() {
@@ -84,6 +86,7 @@ function phoneOf(key) {
 }
 
 export function onMessagesChanged() {
+  if (!started) return;
   const list = Data.messages();
   for (const m of list) {
     if (seenMessages.has(m.id)) continue;
@@ -116,6 +119,7 @@ function mentionedMine(text) {
 }
 
 export function onPostsChanged() {
+  if (!started) return;
   const list = Data.posts();
   for (const p of list) {
     const app = Social.platformOf(p);
@@ -172,6 +176,7 @@ export function onPostsChanged() {
 
 /** New real followers on any of my trainers. */
 export function onSocialChanged() {
+  if (!started) return;
   const now = followerSnapshot();
   for (const [key, set] of now) {
     const before = seenFollowers.get(key) ?? new Set();
@@ -195,6 +200,7 @@ export function onSocialChanged() {
 
 /** Money in and parcels delivered. */
 export function onPhoneChanged(actor) {
+  if (!started) return;
   const before = seenPhone.get(actor.id) ?? { ledger: new Set(), delivered: new Set() };
   const now = phoneSnapshot(actor);
   seenPhone.set(actor.id, now);

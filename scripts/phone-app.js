@@ -7,7 +7,7 @@ import * as Social from "./social.js";
 import * as Store from "./store.js";
 import * as Maps from "./maps.js";
 import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from "./social-app.js";
-import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt } from "./paid-apps.js";
+import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt, addSpotAt } from "./paid-apps.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const FormDataExt = foundry.applications.ux?.FormDataExtended ?? globalThis.FormDataExtended;
@@ -204,6 +204,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   /** Switch screens. Used by the action handlers in this file and the app files. */
   go(app, extra = {}) {
+    if (app !== "pokemaps") { this.cityView = null; this.citySpot = null; this.cityEdit = false; }
     this.app = app;
     Object.assign(this, extra);
     if (app === "thread" && this.other) Data.markRead(this.actor, this.other, this.threadCh);
@@ -231,7 +232,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       isGM,
       app,
       view: { [app]: true, social: isSocial(app) },
-      title: app === "thread" ? Data.who(this.other).name + (this.threadCh !== "sms" ? ` · ${Social.PLATFORMS[this.threadCh]?.name ?? ""}` : "") : APP_TITLES[app] ?? "",
+      title: app === "pokemaps" && this.cityView ? (Maps.pinById(this.cityView)?.name ?? "City map") : app === "thread" ? Data.who(this.other).name + (this.threadCh !== "sms" ? ` · ${Social.PLATFORMS[this.threadCh]?.name ?? ""}` : "") : APP_TITLES[app] ?? "",
       clock: Time.clockTime(),
       name: this.actor.name,
       actorId: this.actor.id,
@@ -239,6 +240,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       rotom: phone.rotom,
       rotomName: phone.rotomName || "Rotom",
       signal: Data.hasSignal(),
+      gmOnline: Data.gmOnline(),
       dmCh: app === "thread" && this.threadCh !== "sms" ? this.threadCh : null,
       busy: this.busy
     };
@@ -556,6 +558,18 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     }
 
+    // City maps: GM clicks the city in edit mode to drop a labelled spot.
+    const city = html.querySelector(".ap-city-img");
+    if (city && this.cityEdit && game.user.isGM) {
+      city.addEventListener("click", async (ev) => {
+        const r = city.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width * 100;
+        const y = (ev.clientY - r.top) / r.height * 100;
+        const id = await addSpotAt(this.cityView, x, y);
+        if (id) { this.citySpot = id; this.render(); }
+      });
+    }
+
     if (!game.user.isGM) return;
     html.querySelectorAll("[data-app-grant]").forEach((el) => el.addEventListener("change", async () => {
       const key = el.dataset.appGrant;
@@ -564,7 +578,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       await Data.setPhone(this.actor, "installed", [...list]);
     }));
     html.querySelector("[data-location]")?.addEventListener("change", async (ev) => {
-      await Data.setPhone(this.actor, "location", ev.currentTarget.value || null);
+      await Data.setLocation(this.actor, ev.currentTarget.value || null);
     });
     html.querySelectorAll("[data-fan-base]").forEach((el) => el.addEventListener("change", async () => {
       const n = Math.max(0, Math.floor(Number(el.value) || 0));
@@ -620,6 +634,11 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onBack() {
     if (isSocial(this.app) && socialBack.call(this)) return;
+    if (this.app === "pokemaps" && this.cityView) {
+      this.cityView = null;
+      this.citySpot = null;
+      return this.render();
+    }
     if (this.app === "thread" && this.threadBack) {
       const platform = this.threadBack;
       this.app = platform;
@@ -684,7 +703,9 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   async savePhoto(dataUrl) {
     if (!dataUrl) return;
-    await this.withBusy("Saving photo...", () => Data.request("photo", { actorId: this.actor.id, dataUrl }));
+    const res = await this.withBusy("Saving photo...", () => Data.savePhoto(this.actor, dataUrl));
+    if (res?.queued) ui.notifications.info("Photo saved to send. It'll land in your Gallery once the network's back up.");
+    else if (res && res.ok === false) ui.notifications.warn(res.error ?? "The photo didn't save.");
     this.go("gallery");
   }
 

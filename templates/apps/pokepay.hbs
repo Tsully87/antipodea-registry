@@ -11,6 +11,7 @@
     </div>
     <button type="button" class="ap-share" data-action="apPay" {{#unless signal}}disabled{{/unless}}><i class="fa-solid fa-paper-plane"></i> Send money</button>
     <p class="ap-hint">You can't send money between characters you play.</p>
+    {{#unless gmOnline}}<p class="ap-hint"><i class="fa-solid fa-clock"></i> The bank's closed right now. Payments queue and go through when the GM's next online.</p>{{/unless}}
   </div>
   <h4 class="ap-subhead">Activity</h4>
   <ul class="ap-ledger">

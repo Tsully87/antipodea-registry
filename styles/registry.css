@@ -923,3 +923,17 @@
 .antipodea-phone .dm-pokegram .ap-msg.mine { background: #d6336c; }
 .antipodea-phone .dm-poketube .ap-msg.mine { background: #e03131; }
 .antipodea-phone .dm-tiktogepi .ap-msg.mine { background: #fe2c55; }
+
+/* City maps */
+.antipodea-phone .ap-city-scroll { max-height: 360px; background: #e9ecef; }
+.antipodea-phone .ap-city-img { display: block; width: 100%; border: none; border-radius: 0; }
+.antipodea-phone .ap-city-img.editing { cursor: crosshair; outline: 3px dashed #fab005; outline-offset: -3px; }
+.antipodea-phone .ap-spot { position: absolute; transform: translate(-50%, -50%); width: 24px; height: 24px; padding: 0; margin: 0; line-height: 1; border-radius: 50%; border: 2px solid #fff; background: var(--spot); color: #fff; font-size: 11px; display: grid; place-items: center; box-shadow: 0 1px 4px rgba(0,0,0,.45); cursor: pointer; }
+.antipodea-phone .ap-spot:hover { transform: translate(-50%, -50%) scale(1.15); }
+.antipodea-phone .ap-spot.selected { width: 30px; height: 30px; font-size: 13px; border-color: #fab005; z-index: 2; }
+.antipodea-phone .ap-spot-note { margin: 6px 0 0; font-size: 13px; }
+.antipodea-phone .ap-city-btn { margin-top: 8px; background: #1c7ed6 !important; }
+.antipodea-phone .ap-city-locked { margin: 8px 0 0; font-size: 12px; color: #868e96; }
+.antipodea-phone .ap-spot-list i { width: 16px; text-align: center; }
+.antipodea-phone .ap-city-gm button { white-space: nowrap; width: auto; }
+.antipodea-phone .ap-city-btn { display: flex; width: fit-content; }

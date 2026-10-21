@@ -5,6 +5,8 @@ import { RegistryPhone, APP_PARTIALS, TEMPLATE_ROOT } from "./phone-app.js";
 import { postToDiscord } from "./discord.js";
 import * as Data from "./phone-data.js";
 import * as Notify from "./notify.js";
+import * as Net from "./network.js";
+import { ZONES } from "./maps.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -53,6 +55,62 @@ function resolveKey(k) {
   if (typeof k === "string" && Data.isRotomKey(k)) return k;
   return resolveActor(k)?.id ?? k;
 }
+
+/* -------------------------------------------- */
+/*  Phone Network                               */
+/* -------------------------------------------- */
+
+async function startNetwork() {
+  if (game.user.isGM) {
+    await Net.ensureJournal();
+    await Data.migrateFromSettings();
+  }
+  Net.invalidate();
+  Notify.init(RegistryPhone);
+  RegistryPhone.refresh();
+  if (Data.isActiveGM()) {
+    await Data.processBacklog();
+    await Data.prune();
+    Data.refreshForecastCache(ZONES).catch((e) => console.warn(`${MODULE_ID} | forecast cache`, e));
+  } else {
+    await Data.checkMyJobs();
+  }
+}
+
+let netTimer = null;
+const netDirty = new Set();
+function onNetworkPage(page, action) {
+  if (!Net.isNetworkPage(page)) return;
+  Net.invalidate();
+  netDirty.add(page.flags?.[MODULE_ID]?.kind ?? "?");
+  if (action === "delete") netDirty.add("refresh");
+  clearTimeout(netTimer);
+  netTimer = setTimeout(() => {
+    const kinds = new Set(netDirty);
+    netDirty.clear();
+    if (kinds.has("msg")) Notify.onMessagesChanged();
+    if (kinds.has("post")) Notify.onPostsChanged();
+    if (kinds.has("profile")) Notify.onSocialChanged();
+    if (kinds.has("job")) {
+      if (Data.isActiveGM()) Data.processBacklog();
+      else Data.checkMyJobs();
+    }
+    if (kinds.has("post") && Data.isActiveGM()) Data.processBacklog();
+    RegistryPhone.refresh();
+  }, 150);
+}
+
+Hooks.on("createJournalEntryPage", (page) => onNetworkPage(page, "create"));
+Hooks.on("updateJournalEntryPage", (page) => onNetworkPage(page, "update"));
+Hooks.on("deleteJournalEntryPage", (page) => onNetworkPage(page, "delete"));
+
+// When a GM (you, or a bot GM later) comes online, they pick up whatever queued while nobody was on.
+Hooks.on("userConnected", () => {
+  setTimeout(() => {
+    if (Data.isActiveGM()) Data.processBacklog();
+    RegistryPhone.refresh();
+  }, 1500);
+});
 
 let sweepTimer = null;
 function queueSweep() {
@@ -208,7 +266,7 @@ Hooks.once("init", () => {
   });
   game.settings.register(MODULE_ID, "social", {
     scope: "world", config: false, type: Object, default: {},
-    onChange: () => Notify.onSocialChanged()
+    // Old storage, kept only so 1.3 can move it into the Phone Network.
   });
 
   game.settings.register(MODULE_ID, "pokegramToasts", {
@@ -220,13 +278,18 @@ Hooks.once("init", () => {
     name: "Phone: notification sound",
     scope: "client", config: true, type: Boolean, default: true
   });
+  game.settings.register(MODULE_ID, "networkMigrated", { scope: "world", config: false, type: Boolean, default: false });
+  game.settings.register(MODULE_ID, "forecastCache", {
+    scope: "world", config: false, type: Object, default: {},
+    onChange: () => RegistryPhone.refresh()
+  });
   game.settings.register(MODULE_ID, "messages", {
     scope: "world", config: false, type: Array, default: [],
-    onChange: () => Notify.onMessagesChanged()
+    // Old storage, kept only for the move.
   });
   game.settings.register(MODULE_ID, "posts", {
     scope: "world", config: false, type: Array, default: [],
-    onChange: () => Notify.onPostsChanged()
+    // Old storage, kept only for the move.
   });
   game.settings.register(MODULE_ID, "events", {
     scope: "world", config: false, type: Array, default: [],
@@ -268,7 +331,7 @@ Hooks.once("ready", () => {
     time: Time
   };
   game.socket.on(Data.SOCKET, Data.onSocket);
-  Notify.init(RegistryPhone);
+  startNetwork().catch((e) => console.error(`${MODULE_ID} | network start failed`, e));
   queueSweep();
 });
 
@@ -280,6 +343,7 @@ let deliverTimer = null;
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
   if (Data.isActiveGM()) {
+    Data.refreshForecastCache(ZONES).catch(() => {});
     clearTimeout(deliverTimer);
     deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
   }

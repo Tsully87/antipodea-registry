@@ -1,6 +1,7 @@
 <div class="ap-mart">
   <div class="ap-balance"><span>Balance</span><strong>{{balance}}</strong></div>
   <p class="ap-hint">Mart prices plus {{markup}}% delivery. Arrives in {{deliveryLabel}} on the world clock.</p>
+  {{#unless gmOnline}}<p class="ap-hint"><i class="fa-solid fa-clock"></i> The Mart's closed right now. Orders queue and are placed (and paid) when the GM's next online.</p>{{/unless}}
   {{#if orders.length}}
   <h4 class="ap-subhead">Your orders</h4>
   <ul class="ap-orders">
