@@ -6,18 +6,45 @@ The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13.
 
 - **Messages:** text other trainers. Open an NPC's phone to text as them. Attach photos.
 - **Contacts:** everyone's number, plus the Antipodea directory (player trainers and NPCs you mark as listed).
-- **PokéGram:** shared photo feed with likes and comments, mirrored to Discord if you set a webhook.
+- **PokéGram, PokéTube, TikTogepi:** social apps with profiles, follows, likes, comments, reposts, DMs, @mentions, #hashtags and Trending. Fan engagement grows on the world clock. Each can mirror new posts to its own Discord channel.
 - **Camera:** snap what you can see on the map, or upload a picture.
 - **Gallery:** view, post, send or delete photos.
 - **Calendar:** month view on the world clock, reminders, and GM public events.
 - **Trainer Card** and **Licence** (below).
+- **App Store** (Rotom Phones only): buy paid apps with the trainer's money.
 - **Registry:** GM only. Card, licence, fines and the phone settings for that trainer.
+
+### Paid apps
+| App | Default price | What it does |
+|---|---|---|
+| Translator | $1,500 | Speak through the phone; posts to chat marked as translated into the chosen language. |
+| Weather | $500 | Today's and tomorrow's weather for your zone, from the Antipodea Weather macro. |
+| Pro Camera | $1,000 | Filters, sharper photos, Pro badge on posts, +1 Contest Introduction for promo content. |
+| PokéMaps | $750 | Region map with every town, your location, distance and travel days (1 Capability = 1 km/h, 8 hrs a day). |
+| PokéPay | $250 | Balance, send money to other trainers, history. No transfers between one player's characters. |
+| Mart Express | $500 | Order items from the "Poké Mart" Items folder at +25%, delivered after 1 in-game day. |
+
+Prices are in the **App Store: prices** setting. Tick or untick apps in a trainer's Registry tab to give or remove them for free.
+
+### Setting up the paid apps
+- **PokéMaps:** set **PokéMaps: map image** to your Region Map. The pins are pre-loaded for every city and town. Set each trainer's location in their Registry tab, or open PokéMaps on their phone, tap a place and hit **Put them here**. Use **Edit pins** then click the map to add places.
+- **Mart Express:** make an Items folder called **Poké Mart** (subfolders become shop sections). Anything in it with a cost can be ordered.
+- **Weather:** add this block to your **ANTIPODEA WEATHER** macro, on the line just above `if (isAuto) {`:
+
+```js
+// --- Antipodea Phone: Weather app forecast ---
+if (scope?.forecast) {
+  const key = Object.keys(ZONES).find((k) => ZONES[k].name === scope.forecast.zone) ?? Object.keys(ZONES)[0];
+  return scope.forecast.dates.map((d) => chatCard([rollDay(key, d ?? date)], dateText(d ?? date)));
+}
+```
+
 
 ### Rotom Phones
 Tick **Rotom Phone** in a trainer's Registry tab. Their phone glows orange, their Rotom sits on the home screen, and you can type in **Rotom says** to pop a message up on their screen. Their replies come to you.
 
 ### Needs a GM online
-Texts, posts and photos are saved by the GM's client. If no GM is logged in, phones show **No signal** and can only read.
+Texts, posts, photos, payments, orders and forecasts are handled by the GM's client. If no GM is logged in, phones show **No signal** and can only read. App Store purchases work without a GM.
 
 ## Registry
 
@@ -55,9 +82,14 @@ reg.testDiscord();                   // posts a test message to the webhook
 | Discord webhook URL | Stored on your user only |
 | Phone: default contacts | Professor Manuka |
 | Phone: PokéGram / Camera / reminders need a Rotom Phone | Off / Off / On |
-| Phone: post PokéGram to Discord | On |
-| Phone: PokéGram Discord webhook URL | Stored on your user only |
-| Phone: pop up new PokéGram posts | On (per player) |
+| Phone: post social apps to Discord | On |
+| Phone: PokéGram / PokéTube / TikTogepi Discord webhook URLs | Stored on your user only, blank skips that app |
+| Phone: pop up new social posts | On (per player) |
+| App Store: prices | translator=1500, weather=500, procamera=1000, pokemaps=750, pokepay=250, mart=500 |
+| Translator: languages | Kantonian, Johtonian, Hoennian, Sinnohan, Unovan, Kalosian, Alolan, Galarian, Paldean |
+| Weather: macro name | ANTIPODEA WEATHER |
+| PokéMaps: map image / km per pixel | none / 4.11 |
+| Mart Express: folder / markup / delivery days | Poké Mart / 25% / 1 |
 | Phone: notification sound | On (per player) |
 
 ## Offence table

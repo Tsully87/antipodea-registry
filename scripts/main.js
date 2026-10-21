@@ -111,6 +111,16 @@ Hooks.once("init", () => {
     scope: "world", config: true, type: Boolean, default: false,
     onChange: () => RegistryPhone.refresh()
   });
+  game.settings.register(MODULE_ID, "rotomOnlyPoketube", {
+    name: "Phone: PokéTube needs a Rotom Phone",
+    scope: "world", config: true, type: Boolean, default: false,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "rotomOnlyTiktogepi", {
+    name: "Phone: TikTogepi needs a Rotom Phone",
+    scope: "world", config: true, type: Boolean, default: false,
+    onChange: () => RegistryPhone.refresh()
+  });
   game.settings.register(MODULE_ID, "rotomOnlyCamera", {
     name: "Phone: Camera needs a Rotom Phone",
     scope: "world", config: true, type: Boolean, default: false,
@@ -123,8 +133,8 @@ Hooks.once("init", () => {
     onChange: () => RegistryPhone.refresh()
   });
   game.settings.register(MODULE_ID, "pokegramToDiscord", {
-    name: "Phone: post PokéGram to Discord",
-    hint: "New PokéGram posts are copied to a Discord channel through the webhook below.",
+    name: "Phone: post social apps to Discord",
+    hint: "New PokéGram, PokéTube and TikTogepi posts are copied to Discord through the webhooks below. Leave a webhook blank to skip that app.",
     scope: "world", config: true, type: Boolean, default: true
   });
   game.settings.register(MODULE_ID, "pokegramWebhookUrl", {
@@ -133,8 +143,76 @@ Hooks.once("init", () => {
     scope: userScope, config: true, type: String, default: "",
     restricted: true
   });
+  game.settings.register(MODULE_ID, "poketubeWebhookUrl", {
+    name: "Phone: PokéTube Discord webhook URL",
+    hint: "Stored on your user account only.",
+    scope: userScope, config: true, type: String, default: "",
+    restricted: true
+  });
+  game.settings.register(MODULE_ID, "tiktogepiWebhookUrl", {
+    name: "Phone: TikTogepi Discord webhook URL",
+    hint: "Stored on your user account only.",
+    scope: userScope, config: true, type: String, default: "",
+    restricted: true
+  });
+
+  // App Store
+  game.settings.register(MODULE_ID, "appPrices", {
+    name: "App Store: prices",
+    hint: "Change any price with key=amount, separated by commas. Keys: translator, weather, procamera, pokemaps, pokepay, mart.",
+    scope: "world", config: true, type: String,
+    default: "translator=1500, weather=500, procamera=1000, pokemaps=750, pokepay=250, mart=500",
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "translatorLanguages", {
+    name: "Translator: languages",
+    hint: "Languages the Translator app offers, separated by commas.",
+    scope: "world", config: true, type: String,
+    default: "Kantonian, Johtonian, Hoennian, Sinnohan, Unovan, Kalosian, Alolan, Galarian, Paldean"
+  });
+  game.settings.register(MODULE_ID, "weatherMacro", {
+    name: "Weather: macro name",
+    hint: "The weather macro the Weather app asks for forecasts. It needs the forecast block from the README.",
+    scope: "world", config: true, type: String, default: "ANTIPODEA WEATHER"
+  });
+  game.settings.register(MODULE_ID, "mapImage", {
+    name: "PokéMaps: map image",
+    hint: "Your Antipodea Region Map (any size copy of the 1408 x 768 map lines up with the pins).",
+    scope: "world", config: true, type: String, default: "", filePicker: "image",
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "mapKmPerPixel", {
+    name: "PokéMaps: km per map pixel",
+    hint: "Measured on the 1408 px wide map. 4.11 makes mainland Australia 3,000 km wide, matching the Antipodea Region scene.",
+    scope: "world", config: true, type: Number, default: 4.11,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "mapPins", {
+    scope: "world", config: false, type: Array, default: [],
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "martFolder", {
+    name: "Mart Express: item folder",
+    hint: "Items in this Items folder (and its subfolders) can be ordered. Their price is the item's cost.",
+    scope: "world", config: true, type: String, default: "Poké Mart",
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "martMarkup", {
+    name: "Mart Express: delivery markup (%)",
+    scope: "world", config: true, type: Number, default: 25,
+    onChange: () => RegistryPhone.refresh()
+  });
+  game.settings.register(MODULE_ID, "martDeliveryDays", {
+    name: "Mart Express: delivery time (in-game days)",
+    scope: "world", config: true, type: Number, default: 1
+  });
+  game.settings.register(MODULE_ID, "social", {
+    scope: "world", config: false, type: Object, default: {},
+    onChange: () => Notify.onSocialChanged()
+  });
+
   game.settings.register(MODULE_ID, "pokegramToasts", {
-    name: "Phone: pop up new PokéGram posts",
+    name: "Phone: pop up new social posts",
     hint: "Show a notification on your screen when someone posts.",
     scope: "client", config: true, type: Boolean, default: true
   });
@@ -198,8 +276,13 @@ Hooks.once("ready", () => {
 /*  World clock                                 */
 /* -------------------------------------------- */
 
+let deliverTimer = null;
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
+  if (Data.isActiveGM()) {
+    clearTimeout(deliverTimer);
+    deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
+  }
   Notify.onTimeChanged(worldTime, delta);
   RegistryPhone.refresh();
 });
@@ -209,9 +292,10 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
 /* -------------------------------------------- */
 
 Hooks.on("updateActor", (actor, changes) => {
-  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes) {
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money")) {
     RegistryPhone.refresh(actor.id);
   }
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone`)) Notify.onPhoneChanged(actor);
 });
 
 /* -------------------------------------------- */

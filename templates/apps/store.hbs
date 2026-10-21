@@ -1,0 +1,15 @@
+<div class="ap-store">
+  <div class="ap-balance"><span>Balance</span><strong>{{balance}}</strong></div>
+  {{#each storeApps}}
+  <div class="ap-store-app">
+    <span class="ap-icon-tile small" style="--tile: {{color}}"><i class="fa-solid {{icon}}"></i></span>
+    <div class="ap-store-text"><strong>{{label}}</strong><small>{{blurb}}</small></div>
+    {{#if installed}}
+    <span class="ap-installed"><i class="fa-solid fa-circle-check"></i> Installed</span>
+    {{else}}
+    <button type="button" class="ap-pill small" data-action="apBuyApp" data-app="{{key}}">{{price}}</button>
+    {{/if}}
+  </div>
+  {{/each}}
+  <p class="ap-hint">Money comes straight off your trainer sheet. Apps stay on this phone.</p>
+</div>

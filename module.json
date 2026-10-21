@@ -1,8 +1,8 @@
 {
   "id": "antipodea-registry",
   "title": "Antipodea Trainer Registry",
-  "description": "The Antipodea phone for the Pokémon Westmarch: Messages, Contacts, PokéGram, Camera, Gallery, Calendar, Trainer Card and Riding Licence, with GM-voiced Rotom Phones. Tracks badges, licences, demerit points and suspensions on the Seasons & Stars world clock and posts notices to Discord.",
-  "version": "1.1.0",
+  "description": "The Antipodea phone for the Pokémon Westmarch: Messages, Contacts, PokéGram, PokéTube, TikTogepi, Camera, Gallery, Calendar, Trainer Card and Riding Licence, plus an App Store with paid Rotom Phone apps (Translator, Weather, Pro Camera, PokéMaps, PokéPay, Mart Express). Tracks licences and demerits on the Seasons & Stars clock and posts to Discord.",
+  "version": "1.2.0",
   "authors": [
     {
       "name": "Tony (RedSavage1987)"

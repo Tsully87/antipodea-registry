@@ -1,0 +1,58 @@
+<div class="ap-maps">
+  {{#if mapImage}}
+  <div class="ap-map-tools">
+    <button type="button" class="ap-round" data-action="apMapZoom" data-delta="-1" {{#unless canZoomOut}}disabled{{/unless}}><i class="fa-solid fa-minus"></i></button>
+    <span>{{zoom}}x</span>
+    <button type="button" class="ap-round" data-action="apMapZoom" data-delta="1"><i class="fa-solid fa-plus"></i></button>
+    {{#if isGM}}<button type="button" class="ap-pill small {{#unless mapEdit}}ghost{{/unless}}" data-action="apMapEdit"><i class="fa-solid fa-location-dot"></i> {{#if mapEdit}}Click map to add{{else}}Edit pins{{/if}}</button>{{/if}}
+  </div>
+  <div class="ap-map-scroll">
+    <div class="ap-map-wrap" style="width: {{mapWidth}}px">
+      <img class="ap-map-img {{#if mapEdit}}editing{{/if}}" src="{{mapImage}}" alt="">
+      {{#each pins}}
+      <button type="button" class="ap-pin kind-{{kind}} {{#if here}}here{{/if}} {{#if selected}}selected{{/if}}" style="left: {{left}}%; top: {{top}}%; --pin: {{color}}" data-action="apMapPin" data-id="{{id}}" data-tooltip="{{name}}">{{#if here}}<i class="fa-solid fa-person"></i>{{/if}}</button>
+      {{/each}}
+    </div>
+  </div>
+  {{else}}
+  <p class="ap-warn">{{#if isGM}}Set the map image in module settings (PokéMaps: map image).{{else}}Map's still downloading. Ask the GM to set it up.{{/if}}</p>
+  {{/if}}
+
+  <div class="ap-map-card">
+    <div class="ap-map-here"><i class="fa-solid fa-location-crosshairs"></i> {{#if here}}You're in <strong>{{here.name}}</strong>{{else}}Location unknown{{/if}}</div>
+    {{#if sel}}
+    <h4>{{sel.name}}</h4>
+    <small>{{sel.kindLabel}} · {{sel.zone}}</small>
+    {{#if route}}
+    <div class="ap-route">
+      <span><strong>{{route.km}}</strong> km</span>
+      <span><strong>{{route.hours}}</strong> hrs</span>
+      <span><strong>{{route.days}}</strong> travel days</span>
+    </div>
+    {{#if route.noSpeed}}<p class="ap-hint">No speed on the sheet for that, so enter one below.</p>{{/if}}
+    <small class="ap-hint">As the Pidgey flies at {{route.kph}} km/h, 8 hours of travel a day.</small>
+    {{/if}}
+    {{#if isGM}}
+    <div class="ap-row">
+      <button type="button" class="ap-pill small gm" data-action="apMapSetHere"><i class="fa-solid fa-person"></i> Put {{name}} here</button>
+      <button type="button" class="ap-link danger" data-action="apMapDeletePin">Delete pin</button>
+    </div>
+    {{/if}}
+    {{else}}
+    <p class="ap-hint">Tap a place to see how far it is.</p>
+    {{/if}}
+  </div>
+
+  <div class="ap-map-options">
+    <select data-state="mapMode">{{#each modes}}<option value="{{key}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select>
+    <div class="ap-row">
+      <input type="number" data-state="mapSpeed" value="{{mapSpeed}}" min="0" placeholder="Speed override (e.g. a mount)">
+      <label class="ap-check"><input type="checkbox" data-state="mapSlow" {{#if mapSlow}}checked{{/if}}> Slow terrain</label>
+    </div>
+  </div>
+
+  <input type="text" data-draft="map-search" placeholder="Search places">
+  <ul class="ap-places">
+    {{#each placeList}}<li><button type="button" data-action="apMapPin" data-id="{{id}}">{{name}}{{#if here}} <i class="fa-solid fa-person"></i>{{/if}}</button></li>{{/each}}
+  </ul>
+</div>

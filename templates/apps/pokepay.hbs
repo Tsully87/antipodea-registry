@@ -1,0 +1,19 @@
+<div class="ap-pay">
+  <div class="ap-balance big"><span>PokéPay balance</span><strong>{{balance}}</strong></div>
+  <div class="ap-pay-form">
+    <select data-pay-to>
+      <option value="">Send to...</option>
+      {{#each payees}}<option value="{{id}}">{{name}}</option>{{/each}}
+    </select>
+    <div class="ap-row">
+      <input type="number" data-draft="pay-amount" value="{{payAmount}}" min="1" placeholder="Amount $">
+      <input type="text" data-draft="pay-note" value="{{payNote}}" placeholder="What for?">
+    </div>
+    <button type="button" class="ap-share" data-action="apPay" {{#unless signal}}disabled{{/unless}}><i class="fa-solid fa-paper-plane"></i> Send money</button>
+    <p class="ap-hint">You can't send money between characters you play.</p>
+  </div>
+  <h4 class="ap-subhead">Activity</h4>
+  <ul class="ap-ledger">
+    {{#each ledger}}<li><span class="ap-what">{{name}}<small>{{date}}{{#if note}} · {{note}}{{/if}}</small></span><strong class="{{#if incoming}}in{{else}}out{{/if}}">{{amountLabel}}</strong></li>{{else}}<li class="ap-hint">No payments yet.</li>{{/each}}
+  </ul>
+</div>

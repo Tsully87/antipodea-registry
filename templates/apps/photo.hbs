@@ -4,7 +4,11 @@
 <img class="ap-photo-full" src="{{shot.src}}" alt="" data-action="apPhotoFull" data-src="{{shot.src}}">
 <p class="ap-hint-center">{{shot.label}}</p>
 <div class="ap-photo-actions">
-  {{#if canPost}}<button type="button" class="ap-share" data-action="apPhotoPost"><i class="fa-solid fa-camera-retro"></i> Post to PokéGram</button>{{/if}}
+  {{#if shareTo.length}}
+  <div class="ap-share-to">
+    {{#each shareTo}}<button type="button" class="ap-share-btn share-{{key}}" data-action="apPhotoPost" data-platform="{{key}}"><i class="fa-solid {{icon}}"></i> {{name}}</button>{{/each}}
+  </div>
+  {{/if}}
   <div class="ap-row">
     <select data-photo-send>
       <option value="">Send to...</option>

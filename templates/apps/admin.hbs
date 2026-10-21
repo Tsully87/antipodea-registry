@@ -41,6 +41,22 @@
   </label>
   <p class="hint">Pops up on the player's screen. Their replies to {{rotomName}} come to you.</p>
   {{/if}}
+  <label>Location (for PokéMaps and Weather)
+    <select data-location><option value="" {{#if admin.noLocation}}selected{{/if}}>Unknown</option>{{#each admin.locations}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+  </label>
+  {{#if rotom}}
+  <div class="ap-subrow">Apps (tick to give free, untick to remove)</div>
+  <div class="ap-badge-grid">
+    {{#each admin.apps}}<label class="ap-check"><input type="checkbox" data-app-grant="{{key}}" {{#if on}}checked{{/if}}> {{label}}</label>{{/each}}
+  </div>
+  {{#if admin.purchases.length}}<p class="hint">Bought: {{#each admin.purchases}}{{label}} {{price}} ({{date}}){{#unless @last}}, {{/unless}}{{/each}}</p>{{/if}}
+  {{/if}}
+  <div class="ap-subrow">Social</div>
+  <label>Handle <input type="text" data-admin-handle value="{{admin.handle}}"></label>
+  <div class="ap-fanbases">
+    {{#each admin.fanBases}}<label>{{name}} starting fans <input type="number" min="0" data-fan-base="{{key}}" value="{{value}}"></label>{{/each}}
+  </div>
+  <p class="hint">Starting fans set where a trainer begins (Jax isn't starting from zero). Real followers and fans won from views add on top.</p>
   {{#if admin.isNpc}}
   <label class="ap-check"><input type="checkbox" data-phone-field="listed" {{#if admin.listed}}checked{{/if}}> Listed in the phone directory</label>
   <p class="hint">Listed NPCs can be added as contacts by players. Open this NPC's phone to text as them.</p>

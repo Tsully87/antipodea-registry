@@ -3,6 +3,11 @@ import * as Time from "./time.js";
 import * as Registry from "./registry.js";
 import * as Data from "./phone-data.js";
 import { discordEnabled } from "./discord.js";
+import * as Social from "./social.js";
+import * as Store from "./store.js";
+import * as Maps from "./maps.js";
+import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from "./social-app.js";
+import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt } from "./paid-apps.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const FormDataExt = foundry.applications.ux?.FormDataExtended ?? globalThis.FormDataExtended;
@@ -10,7 +15,8 @@ const FilePickerCls = foundry.applications.apps?.FilePicker?.implementation ?? g
 const esc = (s) => foundry.utils.escapeHTML(String(s ?? ""));
 
 export const TEMPLATE_ROOT = `modules/${MODULE_ID}/templates`;
-export const APP_PARTIALS = ["home", "card", "licence", "admin", "messages", "thread", "contacts", "pokegram", "compose", "camera", "gallery", "photo", "calendar"]
+export const APP_PARTIALS = ["home", "card", "licence", "admin", "messages", "thread", "contacts", "social", "camera", "gallery", "photo", "calendar",
+  "store", "translator", "weather", "pokemaps", "pokepay", "mart"]
   .map((n) => `${TEMPLATE_ROOT}/apps/${n}.hbs`);
 
 /** App icons on the home screen, in order. */
@@ -18,21 +24,25 @@ const HOME_APPS = [
   { app: "messages", label: "Messages", icon: "fa-comment", color: "#2fb34a" },
   { app: "contacts", label: "Contacts", icon: "fa-address-book", color: "#7a7f87" },
   { app: "pokegram", label: "PokéGram", icon: "fa-camera-retro", color: "#d6336c", lock: "pokegram" },
+  { app: "poketube", label: "PokéTube", icon: "fa-play", color: "#e03131", lock: "poketube" },
+  { app: "tiktogepi", label: "TikTogepi", icon: "fa-music", color: "#212529", lock: "tiktogepi" },
   { app: "camera", label: "Camera", icon: "fa-camera", color: "#3d3f44", lock: "camera" },
   { app: "gallery", label: "Gallery", icon: "fa-images", color: "#f08c00" },
   { app: "calendar", label: "Calendar", icon: "fa-calendar-days", color: "#e03131" },
   { app: "card", label: "Trainer Card", icon: "fa-id-badge", color: "#c4622d" },
-  { app: "licence", label: "Licence", icon: "fa-id-card", color: "#1f7a7a" }
+  { app: "licence", label: "Licence", icon: "fa-id-card", color: "#1f7a7a" },
+  { app: "store", label: "App Store", icon: "fa-bag-shopping", color: "#4263eb", lock: "store" }
 ];
 
 const APP_TITLES = {
-  messages: "Messages", thread: "", contacts: "Contacts", pokegram: "PokéGram", compose: "New Post",
+  messages: "Messages", thread: "", contacts: "Contacts", pokegram: "PokéGram", poketube: "PokéTube", tiktogepi: "TikTogepi",
+  store: "App Store", translator: "Translator", weather: "Weather", pokemaps: "PokéMaps", pokepay: "PokéPay", mart: "Mart Express",
   camera: "Camera", gallery: "Gallery", photo: "Photo", calendar: "Calendar",
   card: "Trainer Card", licence: "Riding Licence", admin: "Registry"
 };
 
 /** Where the back arrow goes from each app. */
-const PARENT = { thread: "messages", compose: "pokegram", photo: "gallery" };
+const PARENT = { thread: "messages", photo: "gallery" };
 
 export function badgeNames() {
   const raw = game.settings.get(MODULE_ID, "badgeNames") ?? "";
@@ -56,6 +66,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     this.actor = actor;
     this.app = "home";
     this.other = null;
+    this.threadCh = "sms";
+    this.threadBack = null;
+    this.sv = null;
+    this.camFilter = "none";
     this.photoId = null;
     this.calOffset = 0;
     this.calDay = null;
@@ -87,14 +101,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       apAttachClear: RegistryPhone.#onAttachClear,
       apAddContact: RegistryPhone.#onAddContact,
       apRemoveContact: RegistryPhone.#onRemoveContact,
-      // PokéGram
-      apLike: RegistryPhone.#onLike,
-      apComment: RegistryPhone.#onComment,
-      apDeletePost: RegistryPhone.#onDeletePost,
-      apFeedAuthor: RegistryPhone.#onFeedAuthor,
-      apCompose: RegistryPhone.#onCompose,
-      apComposePick: RegistryPhone.#onComposePick,
-      apPublish: RegistryPhone.#onPublish,
+      // Social apps and paid apps live in their own files
+      ...socialActions,
+      ...paidActions,
+      apCamFilter: RegistryPhone.#onCamFilter,
       // Camera and Gallery
       apSnap: RegistryPhone.#onSnap,
       apUpload: RegistryPhone.#onUpload,
@@ -174,23 +184,29 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /** True if this client has that thread open on screen right now. */
-  static isViewingThread(actorId, other) {
+  static isViewingThread(actorId, other, ch = "sms") {
     const app = RegistryPhone.instances.get(actorId);
-    return !!(app?.rendered && !app.minimized && app.app === "thread" && app.other === other);
+    return !!(app?.rendered && !app.minimized && app.app === "thread" && app.other === other && app.threadCh === ch);
   }
 
-  #navigate({ app, tab, other } = {}) {
+  #navigate({ app, tab, other, ch } = {}) {
     const target = app ?? (tab === "admin" ? "admin" : tab);
     if (!target) return;
     this.app = target;
     if (other !== undefined) this.other = other;
-    if (target === "thread" && this.other) Data.markRead(this.actor, this.other);
+    if (target === "thread") {
+      this.threadCh = ch ?? "sms";
+      this.threadBack = this.threadCh === "sms" ? null : this.threadCh;
+      if (this.other) Data.markRead(this.actor, this.other, this.threadCh);
+    }
+    if (isSocial(target)) this.sv = null;
   }
 
-  #go(app, extra = {}) {
+  /** Switch screens. Used by the action handlers in this file and the app files. */
+  go(app, extra = {}) {
     this.app = app;
     Object.assign(this, extra);
-    if (app === "thread" && this.other) Data.markRead(this.actor, this.other);
+    if (app === "thread" && this.other) Data.markRead(this.actor, this.other, this.threadCh);
     this.render();
   }
 
@@ -214,8 +230,8 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     const ctx = {
       isGM,
       app,
-      view: { [app]: true },
-      title: app === "thread" ? Data.who(this.other).name : APP_TITLES[app] ?? "",
+      view: { [app]: true, social: isSocial(app) },
+      title: app === "thread" ? Data.who(this.other).name + (this.threadCh !== "sms" ? ` · ${Social.PLATFORMS[this.threadCh]?.name ?? ""}` : "") : APP_TITLES[app] ?? "",
       clock: Time.clockTime(),
       name: this.actor.name,
       actorId: this.actor.id,
@@ -223,6 +239,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       rotom: phone.rotom,
       rotomName: phone.rotomName || "Rotom",
       signal: Data.hasSignal(),
+      dmCh: app === "thread" && this.threadCh !== "sms" ? this.threadCh : null,
       busy: this.busy
     };
 
@@ -231,9 +248,21 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       case "messages": ctx.threads = this.#threadList(); break;
       case "thread": Object.assign(ctx, this.#threadContext(phone)); break;
       case "contacts": Object.assign(ctx, this.#contactsContext()); break;
-      case "pokegram": Object.assign(ctx, this.#feedContext()); break;
-      case "compose": Object.assign(ctx, this.#composeContext(phone)); break;
-      case "camera": ctx.canSnap = !!canvas?.ready && !!canvas.scene; break;
+      case "pokegram":
+      case "poketube":
+      case "tiktogepi": Object.assign(ctx, socialContext.call(this, app, phone)); break;
+      case "store": Object.assign(ctx, storeContext.call(this, phone)); break;
+      case "translator": Object.assign(ctx, translatorContext.call(this, phone)); break;
+      case "weather": Object.assign(ctx, weatherContext.call(this, phone)); break;
+      case "pokemaps": Object.assign(ctx, mapsContext.call(this, phone)); break;
+      case "pokepay": Object.assign(ctx, payContext.call(this, phone)); break;
+      case "mart": Object.assign(ctx, martContext.call(this, phone)); break;
+      case "camera": {
+        ctx.canSnap = !!canvas?.ready && !!canvas.scene;
+        ctx.pro = Data.hasApp(phone, "procamera");
+        ctx.filters = Object.entries(Data.FILTERS).map(([key, f]) => ({ key, label: f.label, css: f.css, selected: key === this.camFilter }));
+        break;
+      }
       case "gallery": ctx.gallery = phone.gallery.map((g) => ({ ...g, label: Time.formatShort(g.wt) })); break;
       case "photo": Object.assign(ctx, this.#photoContext(phone, locked)); break;
       case "calendar": Object.assign(ctx, this.#calendarContext(phone, locked)); break;
@@ -252,8 +281,13 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     const apps = HOME_APPS.map((a) => ({
       ...a,
       locked: locked(a.lock),
-      badge: a.app === "messages" ? unread : 0
+      badge: a.app === "messages" ? unread : isSocial(a.app) ? Data.unreadCount(this.actor, a.app) : 0
     }));
+    for (const key of PAID_SCREENS) {
+      if (!Data.hasApp(phone, key)) continue;
+      const def = Store.PAID_APPS[key];
+      apps.push({ app: key, label: def.label, icon: def.icon, color: def.color });
+    }
     if (game.user.isGM) apps.push({ app: "admin", label: "Registry", icon: "fa-user-shield", color: "#0f4f55" });
 
     let bubble = null;
@@ -297,7 +331,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   #threadContext(phone) {
     const me = this.actor.id;
     let lastDay = null;
-    const msgs = Data.thread(this.actor, this.other).map((m) => {
+    const msgs = Data.thread(this.actor, this.other, this.threadCh).map((m) => {
       const day = Time.formatShort(m.wt);
       const showDay = day !== lastDay;
       lastDay = day;
@@ -307,7 +341,8 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     return {
       other: this.other,
       otherWho: w,
-      otherNumber: w.rotom ? "" : Data.phoneNumber(this.other),
+      otherNumber: w.rotom ? "" : this.threadCh === "sms" ? Data.phoneNumber(this.other) : `@${Social.profile(this.other).handle}`,
+      dmApp: this.threadCh !== "sms" ? Social.PLATFORMS[this.threadCh]?.name : null,
       msgs,
       draft: this._drafts[`msg-${this.other}`] ?? "",
       attachImg: this.attachImg,
@@ -326,44 +361,12 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     return { contacts, directory, myNumber: Data.phoneNumber(this.actor.id) };
   }
 
-  #feedContext() {
-    const me = this.actor.id;
-    const all = Data.posts();
-    const shown = this.feedAuthor ? all.filter((p) => p.author === this.feedAuthor) : all;
-    const feed = shown.map((p) => ({
-      ...p,
-      when: ago(p.ms),
-      date: Time.formatShort(p.wt),
-      liked: p.likes.includes(me),
-      likeCount: p.likes.length,
-      likeLabel: `${p.likes.length} like${p.likes.length === 1 ? "" : "s"}`,
-      canDelete: game.user.isGM || p.author === me,
-      authorImg: Data.who(p.author, { img: p.authorImg }).img,
-      comments: p.comments.map((c) => ({ ...c, when: ago(c.ms) })),
-      draft: this._drafts[`comment-${p.id}`] ?? ""
-    }));
-    const author = this.feedAuthor ? Data.who(this.feedAuthor) : null;
-    return {
-      feed,
-      filterName: author?.name ?? null,
-      filterPosts: this.feedAuthor ? shown.length : 0
-    };
-  }
-
-  #composeContext(phone) {
-    return {
-      composeImg: this.composeImg,
-      galleryStrip: phone.gallery.slice(0, 30).map((g) => ({ ...g, selected: g.src === this.composeImg })),
-      draft: this._drafts.caption ?? ""
-    };
-  }
-
   #photoContext(phone, locked) {
     const p = phone.gallery.find((g) => g.id === this.photoId);
     if (!p) return { photo404: true };
     return {
       shot: { ...p, label: Time.formatLong(p.wt) },
-      canPost: !locked("pokegram"),
+      shareTo: SOCIAL_APPS.filter((k) => !locked(k)).map((k) => ({ key: k, name: Social.PLATFORMS[k].name, icon: Social.PLATFORMS[k].icon })),
       sendTo: Data.contactsFor(this.actor)
     };
   }
@@ -470,6 +473,12 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
         listed: phone.listed,
         rotomName: phone.rotomName,
         rotomDraft: this._drafts.rotomSay ?? "",
+        apps: Object.entries(Store.PAID_APPS).map(([key, a]) => ({ key, label: a.label, on: phone.installed.includes(key) })),
+        purchases: phone.purchases.slice(0, 8).map((p) => ({ label: Store.PAID_APPS[p.app]?.label ?? p.app, price: Store.fmtMoney(p.price), date: Time.formatShort(p.wt) })),
+        locations: Maps.pins().map((p) => ({ id: p.id, name: p.name, selected: p.id === phone.location })),
+        noLocation: !phone.location,
+        handle: Social.profile(this.actor.id).handle,
+        fanBases: SOCIAL_APPS.map((k) => ({ key: k, name: Social.PLATFORMS[k].name, value: Social.profile(this.actor.id).base[k] })),
         allDemerits: record.demerits.map((d) => ({
           ...d, issuedLabel: Time.formatShort(d.issued), expiresLabel: Time.formatShort(d.expires), expired: d.expires <= t
         }))
@@ -527,21 +536,60 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       if (ev.currentTarget.value) html.querySelector("[data-action=apPhotoSend]")?.removeAttribute("disabled");
     });
 
+    // Selects and checkboxes that only change what this phone is showing.
+    html.querySelectorAll("[data-state]").forEach((el) => {
+      el.addEventListener("change", () => {
+        this[el.dataset.state] = el.type === "checkbox" ? el.checked : el.value;
+        this.render();
+      });
+    });
+
+    // PokéMaps: GM clicks the map in edit mode to drop a pin.
+    const map = html.querySelector(".ap-map-img");
+    if (map && this.mapEdit && game.user.isGM) {
+      map.addEventListener("click", async (ev) => {
+        const r = map.getBoundingClientRect();
+        const x = (ev.clientX - r.left) / r.width * Maps.MAP_W;
+        const y = (ev.clientY - r.top) / r.height * Maps.MAP_H;
+        const id = await addPinAt(x, y);
+        if (id) { this.mapSel = id; this.render(); }
+      });
+    }
+
     if (!game.user.isGM) return;
+    html.querySelectorAll("[data-app-grant]").forEach((el) => el.addEventListener("change", async () => {
+      const key = el.dataset.appGrant;
+      const list = new Set(this.phone.installed);
+      if (el.checked) list.add(key); else list.delete(key);
+      await Data.setPhone(this.actor, "installed", [...list]);
+    }));
+    html.querySelector("[data-location]")?.addEventListener("change", async (ev) => {
+      await Data.setPhone(this.actor, "location", ev.currentTarget.value || null);
+    });
+    html.querySelectorAll("[data-fan-base]").forEach((el) => el.addEventListener("change", async () => {
+      const n = Math.max(0, Math.floor(Number(el.value) || 0));
+      await Data.ask("profile", { actorId: this.actor.id, base: { [el.dataset.fanBase]: n } });
+    }));
+    html.querySelector("[data-admin-handle]")?.addEventListener("change", async (ev) => {
+      const res = await Data.ask("profile", { actorId: this.actor.id, handle: ev.currentTarget.value });
+      if (res?.ok === false) ui.notifications.warn(res.error);
+    });
     html.querySelectorAll("[data-field]").forEach((el) => el.addEventListener("change", (ev) => this.#onFieldChange(ev)));
     html.querySelectorAll("[data-badge]").forEach((el) => el.addEventListener("change", (ev) => this.#onBadgeChange(ev)));
     html.querySelectorAll("[data-licence]").forEach((el) => el.addEventListener("change", (ev) => this.#onLicenceChange(ev)));
     html.querySelectorAll("[data-phone-field]").forEach((el) => el.addEventListener("change", (ev) => this.#onPhoneField(ev)));
   }
 
-  #draft(key, clear = false) {
+  /** Read (and optionally clear) a text box on the phone. */
+  draft(key, clear = false) {
     const el = this.element?.querySelector(`[data-draft="${CSS.escape(key)}"]`);
     const v = (el?.value ?? this._drafts[key] ?? "").trim();
     if (clear) { this._drafts[key] = ""; if (el) el.value = ""; }
     return v;
   }
 
-  async #withBusy(label, fn) {
+  /** Show a little "working" banner while something runs. */
+  async withBusy(label, fn) {
     this.busy = label;
     this.render();
     try { return await fn(); }
@@ -554,19 +602,32 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onGo(event, target) {
     const app = target.dataset.app;
-    const lockMap = { pokegram: "pokegram", camera: "camera" };
-    if (lockMap[app] && !Data.canUseApp(this.phone, lockMap[app])) {
+    const phone = this.phone;
+    if (["camera", "store", ...SOCIAL_APPS].includes(app) && !Data.canUseApp(phone, app)) {
       return ui.notifications.info("That app needs a Rotom Phone.");
     }
+    if (PAID_SCREENS.includes(app) && !Data.hasApp(phone, app)) {
+      return ui.notifications.info("Get that one from the App Store first.");
+    }
     const extra = {};
-    if (app === "pokegram") extra.feedAuthor = null;
+    if (isSocial(app)) extra.sv = null;
     if (app === "calendar") { extra.calOffset = 0; extra.calDay = null; }
-    this.#go(app, extra);
+    if (app === "messages") { extra.threadCh = "sms"; extra.threadBack = null; }
+    this.go(app, extra);
   }
 
-  static #onHome() { this.#go("home"); }
+  static #onHome() { this.go("home"); }
 
-  static #onBack() { this.#go(PARENT[this.app] ?? "home"); }
+  static #onBack() {
+    if (isSocial(this.app) && socialBack.call(this)) return;
+    if (this.app === "thread" && this.threadBack) {
+      const platform = this.threadBack;
+      this.app = platform;
+      this.sv = { platform, view: "dms" };
+      return this.render();
+    }
+    this.go(PARENT[this.app] ?? "home");
+  }
 
   /* -------------------------------------------- */
   /*  Messages                                    */
@@ -575,16 +636,17 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   static #onOpenThread(event, target) {
     this.attachImg = null;
     this.showAttach = false;
-    this.#go("thread", { other: target.dataset.other });
+    const ch = target.dataset.ch ?? "sms";
+    this.go("thread", { other: target.dataset.other, threadCh: ch, threadBack: ch === "sms" ? null : ch });
   }
 
   static async #onSend() {
     const key = `msg-${this.other}`;
-    const text = this.#draft(key);
+    const text = this.draft(key);
     if (!text && !this.attachImg) return;
-    const ok = await Data.request("message", { from: this.actor.id, to: this.other, text, img: this.attachImg });
+    const ok = await Data.request("message", { from: this.actor.id, to: this.other, text, img: this.attachImg, ch: this.threadCh });
     if (ok === false) return;
-    this.#draft(key, true);
+    this.draft(key, true);
     this.attachImg = null;
     this.showAttach = false;
     this.render();
@@ -606,59 +668,24 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   /* -------------------------------------------- */
-  /*  PokéGram                                    */
-  /* -------------------------------------------- */
-
-  static async #onLike(event, target) {
-    await Data.request("like", { postId: target.dataset.post, actorId: this.actor.id });
-  }
-
-  static async #onComment(event, target) {
-    const key = `comment-${target.dataset.post}`;
-    const text = this.#draft(key);
-    if (!text) return;
-    const ok = await Data.request("comment", { postId: target.dataset.post, actorId: this.actor.id, text });
-    if (ok !== false) this.#draft(key, true);
-  }
-
-  static async #onDeletePost(event, target) {
-    const ok = await DialogV2.confirm({ window: { title: "Delete post" }, content: "<p>Delete this post from PokéGram?</p>", rejectClose: false });
-    if (ok) await Data.request("deletePost", { postId: target.dataset.post });
-  }
-
-  static #onFeedAuthor(event, target) {
-    this.feedAuthor = target.dataset.author || null;
-    this._scroll = null;
-    this.render();
-  }
-
-  static #onCompose(event, target) {
-    this.composeImg = target.dataset.src ?? this.phone.gallery[0]?.src ?? null;
-    this._drafts.caption = "";
-    this.#go("compose");
-  }
-
-  static #onComposePick(event, target) { this.composeImg = target.dataset.src; this.render(); }
-
-  static async #onPublish() {
-    if (!this.composeImg) return ui.notifications.warn("Pick a photo first. Take one with the Camera app.");
-    const caption = this.#draft("caption");
-    const ok = await Data.request("post", { author: this.actor.id, caption, img: this.composeImg });
-    if (ok === false) return;
-    this.#draft("caption", true);
-    this.composeImg = null;
-    this.feedAuthor = null;
-    this.#go("pokegram");
-  }
-
-  /* -------------------------------------------- */
   /*  Camera and Gallery                          */
   /* -------------------------------------------- */
 
-  async #savePhoto(dataUrl) {
+  /** Options for the Pro Camera upgrade: bigger photos and filters. */
+  cameraOpts() {
+    const pro = Data.hasApp(this.phone, "procamera");
+    return { maxEdge: pro ? 2048 : 1280, filter: pro ? this.camFilter : "none" };
+  }
+
+  static #onCamFilter(event, target) {
+    this.camFilter = target.dataset.filter;
+    this.render();
+  }
+
+  async savePhoto(dataUrl) {
     if (!dataUrl) return;
-    await this.#withBusy("Saving photo...", () => Data.request("photo", { actorId: this.actor.id, dataUrl }));
-    this.#go("gallery");
+    await this.withBusy("Saving photo...", () => Data.request("photo", { actorId: this.actor.id, dataUrl }));
+    this.go("gallery");
   }
 
   static async #onSnap() {
@@ -667,30 +694,30 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       // Take the shot with the phone out of the way.
       this.element.style.visibility = "hidden";
       await new Promise((r) => requestAnimationFrame(() => r()));
-      data = Data.captureScene();
+      data = Data.captureScene(this.cameraOpts());
     } catch (e) {
       ui.notifications.warn(e.message);
     } finally {
       this.element.style.visibility = "";
     }
-    if (data) await this.#savePhoto(data);
+    if (data) await this.savePhoto(data);
   }
 
   static async #onUpload() {
-    const data = await Data.pickDeviceImage();
-    if (data) await this.#savePhoto(data);
+    const data = await Data.pickDeviceImage(this.cameraOpts());
+    if (data) await this.savePhoto(data);
   }
 
-  static #onViewPhoto(event, target) { this.#go("photo", { photoId: target.dataset.id }); }
+  static #onViewPhoto(event, target) { this.go("photo", { photoId: target.dataset.id }); }
 
   #currentShot() { return this.phone.gallery.find((g) => g.id === this.photoId); }
 
-  static #onPhotoPost() {
+  static #onPhotoPost(event, target) {
     const p = this.#currentShot();
+    const platform = target.dataset.platform ?? "pokegram";
     if (!p) return;
-    this.composeImg = p.src;
-    this._drafts.caption = "";
-    this.#go("compose");
+    for (const k of ["soc-caption", "soc-title", "soc-sound"]) this._drafts[k] = "";
+    this.go(platform, { sv: { platform, view: "compose", img: p.src } });
   }
 
   static async #onPhotoSend() {
@@ -698,7 +725,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     const to = this.element.querySelector("[data-photo-send]")?.value;
     if (!p || !to) return;
     const ok = await Data.request("message", { from: this.actor.id, to, text: "", img: p.src });
-    if (ok !== false) this.#go("thread", { other: to });
+    if (ok !== false) this.go("thread", { other: to, threadCh: "sms", threadBack: null });
   }
 
   static async #onPhotoDelete() {
@@ -707,7 +734,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     const ok = await DialogV2.confirm({ window: { title: "Delete photo" }, content: "<p>Delete this photo from the gallery?</p>", rejectClose: false });
     if (!ok) return;
     await Data.setPhone(this.actor, "gallery", this.phone.gallery.filter((g) => g.id !== p.id));
-    this.#go("gallery");
+    this.go("gallery");
   }
 
   static #onPhotoFull(event, target) {
@@ -741,11 +768,11 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onAddReminder() {
     if (!Data.canUseApp(this.phone, "reminders")) return ui.notifications.info("Reminders need a Rotom Phone.");
-    const text = this.#draft("reminder");
+    const text = this.draft("reminder");
     if (!text) return;
     const reminders = [...this.phone.reminders, { id: foundry.utils.randomID(), text, due: this.#timeInput(), done: false }]
       .sort((a, b) => a.due - b.due);
-    this.#draft("reminder", true);
+    this.draft("reminder", true);
     await Data.setPhone(this.actor, "reminders", reminders);
   }
 
@@ -760,10 +787,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static async #onAddEvent() {
     if (!game.user.isGM) return;
-    const title = this.#draft("event");
+    const title = this.draft("event");
     if (!title) return;
     const list = [...Data.events(), { id: foundry.utils.randomID(), title, due: this.#timeInput() }].sort((a, b) => a.due - b.due);
-    this.#draft("event", true);
+    this.draft("event", true);
     await game.settings.set(MODULE_ID, "events", list);
   }
 
@@ -835,10 +862,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static async #onRotomSay() {
-    const text = this.#draft("rotomSay");
+    const text = this.draft("rotomSay");
     if (!text) return;
     const ok = await Data.request("message", { from: Data.rotomKey(this.actor.id), to: this.actor.id, text });
-    if (ok !== false) this.#draft("rotomSay", true);
+    if (ok !== false) this.draft("rotomSay", true);
   }
 
   static async #onIssueFine() {

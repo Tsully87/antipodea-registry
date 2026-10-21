@@ -1,5 +1,16 @@
 # Changelog
 
+## 1.2.0
+- New social apps: PokéTube (videos with titles, lengths and subscribers) and TikTogepi (full-screen vertical feed with sounds), alongside PokéGram.
+- Social profiles with handles, bios, follower or subscriber counts, Follow/Subscribe, and a grid of posts.
+- Fan engagement: posts pick up views, likes and fan comments as the world clock moves, based on the trainer's following. Popular posts win new fans, and a few go viral. GMs set starting fans per app (for Jax and friends).
+- @mentions and #hashtags are clickable, with search, a Trending tab and Top Creators.
+- Reposts and in-app DMs for each social app.
+- Notifications for tags, comments, reposts, new followers, DMs, payments received and deliveries.
+- App Store on Rotom Phones: buying an app takes the money straight off the trainer sheet and installs it. GMs can grant or remove apps for free in the Registry tab.
+- Paid apps: Translator, Weather (forecast from the Antipodea Weather macro), Pro Camera (filters, sharper photos, Pro badge), PokéMaps (region map, your location, distance and travel days), PokéPay (balance, send money, history) and Mart Express (order from a Poké Mart item folder, delivered on the world clock).
+- PokéPay blocks transfers between characters owned by the same player.
+
 ## 1.1.0
 - The phone is now a full phone: home screen with app icons, back button and home bar.
 - Messages: real texts between trainers. GMs text as any NPC by opening that NPC's phone. Photos can be attached.

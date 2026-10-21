@@ -637,3 +637,289 @@
 @keyframes ap-toast-in { from { opacity: 0; transform: translateY(-14px); } to { opacity: 1; transform: none; } }
 .antipodea-phone .ap-hint { font-size: 12px; color: #888; }
 .antipodea-phone .ap-msg-img { width: 200px; }
+
+/* ============================================ */
+/*  Social apps (1.2)                           */
+/* ============================================ */
+
+.antipodea-phone .app-poketube .ap-appbar { background: linear-gradient(90deg, #a51111, #e03131); }
+.antipodea-phone .app-tiktogepi .ap-appbar { background: linear-gradient(90deg, #111, #2b2b2b); box-shadow: inset 0 -2px 0 #25f4ee, inset 0 -4px 0 #fe2c55; }
+.antipodea-phone .app-store .ap-appbar { background: linear-gradient(90deg, #364fc7, #4263eb); }
+.antipodea-phone .app-translator .ap-appbar, .antipodea-phone .app-weather .ap-appbar { background: linear-gradient(90deg, #1864ab, #1c7ed6); }
+.antipodea-phone .app-pokemaps .ap-appbar { background: linear-gradient(90deg, #2b8a3e, #40c057); }
+.antipodea-phone .app-pokepay .ap-appbar { background: linear-gradient(90deg, #e67700, #fab005); }
+.antipodea-phone .app-mart .ap-appbar { background: linear-gradient(90deg, #0b7285, #1098ad); }
+.antipodea-phone .is-social .ap-content { padding: 0 0 10px; background: #fafafa; }
+.antipodea-phone .app-tiktogepi .ap-content { background: #111; color: #eee; }
+
+.antipodea-phone .soc-tabs {
+  position: sticky; top: 0; z-index: 3; display: flex;
+  background: #fff; border-bottom: 1px solid #eee;
+}
+.antipodea-phone .app-tiktogepi .soc-tabs { background: #111; border-color: #222; }
+.antipodea-phone .soc-tabs button {
+  flex: 1; height: 40px; padding: 0; border: none; border-radius: 0; background: none; color: #999; font-size: 16px; position: relative;
+}
+.antipodea-phone .soc-tabs button:hover { box-shadow: none; color: #555; }
+.antipodea-phone .soc-tabs button.active { color: var(--soc, #d6336c); box-shadow: inset 0 -3px 0 var(--soc, #d6336c); }
+.antipodea-phone .soc-tabs .ap-count { position: absolute; top: 4px; right: 22%; font-size: 9px; min-width: 16px; height: 16px; }
+.antipodea-phone .soc-pokegram { --soc: #d6336c; }
+.antipodea-phone .soc-poketube { --soc: #e03131; }
+.antipodea-phone .soc-tiktogepi { --soc: #25f4ee; }
+
+.antipodea-phone .soc-brand {
+  padding: 10px 14px 4px; font-size: 24px; font-weight: 800; font-style: italic;
+  background: linear-gradient(90deg, #a61e4d, #f08c00); -webkit-background-clip: text; background-clip: text; color: transparent;
+}
+.antipodea-phone .soc-poketube .soc-brand { background: none; color: #e03131; font-style: normal; letter-spacing: -1px; }
+.antipodea-phone .soc-poketube .soc-brand::before { content: "\f04b"; font-family: "Font Awesome 6 Pro", "Font Awesome 6 Free"; font-weight: 900; margin-right: 6px; font-size: 18px; }
+.antipodea-phone .soc-tiktogepi .soc-brand { background: none; color: #fff; font-style: normal; text-shadow: 2px 2px 0 #fe2c55, -2px -2px 0 #25f4ee; }
+.antipodea-phone .soc-switch { display: flex; gap: 6px; padding: 2px 14px 10px; }
+.antipodea-phone .soc-switch button {
+  width: auto; padding: 3px 12px; border-radius: 14px; border: 1px solid #ddd; background: #fff; color: #555; font-size: 12px;
+}
+.antipodea-phone .soc-switch button.on { background: var(--ap-ink); color: #fff; border-color: var(--ap-ink); }
+.antipodea-phone .app-tiktogepi .soc-switch button { background: #222; border-color: #333; color: #aaa; }
+.antipodea-phone .app-tiktogepi .soc-switch button.on { background: #fff; color: #111; }
+
+.antipodea-phone .soc-head { display: flex; align-items: center; gap: 6px; padding: 8px 12px; }
+.antipodea-phone .soc-author { display: flex; align-items: center; gap: 8px; width: auto; padding: 0; border: none; background: none; color: var(--ap-ink); text-align: left; }
+.antipodea-phone .soc-author:hover { box-shadow: none; }
+.antipodea-phone .soc-author span { display: flex; flex-direction: column; line-height: 1.1; }
+.antipodea-phone .soc-author small { color: #888; }
+.antipodea-phone .soc-when { margin-left: auto; color: #999; }
+.antipodea-phone .soc-chip { font-size: 10px; padding: 1px 6px; border-radius: 8px; background: #fff3bf; color: #a65e00; font-weight: 700; }
+.antipodea-phone .soc-chip.pro { background: #e7f5ff; color: #1864ab; }
+.antipodea-phone .soc-repost { font-size: 11px; color: #888; padding: 6px 12px 0; }
+.antipodea-phone .soc-repost a, .antipodea-phone .soc-comment a, .antipodea-phone .ap-mention, .antipodea-phone .ap-tag { color: #1971c2; font-weight: 700; cursor: pointer; text-decoration: none; }
+.antipodea-phone .ap-tag { font-weight: 600; }
+.antipodea-phone .soc-actions { display: flex; align-items: center; gap: 14px; padding: 6px 12px 0; }
+.antipodea-phone .soc-act {
+  display: flex; align-items: center; gap: 4px; width: auto; padding: 0; border: none; background: none; color: var(--ap-ink); font-size: 19px;
+}
+.antipodea-phone .soc-act span { font-size: 12px; font-weight: 700; }
+.antipodea-phone .soc-act:hover { box-shadow: none; transform: scale(1.08); }
+.antipodea-phone .soc-act.liked { color: #e03131; }
+.antipodea-phone .soc-act.reposted { color: #2f9e44; }
+.antipodea-phone .soc-views { margin-left: auto; font-size: 12px; color: #888; }
+.antipodea-phone .soc-comment { margin: 3px 12px; font-size: 13px; color: #333; }
+.antipodea-phone .soc-comment.fan strong { color: #999; font-weight: 600; }
+.antipodea-phone .soc-more { display: block; margin: 2px 12px; font-size: 12px; color: #999; cursor: pointer; }
+.antipodea-phone .soc-detail { border: none; }
+
+/* PokéTube */
+.antipodea-phone .pt-row { padding: 0 0 12px; }
+.antipodea-phone .pt-thumb { position: relative; display: block; width: 100%; padding: 0; border: none; border-radius: 0; aspect-ratio: 16 / 9; background: #000; overflow: hidden; }
+.antipodea-phone .pt-thumb img { width: 100%; height: 100%; object-fit: cover; border: none; }
+.antipodea-phone .pt-len { position: absolute; right: 6px; bottom: 6px; padding: 1px 5px; border-radius: 4px; background: rgba(0,0,0,.8); color: #fff; font-size: 11px; font-weight: 700; }
+.antipodea-phone .pt-play { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 34px; color: rgba(255,255,255,.85); text-shadow: 0 2px 8px rgba(0,0,0,.5); }
+.antipodea-phone .pt-meta { display: flex; gap: 10px; padding: 8px 12px 0; }
+.antipodea-phone .pt-meta img { cursor: pointer; }
+.antipodea-phone .pt-title { display: block; font-weight: 700; color: var(--ap-ink); cursor: pointer; line-height: 1.25; }
+.antipodea-phone .pt-meta small { color: #777; }
+.antipodea-phone .pt-meta small a { color: #777; cursor: pointer; }
+.antipodea-phone .pt-player { position: relative; aspect-ratio: 16 / 9; background: #000; cursor: zoom-in; }
+.antipodea-phone .pt-player img { width: 100%; height: 100%; object-fit: cover; border: none; opacity: .9; }
+.antipodea-phone .pt-player > i { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%); font-size: 50px; color: rgba(255,255,255,.9); }
+.antipodea-phone .pt-watch-title { margin: 10px 12px 2px; font-size: 16px; border: none; }
+.antipodea-phone .pt-watch-meta { display: block; margin: 0 12px; color: #777; }
+.antipodea-phone .pt-channel { display: flex; align-items: center; justify-content: space-between; padding: 10px 12px; border-top: 1px solid #eee; border-bottom: 1px solid #eee; margin-top: 8px; }
+.antipodea-phone .pt-desc { margin: 8px 12px; font-size: 13px; background: #f1f3f5; padding: 8px; border-radius: 8px; }
+.antipodea-phone .pt-watch .ap-subhead { margin: 12px 12px 4px; }
+
+/* TikTogepi */
+.antipodea-phone .tt-card { position: relative; height: 560px; margin-bottom: 4px; background: #000; overflow: hidden; }
+.antipodea-phone .tt-img { width: 100%; height: 100%; object-fit: cover; border: none; border-radius: 0; cursor: zoom-in; }
+.antipodea-phone .tt-overlay {
+  position: absolute; left: 0; right: 60px; bottom: 0; padding: 40px 12px 14px;
+  background: linear-gradient(transparent, rgba(0,0,0,.75)); color: #fff;
+}
+.antipodea-phone .tt-overlay .soc-repost { padding: 0 0 4px; color: #ddd; }
+.antipodea-phone .tt-handle { font-weight: 800; color: #fff; cursor: pointer; }
+.antipodea-phone .tt-caption { margin: 4px 0; font-size: 13px; }
+.antipodea-phone .tt-caption .ap-tag, .antipodea-phone .tt-caption .ap-mention { color: #fff; }
+.antipodea-phone .tt-sound { font-size: 12px; display: flex; gap: 6px; align-items: center; white-space: nowrap; overflow: hidden; }
+.antipodea-phone .tt-sound.dark { color: #555; padding: 4px 12px; }
+.antipodea-phone .tt-side {
+  position: absolute; right: 6px; bottom: 20px; display: flex; flex-direction: column; align-items: center; gap: 14px; color: #fff;
+}
+.antipodea-phone .tt-side .ap-avatar { border: 2px solid #fff; cursor: pointer; }
+.antipodea-phone .tt-side button, .antipodea-phone .tt-side > span {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; width: auto; padding: 0; border: none; background: none;
+  color: #fff; font-size: 24px; text-shadow: 0 1px 4px rgba(0,0,0,.6);
+}
+.antipodea-phone .tt-side button:hover { box-shadow: none; transform: scale(1.1); }
+.antipodea-phone .tt-side span span, .antipodea-phone .tt-side button span { font-size: 11px; font-weight: 700; }
+.antipodea-phone .tt-side .liked { color: #fe2c55; }
+.antipodea-phone .tt-side .reposted { color: #25f4ee; }
+.antipodea-phone .app-tiktogepi .soc-detail { background: #111; color: #eee; }
+.antipodea-phone .app-tiktogepi .soc-detail .soc-author, .antipodea-phone .app-tiktogepi .soc-act { color: #eee; }
+.antipodea-phone .app-tiktogepi .soc-comment, .antipodea-phone .app-tiktogepi .ap-caption { color: #ddd; }
+.antipodea-phone .app-tiktogepi .ap-comment-row input { color: #eee; }
+.antipodea-phone .app-tiktogepi .ap-hint-center, .antipodea-phone .app-tiktogepi .ap-emptystate { color: #888; }
+
+/* Profiles */
+.antipodea-phone .soc-profile { display: flex; flex-direction: column; align-items: center; text-align: center; padding: 16px 14px 10px; }
+.antipodea-phone .soc-pfp { width: 84px; height: 84px; border-radius: 50%; object-fit: cover; border: 3px solid var(--soc); padding: 2px; background: #fff; }
+.antipodea-phone .soc-profile h3 { margin: 8px 0 0; border: none; }
+.antipodea-phone .soc-profile > small { color: #888; }
+.antipodea-phone .soc-bio { margin: 6px 0 0; font-size: 13px; }
+.antipodea-phone .soc-stats { display: flex; gap: 18px; margin-top: 10px; font-size: 12px; color: #777; }
+.antipodea-phone .soc-stats strong { display: block; font-size: 16px; color: var(--ap-ink); }
+.antipodea-phone .app-tiktogepi .soc-stats strong, .antipodea-phone .app-tiktogepi .soc-profile h3 { color: #fff; }
+.antipodea-phone .soc-profile-btns { display: flex; gap: 6px; margin-top: 10px; }
+.antipodea-phone .soc-profile-btns .ap-pill { background: var(--soc); }
+.antipodea-phone .soc-tiktogepi .soc-profile-btns .ap-pill { background: #fe2c55; }
+.antipodea-phone .soc-profile-btns .ap-pill.ghost { background: rgba(0,0,0,.08); color: var(--ap-ink); }
+.antipodea-phone .app-tiktogepi .soc-profile-btns .ap-pill.ghost { background: #333; color: #fff; }
+.antipodea-phone .soc-edit { margin: 0 14px 10px; padding: 8px 10px; border-radius: 10px; background: rgba(0,0,0,.04); font-size: 12px; }
+.antipodea-phone .soc-edit summary { cursor: pointer; font-weight: 700; }
+.antipodea-phone .soc-edit label { display: block; margin: 6px 0; }
+.antipodea-phone .soc-edit input { width: 100%; }
+.antipodea-phone .soc-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; }
+.antipodea-phone .soc-grid.wide { grid-template-columns: repeat(2, 1fr); }
+.antipodea-phone .soc-grid button { position: relative; padding: 0; border: none; border-radius: 0; aspect-ratio: 1; background: #222; overflow: hidden; }
+.antipodea-phone .soc-grid.wide button { aspect-ratio: 16 / 9; }
+.antipodea-phone .soc-tiktogepi .soc-grid button { aspect-ratio: 3 / 4; }
+.antipodea-phone .soc-grid img { width: 100%; height: 100%; object-fit: cover; border: none; }
+.antipodea-phone .soc-grid-rp { position: absolute; top: 4px; right: 4px; color: #fff; text-shadow: 0 1px 3px #000; }
+.antipodea-phone .soc-grid-views { position: absolute; left: 4px; bottom: 3px; color: #fff; font-size: 10px; font-weight: 700; text-shadow: 0 1px 3px #000; }
+
+/* Trending, search, DMs, compose */
+.antipodea-phone .soc-searchbar { display: flex; gap: 6px; padding: 10px 12px 0; }
+.antipodea-phone .soc .ap-subhead { margin: 14px 12px 6px; }
+.antipodea-phone .soc-trends { list-style: none; margin: 0; padding: 0 12px; }
+.antipodea-phone .soc-trends a { display: flex; align-items: center; gap: 10px; padding: 6px 0; color: inherit; cursor: pointer; border-bottom: 1px solid rgba(0,0,0,.05); }
+.antipodea-phone .soc-trends a span:last-child { display: flex; flex-direction: column; }
+.antipodea-phone .soc-trends small { color: #888; }
+.antipodea-phone .soc-rank { width: 22px; font-weight: 800; color: var(--soc); text-align: center; }
+.antipodea-phone .soc-creators { list-style: none; margin: 0; padding: 0 12px; }
+.antipodea-phone .soc-creators a { display: flex; align-items: center; gap: 8px; padding: 5px 0; color: inherit; cursor: pointer; }
+.antipodea-phone .soc-creators a span { display: flex; flex-direction: column; flex: 1; line-height: 1.15; }
+.antipodea-phone .soc-creators small { color: #888; }
+.antipodea-phone .soc-creators em { font-style: normal; font-weight: 800; color: var(--soc); }
+.antipodea-phone .soc-search-head { padding: 12px; font-size: 16px; }
+.antipodea-phone .soc-search-head small { color: #888; font-size: 12px; }
+.antipodea-phone .soc .ap-threads { margin: 0; }
+.antipodea-phone .app-tiktogepi .ap-threads li button { color: #eee; border-color: #222; }
+.antipodea-phone .soc-chips { display: flex; flex-wrap: wrap; gap: 6px; padding: 0 12px; }
+.antipodea-phone .soc-compose { display: flex; flex-direction: column; gap: 8px; padding: 12px; }
+.antipodea-phone .ap-compose-preview.wide { aspect-ratio: 16 / 9; object-fit: cover; }
+.antipodea-phone .soc-tiktogepi .ap-compose-preview { aspect-ratio: 9 / 14; object-fit: cover; }
+.antipodea-phone .soc-len { display: flex; align-items: center; gap: 8px; font-size: 12px; }
+.antipodea-phone .soc-len input { width: 80px; }
+.antipodea-phone .soc-poketube .ap-share { background: #e03131; }
+.antipodea-phone .soc-tiktogepi .ap-share { background: linear-gradient(90deg, #25f4ee, #fe2c55); }
+.antipodea-phone .soc-feed .ap-emptystate .ap-pill { background: var(--soc); }
+.antipodea-phone .ap-share-to { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.antipodea-phone .ap-share-btn { padding: 8px 4px; border: none; border-radius: 10px; color: #fff; font-weight: 700; font-size: 12px; }
+.antipodea-phone .share-pokegram { background: linear-gradient(90deg, #d6336c, #f08c00); }
+.antipodea-phone .share-poketube { background: #e03131; }
+.antipodea-phone .share-tiktogepi { background: #111; box-shadow: inset 0 -3px 0 #25f4ee; }
+
+/* ============================================ */
+/*  App Store and paid apps                     */
+/* ============================================ */
+
+.antipodea-phone .ap-balance {
+  display: flex; justify-content: space-between; align-items: center;
+  padding: 10px 14px; margin-bottom: 10px; border-radius: 14px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08);
+}
+.antipodea-phone .ap-balance span { color: #777; font-size: 12px; text-transform: uppercase; letter-spacing: 1px; }
+.antipodea-phone .ap-balance strong { font-size: 18px; }
+.antipodea-phone .ap-balance.big { flex-direction: column; gap: 2px; padding: 18px; background: linear-gradient(135deg, #f59f00, #e8590c); color: #fff; }
+.antipodea-phone .ap-balance.big span { color: rgba(255,255,255,.85); }
+.antipodea-phone .ap-balance.big strong { font-size: 30px; }
+.antipodea-phone .ap-store-app { display: flex; align-items: center; gap: 10px; padding: 10px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
+.antipodea-phone .ap-icon-tile.small { width: 46px; height: 46px; flex: 0 0 46px; border-radius: 12px; font-size: 20px; color: #fff; }
+.antipodea-phone .ap-store-text { flex: 1; display: flex; flex-direction: column; font-size: 13px; }
+.antipodea-phone .ap-store-text small { color: #777; line-height: 1.3; }
+.antipodea-phone .ap-installed { font-size: 11px; color: #2f9e44; font-weight: 700; white-space: nowrap; }
+.antipodea-phone .ap-store .ap-pill { background: #4263eb; min-width: 70px; }
+
+.antipodea-phone .ap-translator, .antipodea-phone .ap-weather, .antipodea-phone .ap-pay-form { display: flex; flex-direction: column; gap: 8px; }
+.antipodea-phone .ap-rotom-line { display: flex; align-items: center; gap: 10px; font-size: 13px; padding: 8px; background: #fff4e6; border-radius: 12px; }
+.antipodea-phone .ap-translator label { font-size: 12px; }
+.antipodea-phone .ap-translator select { width: 100%; }
+.antipodea-phone .ap-translator .ap-share, .antipodea-phone .ap-weather .ap-pill { background: #1c7ed6; }
+.antipodea-phone .ap-weather-hero { display: flex; align-items: center; gap: 12px; padding: 16px; border-radius: 16px; background: linear-gradient(135deg, #4dabf7, #1864ab); color: #fff; }
+.antipodea-phone .ap-weather-hero > i { font-size: 36px; }
+.antipodea-phone .ap-weather-hero small { display: block; opacity: .85; }
+.antipodea-phone .ap-weather .ap-row { display: flex; gap: 6px; }
+.antipodea-phone .ap-forecast { padding: 10px; border-radius: 12px; background: #fff; font-size: 12px; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.antipodea-phone .ap-forecast img { max-width: 100%; border: none; }
+.antipodea-phone .ap-forecast h1, .antipodea-phone .ap-forecast h2, .antipodea-phone .ap-forecast h3 { font-size: 14px; border: none; margin: 4px 0; }
+
+.antipodea-phone .ap-maps { display: flex; flex-direction: column; gap: 8px; }
+.antipodea-phone .ap-map-tools { display: flex; align-items: center; gap: 6px; }
+.antipodea-phone .ap-map-tools .ap-pill { margin-left: auto; }
+.antipodea-phone .ap-map-tools .ap-pill.gm, .antipodea-phone .ap-maps .ap-pill { background: #2f9e44; }
+.antipodea-phone .ap-map-tools .ap-pill.ghost { background: rgba(0,0,0,.08); color: var(--ap-ink); }
+.antipodea-phone .ap-map-scroll { overflow: auto; max-height: 300px; border-radius: 12px; background: #0b3d5c; }
+.antipodea-phone .ap-map-wrap { position: relative; }
+.antipodea-phone .ap-map-img { display: block; width: 100%; border: none; border-radius: 0; }
+.antipodea-phone .ap-map-img.editing { cursor: crosshair; outline: 3px dashed #fab005; outline-offset: -3px; }
+.antipodea-phone .ap-pin {
+  position: absolute; transform: translate(-50%, -50%);
+  width: 11px; height: 11px; padding: 0; border-radius: 50%;
+  border: 2px solid #000; background: var(--pin); line-height: 1;
+}
+.antipodea-phone .ap-pin.kind-start, .antipodea-phone .ap-pin.kind-league { width: 14px; height: 14px; }
+.antipodea-phone .ap-pin.kind-both { background: linear-gradient(90deg, #d7263d 50%, #8e44ad 50%); }
+.antipodea-phone .ap-pin.selected { box-shadow: 0 0 0 3px #fff, 0 0 0 5px #2f9e44; z-index: 2; }
+.antipodea-phone .ap-pin.here { width: 22px; height: 22px; background: #2f9e44; border-color: #fff; color: #fff; font-size: 11px; z-index: 3; animation: ap-pulse 1.6s infinite; }
+@keyframes ap-pulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(47,158,68,.6); } 50% { box-shadow: 0 0 0 8px rgba(47,158,68,0); } }
+.antipodea-phone .ap-map-card { padding: 10px 12px; border-radius: 12px; background: #fff; box-shadow: 0 1px 3px rgba(0,0,0,.08); }
+.antipodea-phone .ap-map-card h4 { margin: 6px 0 0; border: none; }
+.antipodea-phone .ap-map-card small { color: #777; }
+.antipodea-phone .ap-map-here { font-size: 12px; color: #2f9e44; }
+.antipodea-phone .ap-map-card .ap-row { display: flex; align-items: center; justify-content: space-between; margin-top: 8px; }
+.antipodea-phone .ap-route { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 8px 0 4px; text-align: center; }
+.antipodea-phone .ap-route span { padding: 6px 2px; border-radius: 10px; background: #ebfbee; font-size: 11px; color: #555; }
+.antipodea-phone .ap-route strong { display: block; font-size: 16px; color: #2b8a3e; }
+.antipodea-phone .ap-map-options { display: flex; flex-direction: column; gap: 6px; }
+.antipodea-phone .ap-map-options .ap-row { display: flex; gap: 6px; align-items: center; }
+.antipodea-phone .ap-map-options .ap-check { white-space: nowrap; font-size: 12px; }
+.antipodea-phone .ap-places { list-style: none; margin: 0; padding: 0; columns: 2; font-size: 12px; }
+.antipodea-phone .ap-places button { width: 100%; padding: 3px 6px; border: none; background: none; text-align: left; color: var(--ap-ink); }
+.antipodea-phone .ap-places button:hover { box-shadow: none; background: rgba(0,0,0,.05); }
+
+.antipodea-phone .ap-pay-form .ap-row { display: flex; gap: 6px; }
+.antipodea-phone .ap-pay-form .ap-share { background: #e67700; }
+.antipodea-phone .ap-ledger, .antipodea-phone .ap-orders { list-style: none; margin: 0; padding: 0; }
+.antipodea-phone .ap-ledger li, .antipodea-phone .ap-orders li {
+  display: flex; align-items: center; gap: 10px; padding: 8px 10px; margin-bottom: 5px; border-radius: 10px; background: #fff;
+}
+.antipodea-phone .ap-ledger strong.in { color: #2f9e44; }
+.antipodea-phone .ap-ledger strong.out { color: #c92a2a; }
+.antipodea-phone .ap-ledger li.ap-hint { background: none; }
+.antipodea-phone .ap-orders img, .antipodea-phone .ap-mart-item img { width: 32px; height: 32px; border: none; object-fit: contain; }
+.antipodea-phone .ap-orders em { font-style: normal; font-weight: 700; }
+.antipodea-phone .ap-orders li.done { opacity: .6; }
+.antipodea-phone .ap-mart-section { margin: 10px 0 4px; font-size: 11px; text-transform: uppercase; letter-spacing: 1px; color: #0b7285; font-weight: 700; }
+.antipodea-phone .ap-mart-item { display: flex; align-items: center; gap: 8px; padding: 6px 8px; margin-bottom: 4px; border-radius: 10px; background: #fff; }
+.antipodea-phone .ap-mart-item input { width: 46px; flex: 0 0 46px; }
+.antipodea-phone .ap-mart .ap-pill { background: #1098ad; }
+
+.antipodea-phone .ap-viewfinder.pro { box-shadow: inset 0 0 0 2px #fab005; }
+.antipodea-phone .ap-pro-badge { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 6px; background: #fab005; color: #000; font-weight: 900; font-size: 11px; }
+.antipodea-phone .ap-filters { display: flex; gap: 6px; overflow-x: auto; width: 100%; }
+.antipodea-phone .ap-filters button {
+  flex: 0 0 auto; display: flex; flex-direction: column; align-items: center; gap: 3px; width: auto; padding: 0; border: none; background: none; color: #aaa; font-size: 10px;
+}
+.antipodea-phone .ap-filters button span { width: 44px; height: 44px; border-radius: 8px; background: linear-gradient(135deg, #f08c00, #1c7ed6 60%, #2f9e44); border: 2px solid transparent; }
+.antipodea-phone .ap-filters button.on { color: #fab005; }
+.antipodea-phone .ap-filters button.on span { border-color: #fab005; }
+
+.antipodea-phone .ap-subrow { margin: 8px 0 4px; font-size: 12px; font-weight: 700; color: #0f4f55; }
+.antipodea-phone .ap-fanbases label { display: flex; justify-content: space-between; align-items: center; gap: 6px; }
+.antipodea-phone .ap-fanbases input { width: 90px; }
+
+.antipodea-translate span { font-size: 11px; color: #1971c2; font-weight: 700; }
+.antipodea-translate p { margin: 4px 0 0; font-style: italic; }
+.antipodea-phone .dm-pokegram .ap-appbar { background: linear-gradient(90deg, #a61e4d, #d6336c, #f08c00); }
+.antipodea-phone .dm-poketube .ap-appbar { background: linear-gradient(90deg, #a51111, #e03131); }
+.antipodea-phone .dm-tiktogepi .ap-appbar { background: linear-gradient(90deg, #111, #2b2b2b); }
+.antipodea-phone .dm-pokegram .ap-msg.mine { background: #d6336c; }
+.antipodea-phone .dm-poketube .ap-msg.mine { background: #e03131; }
+.antipodea-phone .dm-tiktogepi .ap-msg.mine { background: #fe2c55; }
