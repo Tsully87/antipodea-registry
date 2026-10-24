@@ -2,6 +2,7 @@ import { MODULE_ID } from "./constants.js";
 import * as Data from "./phone-data.js";
 import * as Social from "./social.js";
 import * as Store from "./store.js";
+import * as Maps from "./maps.js";
 
 /** Phone-style banners that slide in on screen, plus the logic for who gets them. */
 
@@ -66,10 +67,12 @@ export function toast(o) {
   el.querySelector("strong").textContent = o.title ?? "";
   el.querySelector(".ap-toast-text span").textContent = o.body ?? "";
   el.addEventListener("click", () => { o.onClick?.(); el.remove(); });
+  if (o.alert) el.classList.add("alert");
   container().appendChild(el);
   playSound();
-  setTimeout(() => el.classList.add("out"), 6000);
-  setTimeout(() => el.remove(), 6600);
+  const ms = o.duration ?? 6000;
+  setTimeout(() => el.classList.add("out"), ms);
+  setTimeout(() => el.remove(), ms + 600);
 }
 
 /** Should this client hear about something sent to this address? */
@@ -258,4 +261,57 @@ export function onTimeChanged(worldTime, delta) {
     if (!due(e.due)) continue;
     toast({ title: "Today in Antipodea", body: e.title, icon: "fa-calendar-day", onClick: () => openMyPhone("calendar") });
   }
+}
+
+/* -------------------------------------------- */
+/*  Emergency alerts                            */
+/* -------------------------------------------- */
+
+const SEEN_KEY = () => `${MODULE_ID}.seenAlerts.${game.world.id}.${game.user.id}`;
+
+function seenAlerts() {
+  try { return new Set(JSON.parse(localStorage.getItem(SEEN_KEY()) ?? "[]")); } catch (e) { return new Set(); }
+}
+function saveSeen(set) {
+  try { localStorage.setItem(SEEN_KEY(), JSON.stringify([...set].slice(-200))); } catch (e) { /* private window etc */ }
+}
+
+/** Which weather zone is this trainer's phone in right now? */
+function zoneOf(actor) {
+  const loc = Data.getPhone(actor).location;
+  return loc ? Maps.pinById(loc)?.zone ?? null : null;
+}
+
+/**
+ * Emergency alerts reach every phone (Rotom or not) whose location is in the alert's zone,
+ * like a real emergency broadcast. Players only: the GM already gets the full bulletin in chat.
+ */
+export function onAlerts() {
+  if (!started || game.user.isGM) return;
+  const data = game.settings.get(MODULE_ID, "weatherAlerts") ?? {};
+  const alerts = Array.isArray(data.alerts) ? data.alerts : [];
+  if (!alerts.length) return;
+  const seen = seenAlerts();
+  const mine = game.actors.filter((a) => a.type !== "pokemon" && a.isOwner);
+  let changed = false;
+  for (const al of alerts) {
+    if (!al?.id || seen.has(al.id)) continue;
+    const hit = mine.filter((a) => zoneOf(a) === al.zone);
+    if (!hit.length) continue;
+    seen.add(al.id); changed = true;
+    const who = mine.length > 1 ? ` (${hit.map((a) => a.name).join(", ")})` : "";
+    toast({
+      title: `⚠️ ${al.title}${who}`,
+      body: al.body ?? "",
+      icon: al.icon ?? "fa-triangle-exclamation",
+      alert: true,
+      duration: 15000,
+      onClick: () => {
+        const a = hit[0];
+        const ph = Data.getPhone(a);
+        RegistryPhoneRef?.open(a, { app: Data.hasApp(ph, "weather") ? "weather" : "home" });
+      }
+    });
+  }
+  if (changed) saveSeen(seen);
 }

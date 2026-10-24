@@ -67,6 +67,7 @@ async function startNetwork() {
   }
   Net.invalidate();
   Notify.init(RegistryPhone);
+  Notify.onAlerts();
   RegistryPhone.refresh();
   if (Data.isActiveGM()) {
     await Data.processBacklog();
@@ -291,6 +292,11 @@ Hooks.once("init", () => {
     scope: "world", config: false, type: Array, default: [],
     // Old storage, kept only for the move.
   });
+  game.settings.register(MODULE_ID, "weatherAlerts", {
+    // Emergency alerts from the Antipodea Weather macro: { day, alerts: [{ id, zone, kind, title, body, icon }] }
+    scope: "world", config: false, type: Object, default: {},
+    onChange: () => Notify.onAlerts()
+  });
   game.settings.register(MODULE_ID, "events", {
     scope: "world", config: false, type: Array, default: [],
     onChange: () => RegistryPhone.refresh()
@@ -321,6 +327,15 @@ Hooks.once("ready", () => {
     setEndorsement: Registry.setEndorsement,
     communityService: Registry.communityService,
     sweep: Registry.sweep,
+    /**
+     * GM: post emergency alerts (from the Antipodea Weather macro). Each alert is
+     * { id, zone, kind, title, body, icon }. Every phone whose location is in that zone gets a pop-up.
+     */
+    postAlerts: async (alerts, day = "") => {
+      if (!game.user.isGM) return false;
+      await game.settings.set(MODULE_ID, "weatherAlerts", { day, at: Date.now(), alerts: Array.isArray(alerts) ? alerts : [] });
+      return true;
+    },
     testDiscord: () => postToDiscord("🧪 **Antipodea Trainer Registry** is connected. Notices will post here."),
     /** Text a trainer as any actor (or as their Rotom with "rotom:<actorId>"). GM only. */
     text: (from, to, text) => Data.request("message", { from: resolveKey(from), to: resolveKey(to), text }),

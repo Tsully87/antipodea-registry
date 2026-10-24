@@ -112,6 +112,16 @@ reg.testDiscord();                   // posts a test message to the webhook
 | Riding without a permit or licence (Sky) | $2,500, doubles each repeat | n/a |
 | Other | You set it | You set it |
 
+## Antipodea Weather macro
+
+The weather macro lives in `macros/antipodea-weather.js`. To install or update it in Foundry:
+
+1. Make a new **Script** macro, paste in everything from `macros/install-weather-update.js` and run it as the GM.
+2. It downloads the weather macro for this release, checks it arrived intact, backs up your current one, keeps your Discord webhook, and adds the **Mount Kahikatea** and **Antipodea Earthquake** macros.
+3. A whispered chat message lists what it did.
+
+Emergency alerts reach a player's phone when their trainer's phone location (set with **Put them here** in PokéMaps or in the Registry tab) is in the affected weather zone.
+
 ## Releasing an update
 
 1. Bump nothing by hand. Push your changes to `main`.

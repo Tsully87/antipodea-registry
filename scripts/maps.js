@@ -42,7 +42,7 @@ export const DEFAULT_PINS = [
   P("Budgie Beach", 790, 432, "contest", "Bunya Coast"),
   P("Banksia City", 640, 578, "contest", "Gumleaf Coast"),
   P("Kangaroo Paw City", 112, 380, "contest", "Banksia Coast"),
-  P("Sweet As City", 1005, 612, "contest", "Tussock Plains"),
+  P("Sweet As City", 1005, 612, "contest", "Snowgum High Country"),
   P("Silver Fern Plateau", 1095, 515, "league", "Tussock Plains"),
   P("Lilly Pilly Town", 765, 375, "town", "Bunya Coast"),
   P("Mangrove Point", 598, 98, "town", "Rainforest Reach"),

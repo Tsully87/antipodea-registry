@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.4.0
+- Emergency alerts: when the Antipodea Weather macro reports something serious, every phone whose location is in that weather zone gets a red pop-up, Rotom Phone or not. Tapping it opens the Weather app if they have it, or the home screen.
+- Alerts cover earthquakes (Moderate shaking or worse), strong aftershocks, tsunami warnings, cyclone watches and warnings, severe east coast lows, Watch and Act or Emergency Warning bushfires, thick smoke, Mount Kahikatea at Alert Level 2+, Moderate or Major floods, and severe or extreme heatwaves.
+- Each alert pops up once per player, and only when an event starts or gets worse. Players who log in later still get today's alerts.
+- New API: `game.modules.get("antipodea-registry").api.postAlerts(alerts)` for the weather macro.
+- Sweet As City's PokéMaps pin now sits in Snowgum High Country.
+- The Antipodea Weather macro now lives in this repo (`macros/`), with an installer macro that keeps your Discord webhook.
+
 ## 1.3.3
 - Fixed the Antipodea directory names in Contacts showing pale on the light screen. The list shared a class name with Foundry's own sidebar, which was recolouring it.
 

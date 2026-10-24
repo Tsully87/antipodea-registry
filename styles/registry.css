@@ -942,3 +942,8 @@
 .antipodea-phone .ap-spot-list i { width: 16px; text-align: center; }
 .antipodea-phone .ap-city-gm button { white-space: nowrap; width: auto; }
 .antipodea-phone .ap-city-btn { display: flex; width: fit-content; }
+
+/* Emergency alerts (1.4) */
+.ap-toast.alert { background: linear-gradient(90deg, rgba(160,20,20,.96), rgba(210,45,30,.96)); border: 2px solid #ffd43b; }
+.ap-toast.alert .ap-toast-icon { background: #ffd43b; color: #7a0f0f; }
+.ap-toast.alert .ap-toast-text span { -webkit-line-clamp: 3; }
