@@ -5,7 +5,7 @@
 - Alerts cover earthquakes (Moderate shaking or worse), strong aftershocks, tsunami warnings, cyclone watches and warnings, severe east coast lows, Watch and Act or Emergency Warning bushfires, thick smoke, Mount Kahikatea at Alert Level 2+, Moderate or Major floods, and severe or extreme heatwaves.
 - Each alert pops up once per player, and only when an event starts or gets worse. Players who log in later still get today's alerts.
 - New API: `game.modules.get("antipodea-registry").api.postAlerts(alerts)` for the weather macro.
-- Sweet As City's PokéMaps pin now sits in Snowgum High Country.
+- PokéMaps pins now use the same weather zones as the vault: Sweet As City and Silver Fern Plateau in Snowgum High Country, Ironbark in Bunya Coast, Matai Isle in Tussock Plains.
 - The Antipodea Weather macro now lives in this repo (`macros/`), with an installer macro that keeps your Discord webhook.
 
 ## 1.3.3

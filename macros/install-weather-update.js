@@ -61,16 +61,19 @@ for (const [name, img, key, what] of helpers) {
   report.push(`Added the "${name}" macro.`);
 }
 
-// Sweet As City sits in Snowgum High Country (matches the vault)
+// PokéMaps pins use the same weather zones as the vault's weather_zone fields
 const MOD = "antipodea-registry";
 if (game.modules.get(MOD)?.active) {
   const pins = game.settings.get(MOD, "mapPins");
   if (Array.isArray(pins) && pins.length) {
-    const sweet = pins.find((p) => p.name === "Sweet As City");
-    if (sweet && sweet.zone !== "Snowgum High Country") {
-      sweet.zone = "Snowgum High Country";
+    const fix = { "Sweet As City": "Snowgum High Country", "Silver Fern Plateau": "Snowgum High Country", "Ironbark": "Bunya Coast", "Matai Isle": "Tussock Plains" };
+    const moved = [];
+    for (const p of pins) {
+      if (fix[p.name] && p.zone !== fix[p.name]) { p.zone = fix[p.name]; moved.push(`${p.name} (${p.zone})`); }
+    }
+    if (moved.length) {
       await game.settings.set(MOD, "mapPins", pins);
-      report.push("Moved Sweet As City's PokéMaps pin into Snowgum High Country.");
+      report.push(`Moved PokéMaps pins to match the vault: ${moved.join(", ")}.`);
     }
   }
   // rebuild the phone's saved week of forecasts so the Weather app shows the new version

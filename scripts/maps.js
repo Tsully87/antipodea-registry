@@ -43,7 +43,7 @@ export const DEFAULT_PINS = [
   P("Banksia City", 640, 578, "contest", "Gumleaf Coast"),
   P("Kangaroo Paw City", 112, 380, "contest", "Banksia Coast"),
   P("Sweet As City", 1005, 612, "contest", "Snowgum High Country"),
-  P("Silver Fern Plateau", 1095, 515, "league", "Tussock Plains"),
+  P("Silver Fern Plateau", 1095, 515, "league", "Snowgum High Country"),
   P("Lilly Pilly Town", 765, 375, "town", "Bunya Coast"),
   P("Mangrove Point", 598, 98, "town", "Rainforest Reach"),
   P("Ridgy Didge", 462, 228, "town", "The Big Wet"),
@@ -54,7 +54,7 @@ export const DEFAULT_PINS = [
   P("Galah Flats", 228, 378, "town", "Banksia Coast"),
   P("Marri Vale", 248, 410, "town", "Banksia Coast"),
   P("Billabong Bend", 618, 498, "town", "Gumleaf Coast"),
-  P("Ironbark", 728, 438, "town", "Waratah Coast"),
+  P("Ironbark", 728, 438, "town", "Bunya Coast"),
   P("Leatherwood", 690, 690, "town", "Huon Isle"),
   P("Jandal Cove", 1148, 150, "town", "Pōhutukawa Isle"),
   P("Tōtara Ridge", 1205, 372, "town", "Pōhutukawa Isle"),
@@ -62,7 +62,7 @@ export const DEFAULT_PINS = [
   P("Kawakawa Harbour", 1212, 432, "town", "Pōhutukawa Isle"),
   P("Gumboot Plains", 1135, 545, "town", "Tussock Plains"),
   P("Miro Sound", 962, 625, "town", "Rimu Coast"),
-  P("Matai Isle", 968, 706, "town", "Rimu Coast")
+  P("Matai Isle", 968, 706, "town", "Tussock Plains")
 ];
 
 /** Kinds of labelled spot on a city map. */
