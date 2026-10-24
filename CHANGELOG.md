@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.3
+- Fixed the Antipodea directory names in Contacts showing pale on the light screen. The list shared a class name with Foundry's own sidebar, which was recolouring it.
+
 ## 1.3.1
 - Fixed contact names (and other phone text) turning pale and unreadable when Foundry or another module uses a dark theme. Phone text now always stays dark on the light screen.
 
