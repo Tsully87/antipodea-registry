@@ -1,0 +1,30 @@
+<div class="ap-home">
+  <div class="ap-widget">
+    <div class="ap-widget-time">{{clock}}</div>
+    <div class="ap-widget-date">{{dateLabel}}</div>
+  </div>
+
+  {{#if rotom}}
+  <button type="button" class="ap-rotom-home" data-action="apOpenThread" data-other="rotom:{{actorId}}">
+    <span class="ap-rotom-face"><i></i><i></i></span>
+    {{#if bubble}}<span class="ap-bubble">{{bubble}}</span>{{else}}<span class="ap-bubble quiet">{{rotomName}} is chilling.</span>{{/if}}
+  </button>
+  {{/if}}
+
+  <div class="ap-grid">
+    {{#each apps}}
+    <button type="button" class="ap-icon {{#if locked}}locked{{/if}}" data-action="apGo" data-app="{{app}}">
+      <span class="ap-icon-tile" style="--tile: {{color}}"><i class="fa-solid {{icon}}"></i>{{#if locked}}<i class="fa-solid fa-lock ap-lock"></i>{{/if}}</span>
+      {{#if badge}}<span class="ap-count">{{badge}}</span>{{/if}}
+      <span class="ap-icon-label">{{label}}</span>
+    </button>
+    {{/each}}
+  </div>
+
+  {{#if upcoming.length}}
+  <div class="ap-upnext">
+    <h5><i class="fa-solid fa-calendar-day"></i> Coming up</h5>
+    {{#each upcoming}}<div class="ap-upnext-row {{#if isEvent}}event{{/if}}"><span>{{text}}</span><small>{{when}}</small></div>{{/each}}
+  </div>
+  {{/if}}
+</div>

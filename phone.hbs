@@ -1,0 +1,43 @@
+<div class="ap-device">
+  <div class="ap-screen {{#if rotom}}is-rotom{{/if}} app-{{app}} {{#if view.social}}is-social{{/if}} {{#if dmCh}}dm-{{dmCh}}{{/if}}">
+
+    <div class="ap-statusbar">
+      <span class="ap-clock">{{clock}}</span>
+      <span class="ap-notch">{{#if rotom}}<span class="ap-rotom-face tiny"><i></i><i></i></span>{{/if}}</span>
+      <span class="ap-icons">{{#if signal}}<i class="fa-solid fa-signal"></i>{{else}}<span class="ap-nosignal">No signal</span>{{/if}}<i class="fa-solid fa-wifi"></i><i class="fa-solid fa-battery-three-quarters"></i></span>
+    </div>
+
+    {{#unless view.home}}
+    <div class="ap-appbar">
+      <button type="button" class="ap-back" data-action="apBack" data-tooltip="Back"><i class="fa-solid fa-chevron-left"></i></button>
+      <span class="ap-appbar-title">{{title}}</span>
+      {{#if view.social}}<button type="button" class="ap-appbar-btn" data-action="apSocialCompose" data-tooltip="New post"><i class="fa-solid fa-square-plus"></i></button>{{/if}}
+      {{#if view.messages}}<button type="button" class="ap-appbar-btn" data-action="apGo" data-app="contacts" data-tooltip="New message"><i class="fa-solid fa-pen-to-square"></i></button>{{/if}}
+    </div>
+    {{/unless}}
+
+    <div class="ap-content" data-app="{{app}}">
+      {{#if view.home}}{{> "modules/antipodea-registry/templates/apps/home.hbs"}}{{/if}}
+      {{#if view.messages}}{{> "modules/antipodea-registry/templates/apps/messages.hbs"}}{{/if}}
+      {{#if view.thread}}{{> "modules/antipodea-registry/templates/apps/thread.hbs"}}{{/if}}
+      {{#if view.contacts}}{{> "modules/antipodea-registry/templates/apps/contacts.hbs"}}{{/if}}
+      {{#if view.social}}{{> "modules/antipodea-registry/templates/apps/social.hbs"}}{{/if}}
+      {{#if view.camera}}{{> "modules/antipodea-registry/templates/apps/camera.hbs"}}{{/if}}
+      {{#if view.gallery}}{{> "modules/antipodea-registry/templates/apps/gallery.hbs"}}{{/if}}
+      {{#if view.photo}}{{> "modules/antipodea-registry/templates/apps/photo.hbs"}}{{/if}}
+      {{#if view.calendar}}{{> "modules/antipodea-registry/templates/apps/calendar.hbs"}}{{/if}}
+      {{#if view.card}}{{> "modules/antipodea-registry/templates/apps/card.hbs"}}{{/if}}
+      {{#if view.licence}}{{> "modules/antipodea-registry/templates/apps/licence.hbs"}}{{/if}}
+      {{#if view.store}}{{> "modules/antipodea-registry/templates/apps/store.hbs"}}{{/if}}
+      {{#if view.translator}}{{> "modules/antipodea-registry/templates/apps/translator.hbs"}}{{/if}}
+      {{#if view.weather}}{{> "modules/antipodea-registry/templates/apps/weather.hbs"}}{{/if}}
+      {{#if view.pokemaps}}{{> "modules/antipodea-registry/templates/apps/pokemaps.hbs"}}{{/if}}
+      {{#if view.pokepay}}{{> "modules/antipodea-registry/templates/apps/pokepay.hbs"}}{{/if}}
+      {{#if view.mart}}{{> "modules/antipodea-registry/templates/apps/mart.hbs"}}{{/if}}
+      {{#if view.admin}}{{> "modules/antipodea-registry/templates/apps/admin.hbs"}}{{/if}}
+    </div>
+
+    {{#if busy}}<div class="ap-busy"><i class="fa-solid fa-spinner fa-spin"></i> {{busy}}</div>{{/if}}
+    <button type="button" class="ap-homebar" data-action="apHome" data-tooltip="Home"></button>
+  </div>
+</div>

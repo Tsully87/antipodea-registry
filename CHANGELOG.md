@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.3.1
+- Fixed contact names (and other phone text) turning pale and unreadable when Foundry or another module uses a dark theme. Phone text now always stays dark on the light screen.
+
 ## 1.3.0
 - Renamed to **Pokémon Phone** (the module ID stays antipodea-registry, so nothing needs reinstalling).
 - New Phone Network: texts, DMs, posts, likes, comments, reposts, follows and profiles are saved in a hidden journal every player can write to, so they all work with no GM online.

@@ -1,0 +1,23 @@
+<div class="ap-mart">
+  <div class="ap-balance"><span>Balance</span><strong>{{balance}}</strong></div>
+  <p class="ap-hint">Mart prices plus {{markup}}% delivery. Arrives in {{deliveryLabel}} on the world clock.</p>
+  {{#unless gmOnline}}<p class="ap-hint"><i class="fa-solid fa-clock"></i> The Mart's closed right now. Orders queue and are placed (and paid) when the GM's next online.</p>{{/unless}}
+  {{#if orders.length}}
+  <h4 class="ap-subhead">Your orders</h4>
+  <ul class="ap-orders">
+    {{#each orders}}<li class="{{#if done}}done{{/if}}"><img src="{{img}}" alt=""><span class="ap-what">{{qty}} x {{name}}<small>{{status}}</small></span><em>{{total}}</em></li>{{/each}}
+  </ul>
+  {{/if}}
+  <h4 class="ap-subhead">Shop</h4>
+  {{#each catalog}}
+  {{#if head}}<div class="ap-mart-section">{{head}}</div>{{/if}}
+  <div class="ap-mart-item">
+    <img src="{{img}}" alt="">
+    <span class="ap-what">{{name}}<small>{{priceLabel}}</small></span>
+    <input type="number" data-qty="{{id}}" value="1" min="1" max="99">
+    <button type="button" class="ap-pill small" data-action="apOrder" data-item="{{id}}" {{#unless @root.signal}}disabled{{/unless}}><i class="fa-solid fa-cart-plus"></i></button>
+  </div>
+  {{else}}
+  <p class="ap-warn">The shelves are empty. {{#if isGM}}Put items with a cost in an Items folder called "{{martFolder}}".{{else}}Check back later.{{/if}}</p>
+  {{/each}}
+</div>

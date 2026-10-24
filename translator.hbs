@@ -1,0 +1,9 @@
+<div class="ap-translator">
+  <div class="ap-rotom-line"><span class="ap-rotom-face small"><i></i><i></i></span><span>Type what you want to say and {{rotomName}} will say it in their language.</span></div>
+  <label>Translate into
+    <select data-lang>{{#each languages}}<option {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+  </label>
+  <textarea class="ap-caption-input" data-draft="translate" rows="4" placeholder="G'day, where's the nearest Pokémon Centre?">{{translateDraft}}</textarea>
+  <button type="button" class="ap-share" data-action="apTranslate"><i class="fa-solid fa-language"></i> Speak it</button>
+  <p class="ap-hint">Posts to chat as your trainer, marked as translated. The GM decides how well it lands.</p>
+</div>

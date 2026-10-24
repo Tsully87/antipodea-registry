@@ -1,0 +1,29 @@
+<div class="ap-mynumber">My number <strong>{{myNumber}}</strong></div>
+
+<ul class="ap-contacts">
+  {{#each contacts}}
+  <li>
+    <button type="button" class="ap-contact-main" data-action="apOpenThread" data-other="{{id}}">
+      <img class="ap-avatar" src="{{img}}" alt="">
+      <span class="ap-thread-text"><strong>{{name}}</strong><small>{{number}}</small></span>
+      <i class="fa-solid fa-comment ap-contact-go"></i>
+    </button>
+    {{#if saved}}<button type="button" class="ap-x" data-action="apRemoveContact" data-id="{{id}}" data-tooltip="Remove contact"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+  </li>
+  {{else}}
+  <li class="ap-hint-center">No contacts yet.</li>
+  {{/each}}
+</ul>
+
+{{#if directory.length}}
+<h4 class="ap-subhead">Antipodea directory</h4>
+<ul class="ap-contacts directory">
+  {{#each directory}}
+  <li>
+    <img class="ap-avatar" src="{{img}}" alt="">
+    <span class="ap-thread-text"><strong>{{name}}</strong></span>
+    <button type="button" class="ap-pill small" data-action="apAddContact" data-id="{{id}}"><i class="fa-solid fa-user-plus"></i> Add</button>
+  </li>
+  {{/each}}
+</ul>
+{{/if}}

@@ -1,0 +1,241 @@
+{{#*inline "apComments"}}
+<div class="soc-comments">
+  {{#each comments}}<p class="soc-comment {{#if fan}}fan{{/if}}">{{#if actorId}}<a data-action="apSocialProfile" data-actor="{{actorId}}">@{{name}}</a>{{else}}<strong>@{{name}}</strong>{{/if}} {{{html}}}</p>{{/each}}
+</div>
+<div class="ap-comment-row">
+  <input type="text" data-draft="comment-{{id}}" data-enter="apSocialComment" data-post="{{id}}" value="{{draft}}" placeholder="Add a comment...">
+  <button type="button" class="ap-link" data-action="apSocialComment" data-post="{{id}}">Post</button>
+</div>
+{{/inline}}
+
+{{#*inline "apActions"}}
+<div class="soc-actions">
+  <button type="button" class="soc-act {{#if liked}}liked{{/if}}" data-action="apSocialLike" data-post="{{id}}" data-tooltip="Like"><i class="fa-{{#if liked}}solid{{else}}regular{{/if}} fa-heart"></i><span>{{likes}}</span></button>
+  <button type="button" class="soc-act" data-action="apSocialPost" data-post="{{id}}" data-tooltip="Comments"><i class="fa-regular fa-comment"></i><span>{{commentCount}}</span></button>
+  <button type="button" class="soc-act {{#if reposted}}reposted{{/if}}" data-action="apSocialRepost" data-post="{{id}}" data-tooltip="{{#if reposted}}Undo repost{{else}}Repost{{/if}}"><i class="fa-solid fa-retweet"></i><span>{{reposts}}</span></button>
+  <span class="soc-views"><i class="fa-solid fa-eye"></i> {{views}}</span>
+</div>
+{{/inline}}
+
+{{#*inline "apHead"}}
+{{#if isRepost}}<div class="soc-repost"><i class="fa-solid fa-retweet"></i> <a data-action="apSocialProfile" data-actor="{{repostBy.id}}">@{{repostBy.handle}}</a> reposted{{#if repostCaption}}: {{{repostCaption}}}{{/if}}</div>{{/if}}
+<header class="soc-head">
+  <button type="button" class="soc-author" data-action="apSocialProfile" data-actor="{{author}}">
+    <img class="ap-avatar small" src="{{authorImg}}" alt=""><span><strong>{{authorName}}</strong><small>@{{handle}}</small></span>
+  </button>
+  {{#if viral}}<span class="soc-chip viral">🔥 Viral</span>{{/if}}
+  {{#if pro}}<span class="soc-chip pro">📸 Pro</span>{{/if}}
+  <small class="soc-when">{{when}}</small>
+  {{#if canDelete}}<button type="button" class="ap-x" data-action="apSocialDelete" data-post="{{cardId}}" data-tooltip="Delete"><i class="fa-solid fa-trash"></i></button>{{/if}}
+</header>
+{{/inline}}
+
+{{#*inline "apCard"}}
+{{#if @root.soc.poketube}}
+<article class="pt-row">
+  {{#if isRepost}}<div class="soc-repost"><i class="fa-solid fa-retweet"></i> @{{repostBy.handle}} reposted</div>{{/if}}
+  <button type="button" class="pt-thumb" data-action="apSocialPost" data-post="{{id}}"><img src="{{img}}" alt=""><span class="pt-len">{{lengthLabel}}</span><i class="fa-solid fa-play pt-play"></i></button>
+  <div class="pt-meta">
+    <img class="ap-avatar small" src="{{authorImg}}" alt="" data-action="apSocialProfile" data-actor="{{author}}">
+    <div>
+      <a class="pt-title" data-action="apSocialPost" data-post="{{id}}">{{title}}</a>
+      <small><a data-action="apSocialProfile" data-actor="{{author}}">{{authorName}}</a> · {{views}} views · {{when}}{{#if viral}} · 🔥{{/if}}</small>
+    </div>
+  </div>
+</article>
+{{else if @root.soc.tiktogepi}}
+<article class="tt-card">
+  <img class="tt-img" src="{{img}}" alt="" data-action="apPhotoFull" data-src="{{img}}">
+  <div class="tt-overlay">
+    {{#if isRepost}}<div class="soc-repost"><i class="fa-solid fa-retweet"></i> @{{repostBy.handle}} reposted</div>{{/if}}
+    <a class="tt-handle" data-action="apSocialProfile" data-actor="{{author}}">@{{handle}}</a>{{#if viral}} <span class="soc-chip viral">🔥</span>{{/if}}
+    {{#if hasCaption}}<p class="tt-caption">{{{captionHtml}}}</p>{{/if}}
+    <div class="tt-sound"><i class="fa-solid fa-music"></i> <span>{{sound}}</span></div>
+  </div>
+  <div class="tt-side">
+    <img class="ap-avatar" src="{{authorImg}}" alt="" data-action="apSocialProfile" data-actor="{{author}}">
+    <button type="button" class="{{#if liked}}liked{{/if}}" data-action="apSocialLike" data-post="{{id}}"><i class="fa-solid fa-heart"></i><span>{{likes}}</span></button>
+    <button type="button" data-action="apSocialPost" data-post="{{id}}"><i class="fa-solid fa-comment-dots"></i><span>{{commentCount}}</span></button>
+    <button type="button" class="{{#if reposted}}reposted{{/if}}" data-action="apSocialRepost" data-post="{{id}}"><i class="fa-solid fa-retweet"></i><span>{{reposts}}</span></button>
+    <span><i class="fa-solid fa-play"></i><span>{{views}}</span></span>
+    {{#if canDelete}}<button type="button" data-action="apSocialDelete" data-post="{{cardId}}"><i class="fa-solid fa-trash"></i></button>{{/if}}
+  </div>
+</article>
+{{else}}
+<article class="ap-post">
+  {{> apHead}}
+  <img class="ap-post-img" src="{{img}}" alt="" data-action="apPhotoFull" data-src="{{img}}">
+  {{> apActions}}
+  {{#if hasCaption}}<p class="ap-caption"><strong>@{{handle}}</strong> {{{captionHtml}}}</p>{{/if}}
+  {{#each lastComments}}<p class="soc-comment {{#if fan}}fan{{/if}}"><strong>@{{name}}</strong> {{{html}}}</p>{{/each}}
+  {{#if moreComments}}<a class="soc-more" data-action="apSocialPost" data-post="{{id}}">View all {{commentCount}} comments</a>{{/if}}
+  <div class="ap-comment-row">
+    <input type="text" data-draft="comment-{{id}}" data-enter="apSocialComment" data-post="{{id}}" value="{{draft}}" placeholder="Add a comment...">
+    <button type="button" class="ap-link" data-action="apSocialComment" data-post="{{id}}">Post</button>
+  </div>
+</article>
+{{/if}}
+{{/inline}}
+
+<div class="soc soc-{{soc.key}}">
+  <nav class="soc-tabs">
+    <button type="button" class="{{#if sv.feed}}active{{/if}}" data-action="apSocialNav" data-view="feed"><i class="fa-solid fa-house"></i></button>
+    <button type="button" class="{{#if sv.trending}}active{{/if}}" data-action="apSocialNav" data-view="trending"><i class="fa-solid fa-fire"></i></button>
+    <button type="button" class="{{#if sv.dms}}active{{/if}}" data-action="apSocialNav" data-view="dms"><i class="fa-solid fa-paper-plane"></i>{{#if socialDmUnread}}<span class="ap-count inline">{{socialDmUnread}}</span>{{/if}}</button>
+    <button type="button" class="{{#if sv.profile}}{{#if profile.isMe}}active{{/if}}{{/if}}" data-action="apSocialNav" data-view="profile"><i class="fa-solid fa-user"></i></button>
+  </nav>
+
+  {{!-- ============ FEED ============ --}}
+  {{#if sv.feed}}
+  <div class="soc-brand">{{soc.name}}</div>
+  <div class="soc-switch">
+    <button type="button" class="{{#unless sv.followingOnly}}on{{/unless}}" data-action="apSocialNav" data-view="feed" data-following="0">For You</button>
+    <button type="button" class="{{#if sv.followingOnly}}on{{/if}}" data-action="apSocialNav" data-view="feed" data-following="1">{{soc.following}}</button>
+  </div>
+  <div class="soc-feed">
+    {{#each feed}}{{> apCard}}{{else}}
+    <div class="ap-emptystate">
+      <i class="fa-solid {{soc.icon}}"></i>
+      <p>{{#if sv.followingOnly}}Nobody you follow has posted yet.{{else}}Nothing here yet.{{/if}}</p>
+      <button type="button" class="ap-pill" data-action="apSocialCompose">Make the first post</button>
+    </div>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  {{!-- ============ ONE POST ============ --}}
+  {{#if sv.post}}
+  {{#with post}}
+  {{#if @root.soc.poketube}}
+  <div class="pt-watch">
+    <div class="pt-player" data-action="apPhotoFull" data-src="{{img}}"><img src="{{img}}" alt=""><i class="fa-solid fa-circle-play"></i><span class="pt-len">{{lengthLabel}}</span></div>
+    <h3 class="pt-watch-title">{{title}}</h3>
+    <small class="pt-watch-meta">{{views}} views · {{when}}{{#if viral}} · 🔥 Trending{{/if}}{{#if pro}} · 📸 Pro{{/if}}</small>
+    {{> apActions}}
+    <div class="pt-channel">
+      <button type="button" class="soc-author" data-action="apSocialProfile" data-actor="{{author}}"><img class="ap-avatar" src="{{authorImg}}" alt=""><span><strong>{{authorName}}</strong><small>@{{handle}}</small></span></button>
+      {{#if canDelete}}<button type="button" class="ap-x" data-action="apSocialDelete" data-post="{{cardId}}"><i class="fa-solid fa-trash"></i></button>{{/if}}
+    </div>
+    {{#if hasCaption}}<p class="pt-desc">{{{captionHtml}}}</p>{{/if}}
+    <h4 class="ap-subhead">Comments</h4>
+    {{> apComments}}
+  </div>
+  {{else}}
+  <article class="ap-post soc-detail">
+    {{> apHead}}
+    <img class="ap-post-img" src="{{img}}" alt="" data-action="apPhotoFull" data-src="{{img}}">
+    {{> apActions}}
+    {{#if hasCaption}}<p class="ap-caption"><strong>@{{handle}}</strong> {{{captionHtml}}}</p>{{/if}}
+    {{#if @root.soc.tiktogepi}}<div class="tt-sound dark"><i class="fa-solid fa-music"></i> {{sound}}</div>{{/if}}
+    {{> apComments}}
+  </article>
+  {{/if}}
+  {{else}}
+  <p class="ap-hint-center">That post's been deleted.</p>
+  {{/with}}
+  {{/if}}
+
+  {{!-- ============ PROFILE ============ --}}
+  {{#if sv.profile}}
+  {{#with profile}}
+  <div class="soc-profile">
+    <img class="soc-pfp" src="{{img}}" alt="">
+    <h3>{{name}}</h3>
+    <small>@{{handle}}</small>
+    {{#if bio}}<p class="soc-bio">{{bio}}</p>{{/if}}
+    <div class="soc-stats">
+      <span><strong>{{postCount}}</strong> posts</span>
+      <span><strong>{{fans}}</strong> {{@root.soc.fans}}</span>
+      <span><strong>{{following}}</strong> following</span>
+    </div>
+    {{#unless isMe}}
+    <div class="soc-profile-btns">
+      <button type="button" class="ap-pill {{#if amFollowing}}ghost{{/if}}" data-action="apSocialFollow" data-actor="{{id}}">{{#if amFollowing}}{{@root.soc.following}}{{else}}{{@root.soc.follow}}{{/if}}</button>
+      <button type="button" class="ap-pill ghost" data-action="apSocialDM" data-actor="{{id}}"><i class="fa-solid fa-paper-plane"></i> Message</button>
+    </div>
+    {{/unless}}
+  </div>
+  {{#if isMe}}
+  <details class="soc-edit">
+    <summary><i class="fa-solid fa-pen"></i> Edit profile</summary>
+    <label>Handle <input type="text" data-draft="soc-handle" value="{{handleDraft}}" maxlength="20"></label>
+    <label>Bio <input type="text" data-draft="soc-bio" value="{{bioDraft}}" maxlength="160" placeholder="Tell people who you are"></label>
+    {{#if @root.isGM}}<label>Starting {{@root.soc.fans}} (GM) <input type="number" data-soc-base min="0" value="{{base}}"></label>{{/if}}
+    <button type="button" class="ap-pill" data-action="apSocialSaveProfile">Save</button>
+  </details>
+  {{/if}}
+  <div class="soc-grid {{#if @root.soc.poketube}}wide{{/if}}">
+    {{#each grid}}<button type="button" data-action="apSocialPost" data-post="{{id}}"><img src="{{img}}" alt="">{{#if repost}}<i class="fa-solid fa-retweet soc-grid-rp"></i>{{/if}}<span class="soc-grid-views"><i class="fa-solid fa-play"></i> {{views}}</span></button>{{else}}<p class="ap-hint-center">No posts yet.</p>{{/each}}
+  </div>
+  {{/with}}
+  {{/if}}
+
+  {{!-- ============ TRENDING ============ --}}
+  {{#if sv.trending}}
+  <div class="ap-row soc-searchbar">
+    <input type="text" data-draft="soc-search" data-enter="apSocialSearch" placeholder="Search #tags, @handles or words">
+    <button type="button" class="ap-round" data-action="apSocialSearch"><i class="fa-solid fa-magnifying-glass"></i></button>
+  </div>
+  <h4 class="ap-subhead">Trending this week</h4>
+  <ol class="soc-trends">
+    {{#each trends}}<li><a data-action="apSocialTag" data-tag="{{tag}}"><span class="soc-rank">{{rank}}</span><span><strong>#{{tag}}</strong><small>{{postsLabel}} · {{score}} buzz</small></span></a></li>{{else}}<li class="ap-hint">No hashtags yet. Start one!</li>{{/each}}
+  </ol>
+  {{#if creators.length}}
+  <h4 class="ap-subhead">Top creators</h4>
+  <ul class="soc-creators">
+    {{#each creators}}<li><a data-action="apSocialProfile" data-actor="{{id}}"><img class="ap-avatar small" src="{{img}}" alt=""><span><strong>{{name}}</strong><small>@{{handle}}</small></span><em>{{fans}}</em></a></li>{{/each}}
+  </ul>
+  {{/if}}
+  {{#if topPosts.length}}
+  <h4 class="ap-subhead">Hot right now</h4>
+  <div class="soc-feed">{{#each topPosts}}{{> apCard}}{{/each}}</div>
+  {{/if}}
+  {{/if}}
+
+  {{!-- ============ SEARCH ============ --}}
+  {{#if sv.search}}
+  <div class="soc-search-head"><strong>{{searchLabel}}</strong> <small>{{results.length}} results</small></div>
+  {{#if people.length}}
+  <ul class="soc-creators">{{#each people}}<li><a data-action="apSocialProfile" data-actor="{{id}}"><img class="ap-avatar small" src="{{img}}" alt=""><span><strong>{{name}}</strong><small>@{{handle}}</small></span></a></li>{{/each}}</ul>
+  {{/if}}
+  <div class="soc-feed">{{#each results}}{{> apCard}}{{else}}<p class="ap-hint-center">Nothing found.</p>{{/each}}</div>
+  {{/if}}
+
+  {{!-- ============ DMS ============ --}}
+  {{#if sv.dms}}
+  <ul class="ap-threads">
+    {{#each dms}}
+    <li><button type="button" data-action="apOpenThread" data-other="{{other}}" data-ch="{{@root.soc.key}}">
+      <img class="ap-avatar" src="{{img}}" alt="">
+      <span class="ap-thread-text"><strong>{{name}}</strong><small>{{#if mine}}You: {{/if}}{{preview}}</small></span>
+      <span class="ap-thread-meta"><small>{{time}}</small>{{#if unread}}<span class="ap-count inline">{{unread}}</span>{{/if}}</span>
+    </button></li>
+    {{else}}
+    <li class="ap-hint-center">No DMs yet. Message someone from their profile.</li>
+    {{/each}}
+  </ul>
+  {{#if dmPeople.length}}
+  <h4 class="ap-subhead">People you follow</h4>
+  <div class="soc-chips">{{#each dmPeople}}<button type="button" class="ap-pill small ghost" data-action="apSocialDM" data-actor="{{id}}">@{{handle}}</button>{{/each}}</div>
+  {{/if}}
+  {{/if}}
+
+  {{!-- ============ COMPOSE ============ --}}
+  {{#if sv.compose}}
+  <div class="soc-compose">
+    {{#if composeImg}}<img class="ap-compose-preview {{#if @root.soc.poketube}}wide{{/if}}" src="{{composeImg}}" alt="">{{else}}<div class="ap-emptystate small"><i class="fa-solid fa-image"></i><p>Pick a photo below.</p></div>{{/if}}
+    <div class="ap-strip">
+      {{#each galleryStrip}}<img class="{{#if selected}}selected{{/if}}" src="{{src}}" alt="" data-action="apSocialPick" data-src="{{src}}">{{/each}}
+      <button type="button" class="ap-strip-add" data-action="apGo" data-app="camera" data-tooltip="Take a photo"><i class="fa-solid fa-camera"></i></button>
+    </div>
+    {{#if soc.poketube}}
+    <input type="text" data-draft="soc-title" value="{{drafts.title}}" placeholder="Video title" maxlength="100">
+    <label class="soc-len">Length <input type="text" data-draft="soc-length" value="{{drafts.length}}" placeholder="1:30"></label>
+    {{/if}}
+    <textarea class="ap-caption-input" data-draft="soc-caption" rows="3" placeholder="{{#if soc.poketube}}Description{{else}}Write a caption... #tags and @mentions work{{/if}}">{{drafts.caption}}</textarea>
+    {{#if soc.tiktogepi}}<input type="text" data-draft="soc-sound" value="{{drafts.sound}}" placeholder="Sound (blank = original sound)">{{/if}}
+    {{#if pro}}<p class="ap-hint"><i class="fa-solid fa-camera-retro"></i> Pro Camera: tag this #promo for your Contest Introduction bonus.</p>{{/if}}
+    <button type="button" class="ap-share" data-action="apSocialPublish" {{#unless signal}}disabled{{/unless}}><i class="fa-solid fa-paper-plane"></i> {{#if soc.poketube}}Upload to {{soc.name}}{{else}}Share to {{soc.name}}{{/if}}</button>
+  </div>
+  {{/if}}
+</div>
