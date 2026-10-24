@@ -13,6 +13,10 @@
   --ap-yellow: #f6c90e;
 }
 
+/* Keep phone text dark on the light screen, whatever theme Foundry, the system or other modules use.
+   Placed first so the app-specific colours further down still win. */
+.antipodea-phone .ap-screen :where(strong, b, em, i, small, span, p, li, h1, h2, h3, h4, h5, h6, label, a, button) { color: inherit; }
+
 .antipodea-phone .window-content {
   padding: 0;
   background: #111;
@@ -480,8 +484,9 @@
   border-bottom: 1px solid rgba(0,0,0,.06);
 }
 .antipodea-phone .ap-threads li button:hover,
-.antipodea-phone .ap-contact-main:hover { background: rgba(0,0,0,.04); box-shadow: none; }
-.antipodea-phone .ap-thread-text { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.antipodea-phone .ap-contact-main:hover { background: rgba(0,0,0,.04); box-shadow: none; color: var(--ap-ink); }
+.antipodea-phone .ap-thread-text { flex: 1; min-width: 0; display: flex; flex-direction: column; color: inherit; }
+.antipodea-phone .ap-thread-text strong { color: inherit; font-weight: 700; }
 .antipodea-phone .ap-thread-text small { color: #777; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .antipodea-phone .ap-thread-meta { display: flex; flex-direction: column; align-items: flex-end; gap: 3px; color: #999; }
 
