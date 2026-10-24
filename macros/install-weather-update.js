@@ -6,7 +6,8 @@
 //  Safe to run more than once.
 // =====================================================================
 const TAG = "1.4.0";
-const SOURCE = `https://raw.githubusercontent.com/Tsully87/antipodea-registry/${TAG}/macros/antipodea-weather.js`;
+const COMMIT = "14e6d71914e6aceb9ca341851814c62b2a5c471d"; // the exact version that was tested
+const SOURCE = `https://raw.githubusercontent.com/Tsully87/antipodea-registry/${COMMIT}/macros/antipodea-weather.js`;
 const EXPECTED_SHA256 = "e11c5125a5e3a5c9d635055407242814b3e42ba9bcc08de09982d5a2c5886ce5";
 
 if (!game.user.isGM) return ui.notifications.warn("Only the GM can install the weather macro.");
