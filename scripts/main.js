@@ -79,12 +79,20 @@ async function gmPhonePicker(tab) {
   groups.push(["Players", all.filter((a) => a.hasPlayerOwner)]);
   const npcs = all.filter((a) => !a.hasPlayerOwner);
   const byFolder = new Map();
+  // Each NPC usually sits in a folder of its own name (with its Pokémon), so group by the
+  // first folder above that, e.g. "The Croc Shed" or "Police". Top-level ones go in "Other".
+  const groupOf = (a) => {
+    let f = a.folder;
+    while (f && f.name === a.name) f = f.folder;
+    return f?.folder ? f.name : "Other";
+  };
   for (const a of npcs) {
-    const f = a.folder?.name ?? "NPCs";
+    const f = groupOf(a);
     if (!byFolder.has(f)) byFolder.set(f, []);
     byFolder.get(f).push(a);
   }
-  for (const [f, list] of [...byFolder].sort((x, y) => x[0].localeCompare(y[0]))) groups.push([`NPC: ${f}`, list]);
+  const order = [...byFolder].sort((x, y) => (x[0] === "Other") - (y[0] === "Other") || x[0].localeCompare(y[0]));
+  for (const [f, list] of order) groups.push([`NPCs: ${f}`, list]);
 
   const opt = (a) => `<option value="${a.id}" data-name="${esc(a.name.toLowerCase())}">${esc(a.name)}</option>`;
   const html = groups.filter(([, l]) => l.length)
