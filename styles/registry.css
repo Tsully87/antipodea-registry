@@ -947,3 +947,152 @@
 .ap-toast.alert { background: linear-gradient(90deg, rgba(160,20,20,.96), rgba(210,45,30,.96)); border: 2px solid #ffd43b; }
 .ap-toast.alert .ap-toast-icon { background: #ffd43b; color: #7a0f0f; }
 .ap-toast.alert .ap-toast-text span { -webkit-line-clamp: 3; }
+
+/* ------------------------------------------------------------------ */
+/* Poké Mart: player shop window and GM Shop Manager                  */
+/* Shop counter look: sand paper, ochre signage, gum-green till.      */
+/* ------------------------------------------------------------------ */
+.antipodea-shop {
+  --sh-ochre: #c4622d;
+  --sh-ochre-deep: #8f3f1a;
+  --sh-gum: #3f7a5a;
+  --sh-gum-deep: #2c5a41;
+  --sh-sand: #f4ead8;
+  --sh-paper: #fffaf1;
+  --sh-line: #e0d2b8;
+  --sh-ink: #23211d;
+  --sh-muted: #6f675b;
+  --sh-red: #b3362f;
+}
+.antipodea-shop .window-content { padding: 0; background: var(--sh-sand); color: var(--sh-ink); }
+.antipodea-shop :where(h2, h3, p, span, strong, small, label, legend, td, th, li, output, em) { color: inherit; }
+.antipodea-shop button { font-family: inherit; cursor: pointer; }
+.antipodea-shop button:disabled { opacity: .45; cursor: default; }
+.antipodea-shop :focus-visible { outline: 2px solid var(--sh-ochre); outline-offset: 2px; }
+
+.antipodea-shop .sh-wrap { display: flex; flex-direction: column; height: 100%; }
+.antipodea-shop .sh-head {
+  display: flex; align-items: center; gap: 10px; padding: 10px 14px;
+  background: var(--sh-ink); color: #fff;
+}
+.antipodea-shop .sh-head :where(strong, span, small) { color: #fff; }
+.antipodea-shop .sh-face { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; border: 2px solid var(--sh-ochre); }
+.antipodea-shop .sh-who { display: flex; flex-direction: column; gap: 2px; flex: 1; min-width: 0; }
+.antipodea-shop .sh-who select { max-width: 220px; background: #fff; color: var(--sh-ink); }
+.antipodea-shop .sh-place { font-size: 12px; opacity: .85; }
+.antipodea-shop .sh-wallet { display: flex; flex-direction: column; align-items: flex-end; font-variant-numeric: tabular-nums; }
+.antipodea-shop .sh-wallet span { font-size: 10px; letter-spacing: .1em; text-transform: uppercase; opacity: .75; }
+.antipodea-shop .sh-wallet strong { font-size: 18px; color: #ffd27a; }
+
+.antipodea-shop .sh-shops { display: flex; flex-wrap: wrap; gap: 6px; padding: 8px 14px 0; }
+.antipodea-shop .sh-tab {
+  border: 1px solid var(--sh-line); background: var(--sh-paper); color: var(--sh-ink);
+  border-radius: 999px; padding: 4px 12px; font-size: 13px; width: auto; line-height: 1.4;
+}
+.antipodea-shop .sh-tab.active { background: var(--sh-ochre); border-color: var(--sh-ochre); color: #fff; }
+.antipodea-shop .sh-tab small { opacity: .7; }
+
+.antipodea-shop .sh-sign {
+  display: flex; justify-content: space-between; align-items: flex-end; gap: 12px;
+  margin: 10px 14px 0; padding: 10px 12px; border-radius: 8px;
+  background: var(--sh-ochre); color: #fff;
+}
+.antipodea-shop .sh-sign :where(h2, p) { color: #fff; }
+.antipodea-shop .sh-sign h2 { margin: 0; border: 0; font-size: 20px; font-weight: 700; }
+.antipodea-shop .sh-keeper { margin: 2px 0 0; font-size: 12px; opacity: .9; }
+.antipodea-shop .sh-blurb { margin: 4px 0 0; font-size: 13px; }
+.antipodea-shop .sh-mode { display: flex; background: rgba(0,0,0,.18); border-radius: 999px; padding: 3px; flex: none; }
+.antipodea-shop .sh-mode button {
+  border: 0; background: none; color: #fff; border-radius: 999px; padding: 4px 12px; width: auto; line-height: 1.4; white-space: nowrap;
+}
+.antipodea-shop .sh-mode button.active { background: #fff; color: var(--sh-ochre-deep); font-weight: 700; }
+
+.antipodea-shop .sh-msg { margin: 8px 14px 0; padding: 6px 10px; border-radius: 6px; background: #e3efe7; color: var(--sh-gum-deep); font-size: 13px; }
+.antipodea-shop .sh-msg.bad { background: #f6e1dd; color: var(--sh-red); }
+
+.antipodea-shop .sh-shelves { flex: 1; overflow-y: auto; padding: 6px 14px 10px; }
+.antipodea-shop .sh-section {
+  margin: 12px 0 4px; border: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--sh-gum-deep);
+}
+.antipodea-shop .sh-rows { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.antipodea-shop .sh-row {
+  display: grid; grid-template-columns: 32px 1fr auto auto; align-items: center; gap: 10px;
+  padding: 5px 8px; background: var(--sh-paper); border: 1px solid var(--sh-line); border-radius: 6px;
+}
+.antipodea-shop .sh-row.picked { border-color: var(--sh-gum); box-shadow: inset 3px 0 0 var(--sh-gum); }
+.antipodea-shop .sh-row img { width: 32px; height: 32px; object-fit: contain; border: 0; }
+.antipodea-shop .sh-name { display: flex; flex-direction: column; min-width: 0; }
+.antipodea-shop .sh-name small { font-size: 11px; color: var(--sh-muted); }
+.antipodea-shop .sh-price { font-weight: 700; font-variant-numeric: tabular-nums; }
+.antipodea-shop .sh-step { display: flex; align-items: center; gap: 4px; }
+.antipodea-shop .sh-step button {
+  width: 26px; height: 26px; line-height: 1; padding: 0; border-radius: 50%;
+  border: 1px solid var(--sh-line); background: #fff; color: var(--sh-ink); font-size: 11px;
+}
+.antipodea-shop .sh-step output { min-width: 22px; text-align: center; font-weight: 700; font-variant-numeric: tabular-nums; }
+.antipodea-shop .sh-empty, .antipodea-shop .sh-hint, .antipodea-shop .sm-hint { color: var(--sh-muted); font-size: 13px; }
+
+.antipodea-shop .sh-till {
+  display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px;
+  padding: 10px 14px; background: var(--sh-gum-deep); color: #fff;
+}
+.antipodea-shop .sh-till :where(span, strong) { color: #fff; }
+.antipodea-shop .sh-sum { display: flex; flex-wrap: wrap; gap: 4px 16px; font-size: 13px; font-variant-numeric: tabular-nums; }
+.antipodea-shop .sh-sum .bad strong { color: #ffb3a8; }
+.antipodea-shop .sh-btns { display: flex; gap: 6px; }
+.antipodea-shop .sh-go {
+  width: auto; border: 0; border-radius: 6px; padding: 6px 16px; line-height: 1.4;
+  background: var(--sh-ochre); color: #fff; font-weight: 700;
+}
+.antipodea-shop .sh-go:hover:not(:disabled) { background: var(--sh-ochre-deep); }
+.antipodea-shop .sh-ghost {
+  width: auto; border: 1px solid currentColor; border-radius: 6px; padding: 5px 12px; line-height: 1.4;
+  background: transparent; color: inherit;
+}
+.antipodea-shop .sh-head .sh-ghost { color: #fff; padding: 4px 8px; }
+.antipodea-shop .sh-ghost.danger { color: var(--sh-red); }
+
+.antipodea-shop .sh-none { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; padding: 24px; text-align: center; }
+.antipodea-shop .sh-none > i { font-size: 40px; color: var(--sh-ochre); }
+.antipodea-shop .sh-none p { margin: 0; max-width: 34ch; }
+
+/* Shop Manager */
+.antipodea-shop-manager .window-content { overflow: hidden; }
+.antipodea-shop .sm-wrap { display: grid; grid-template-columns: 230px 1fr; height: 100%; }
+.antipodea-shop .sm-side { display: flex; flex-direction: column; min-height: 0; background: var(--sh-paper); border-right: 1px solid var(--sh-line); }
+.antipodea-shop .sm-list { padding: 12px; display: flex; flex-direction: column; gap: 8px; overflow-y: auto; flex: 1; }
+.antipodea-shop .sm-side h3, .antipodea-shop .sm-edit h3 {
+  margin: 0; border: 0; font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sh-gum-deep);
+}
+.antipodea-shop .sm-list ul, .antipodea-shop .sm-receipts ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.antipodea-shop .sm-list li button {
+  width: 100%; text-align: left; display: flex; flex-direction: column; gap: 1px; line-height: 1.3;
+  padding: 6px 8px; border: 1px solid var(--sh-line); border-radius: 6px; background: #fff; color: var(--sh-ink);
+}
+.antipodea-shop .sm-list li button.active { border-color: var(--sh-ochre); box-shadow: inset 3px 0 0 var(--sh-ochre); }
+.antipodea-shop .sm-list li small { color: var(--sh-muted); font-size: 11px; }
+.antipodea-shop .sm-side .sh-ghost { color: var(--sh-gum-deep); }
+.antipodea-shop .sm-receipts { padding: 12px; border-top: 1px solid var(--sh-line); max-height: 40%; overflow-y: auto; }
+.antipodea-shop .sm-receipts li { font-size: 12px; line-height: 1.35; }
+.antipodea-shop .sm-receipts small { display: block; color: var(--sh-muted); }
+
+.antipodea-shop .sm-edit { display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; min-height: 0; min-width: 0; }
+.antipodea-shop .sm-fields { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 8px 12px; }
+.antipodea-shop .sm-fields label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; font-weight: 600; color: var(--sh-muted); }
+.antipodea-shop .sm-fields label.wide { grid-column: 1 / -1; }
+.antipodea-shop .sm-fields :where(input, select) { color: var(--sh-ink); background: #fff; }
+.antipodea-shop .sm-items { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 8px; padding-right: 4px; }
+.antipodea-shop .sm-sec { border: 1px solid var(--sh-line); border-radius: 8px; background: var(--sh-paper); padding: 4px 10px 8px; margin: 0; }
+.antipodea-shop .sm-sec.off { opacity: .7; }
+.antipodea-shop .sm-sec legend { display: flex; align-items: center; gap: 10px; padding: 0 4px; font-weight: 700; }
+.antipodea-shop .sm-sec legend label { display: flex; align-items: center; gap: 4px; }
+.antipodea-shop .sm-mini { width: auto; font-size: 11px; padding: 1px 8px; line-height: 1.5; border: 1px solid var(--sh-line); background: #fff; color: var(--sh-ink); border-radius: 999px; }
+.antipodea-shop .sm-sec table { width: 100%; border-collapse: collapse; margin: 0; background: none; border: 0; }
+.antipodea-shop .sm-sec th { font-size: 11px; text-align: left; color: var(--sh-muted); background: none; border: 0; }
+.antipodea-shop .sm-sec td { padding: 2px 4px; border-top: 1px solid var(--sh-line); font-variant-numeric: tabular-nums; background: none; }
+.antipodea-shop .sm-sec td img { width: 22px; height: 22px; vertical-align: middle; border: 0; margin-right: 4px; }
+.antipodea-shop .sm-sec td input[type=number] { width: 80px; color: var(--sh-ink); background: #fff; }
+.antipodea-shop .sm-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; border-top: 1px solid var(--sh-line); }
+.antipodea-shop .sm-foot .sh-ghost:not(.danger) { color: var(--sh-gum-deep); }
+.antipodea-shop .sm-foot .danger { margin-right: auto; }

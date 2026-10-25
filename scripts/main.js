@@ -7,6 +7,8 @@ import * as Data from "./phone-data.js";
 import * as Notify from "./notify.js";
 import * as Net from "./network.js";
 import { ZONES } from "./maps.js";
+import * as Shop from "./shop.js";
+import { ShopWindow, ShopManager } from "./shop-app.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -44,6 +46,34 @@ async function openMine(tab) {
     rejectClose: false
   });
   if (id) RegistryPhone.open(game.actors.get(id), { tab });
+}
+
+/** Open the shop for the player's trainer (or the selected token's, for the GM). */
+function openShop(actor) {
+  if (!actor) {
+    const controlled = canvas?.tokens?.controlled?.map((t) => t.actor).find((a) => isTrainer(a) && a.isOwner);
+    actor = controlled ?? (game.user.isGM ? null : myTrainer());
+  }
+  return ShopWindow.open(actor);
+}
+
+/** First time: set up Vinnie's in Bunya City so there's a shop to start with. */
+async function seedShops() {
+  if (!game.user.isGM || Shop.shops().length || Shop.data().seeded) return;
+  const shop = Shop.blankShop("bunya-city");
+  Object.assign(shop, {
+    name: "Central Poké Mart",
+    keeper: "Vinnie Costa",
+    blurb: "Bunya City's busiest Mart. Ask Vinnie about the free Potion for new arrivals."
+  });
+  await Shop.saveShop(shop);
+  await Shop.saveMeta({ seeded: true });
+}
+
+for (const hook of ["createItem", "updateItem", "deleteItem"]) {
+  Hooks.on(hook, (item) => {
+    if (item.parent?.id && ShopWindow.current?.actorId === item.parent.id) ShopWindow.refresh();
+  });
 }
 
 /* -------------------------------------------- */
@@ -162,6 +192,8 @@ async function startNetwork() {
   if (Data.isActiveGM()) {
     await Data.processBacklog();
     await Data.prune();
+    await seedShops();
+    Shop.processReceipts().catch((e) => console.warn(`${MODULE_ID} | receipts`, e));
     Data.refreshForecastCache(ZONES).catch((e) => console.warn(`${MODULE_ID} | forecast cache`, e));
   } else {
     await Data.checkMyJobs();
@@ -187,6 +219,10 @@ function onNetworkPage(page, action) {
       else Data.checkMyJobs();
     }
     if (kinds.has("post") && Data.isActiveGM()) Data.processBacklog();
+    if (kinds.has("receipt")) {
+      if (Data.isActiveGM()) Shop.processReceipts();
+      ShopManager.refresh();
+    }
     RegistryPhone.refresh();
   }, 150);
 }
@@ -198,7 +234,7 @@ Hooks.on("deleteJournalEntryPage", (page) => onNetworkPage(page, "delete"));
 // When a GM (you, or a bot GM later) comes online, they pick up whatever queued while nobody was on.
 Hooks.on("userConnected", () => {
   setTimeout(() => {
-    if (Data.isActiveGM()) Data.processBacklog();
+    if (Data.isActiveGM()) { Data.processBacklog(); Shop.processReceipts(); }
     RegistryPhone.refresh();
   }, 1500);
 });
@@ -392,6 +428,29 @@ Hooks.once("init", () => {
     onChange: () => RegistryPhone.refresh()
   });
 
+  game.settings.register(MODULE_ID, "shops", {
+    scope: "world", config: false, type: Object, default: {},
+    onChange: () => { ShopWindow.refresh(); ShopManager.refresh(); }
+  });
+  game.settings.registerMenu(MODULE_ID, "shopManagerMenu", {
+    name: "Poké Mart: shops",
+    label: "Open Shop Manager",
+    hint: "Set up shops in each city: what they sell, markups and buy-back rates, and their #poke-mart posts on Discord.",
+    icon: "fa-solid fa-store",
+    type: ShopManager,
+    restricted: true
+  });
+  game.settings.register(MODULE_ID, "shopWebhook", {
+    name: "Poké Mart: Discord webhook URL (#poke-mart forum)",
+    hint: "Stored on your user account only. Make a webhook in the #poke-mart forum channel. Shop price lists and receipts post there.",
+    scope: userScope, config: true, type: String, default: ""
+  });
+  game.settings.register(MODULE_ID, "shopNoSell", {
+    name: "Poké Mart: items shops won't buy",
+    hint: "Item names, separated by commas. Key items like the Pokédex.",
+    scope: "world", config: true, type: String, default: "Pokédex, Basic Phone, Rotom Phone",
+    onChange: () => ShopWindow.refresh()
+  });
   game.settings.register(MODULE_ID, RECENT_KEY, { scope: "client", config: false, type: Array, default: [] });
   game.settings.register(MODULE_ID, "autoWeather", {
     name: "Weather: run the weather macro when the day changes",
@@ -401,6 +460,12 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
+  game.keybindings.register(MODULE_ID, "openShop", {
+    name: "Open the Poké Mart",
+    hint: "Opens the shop for wherever your trainer is.",
+    editable: [{ key: "KeyM", modifiers: ["Shift"] }],
+    onDown: () => { openShop(); return true; }
+  });
   game.keybindings.register(MODULE_ID, "openPhone", {
     name: "Open my phone",
     hint: "Opens your trainer's phone.",
@@ -418,6 +483,11 @@ Hooks.once("ready", () => {
     /** Open a trainer's phone. app: "home", "messages", "pokegram", "camera", "gallery", "calendar", "card", "licence" or "admin". */
     open: (actor, app) => RegistryPhone.open(resolveActor(actor), { app }),
     openMine,
+    /** Open the shop for a trainer (defaults to the player's own). GMs see every shop. */
+    openShop: (actor) => openShop(resolveActor(actor)),
+    /** GM: the Shop Manager. */
+    manageShops: () => ShopManager.open(),
+    shops: Shop,
     /** GM: the quick phone picker (a selected trainer token opens straight away). */
     pickPhone: (app) => gmPhonePicker(app),
     getRecord: Registry.getRecord,
@@ -490,6 +560,7 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
 /* -------------------------------------------- */
 
 Hooks.on("updateActor", (actor, changes) => {
+  if (ShopWindow.current?.actorId === actor.id) ShopWindow.refresh();
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money")) {
     RegistryPhone.refresh(actor.id);
   }
@@ -549,5 +620,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: true,
     onChange: () => openMine()
+  };
+  tokens.tools.antipodeaShop = {
+    name: "antipodeaShop",
+    title: "Poké Mart",
+    icon: "fa-solid fa-store",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: true,
+    onChange: () => openShop()
   };
 });

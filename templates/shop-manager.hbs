@@ -1,0 +1,88 @@
+<div class="sm-wrap">
+  <aside class="sm-side">
+    <div class="sm-list">
+      <h3>Shops</h3>
+      <ul>
+        {{#each shops}}
+        <li><button type="button" class="{{#if active}}active{{/if}}" data-action="smPick" data-shop="{{id}}">
+          <strong>{{name}}</strong><small>{{place}}{{#if posted}} · <i class="fa-brands fa-discord" title="Posted on Discord"></i>{{/if}}</small>
+        </button></li>
+        {{else}}
+        <li class="sm-hint">No shops yet.</li>
+        {{/each}}
+      </ul>
+      <button type="button" class="sh-go" data-action="smNew"><i class="fa-solid fa-plus"></i> New shop</button>
+      {{#if shops.length}}
+      <button type="button" class="sh-ghost" data-action="smPublishAll" {{#unless discordReady}}disabled{{/unless}} {{#if busy}}disabled{{/if}}>
+        <i class="fa-brands fa-discord"></i> Update all on Discord
+      </button>
+      {{/if}}
+      {{#unless discordReady}}<p class="sm-hint">Add the #poke-mart webhook in Module Settings to post shops and receipts to Discord.</p>{{/unless}}
+    </div>
+    <div class="sm-receipts">
+      <h3>Recent sales</h3>
+      <ul>
+        {{#each receipts}}
+        <li><strong>{{who}}</strong> {{verb}} {{what}} <em>{{total}}</em> <small>{{shop}}{{#unless posted}} · waiting for Discord{{/unless}}</small></li>
+        {{else}}
+        <li class="sm-hint">Nothing sold yet.</li>
+        {{/each}}
+      </ul>
+    </div>
+  </aside>
+
+  <section class="sm-edit">
+    {{#if empty}}<p class="sh-msg bad">No items with a price in the "{{folder}}" Items folder. Put items in sub-folders there (one per section).</p>{{/if}}
+    {{#if shop}}
+    <div class="sm-fields">
+      <label class="wide">Shop name <input type="text" name="name" value="{{shop.name}}" required></label>
+      <label>Where
+        <select name="pin">{{#each shop.pins}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+      </label>
+      <label>Shopkeeper <input type="text" name="keeper" value="{{shop.keeper}}" placeholder="e.g. Vinnie Costa"></label>
+      <label class="wide">Blurb <input type="text" name="blurb" value="{{shop.blurb}}" placeholder="One line players see at the top of the shop"></label>
+      <label>Markup % <input type="number" name="markup" value="{{shop.markup}}" step="5"></label>
+      <label>Buys back at % <input type="number" name="sellRate" value="{{shop.sellRate}}" min="0" max="100" step="5"></label>
+    </div>
+
+    <h3>What it sells</h3>
+    <p class="sm-hint">Tick a section to stock it, untick items that are out of stock. Leave Set price blank to use the item's price plus the markup.</p>
+    <div class="sm-items">
+      {{#each shop.sections}}
+      <fieldset class="sm-sec {{#unless on}}off{{/unless}}">
+        <legend>
+          <label><input type="checkbox" name="section" value="{{name}}" {{#if on}}checked{{/if}}> {{name}}</label>
+          {{#if on}}<button type="button" class="sm-mini" data-action="smAll" data-section="{{name}}">All / none</button>{{/if}}
+        </legend>
+        {{#if on}}
+        <table>
+          <thead><tr><th>In stock</th><th>Item</th><th>Base</th><th>Set price</th><th>Sells for</th></tr></thead>
+          <tbody>
+            {{#each items}}
+            <tr>
+              <td><input type="checkbox" name="stock" value="{{id}}" data-section="{{section}}" {{#if inStock}}checked{{/if}} aria-label="{{name}} in stock"></td>
+              <td><img src="{{img}}" alt=""> {{name}}</td>
+              <td>${{cost}}</td>
+              <td><input type="number" name="price" data-item="{{id}}" value="{{setPrice}}" min="0" placeholder="auto" aria-label="Set price for {{name}}"></td>
+              <td>{{price}}</td>
+            </tr>
+            {{/each}}
+          </tbody>
+        </table>
+        {{/if}}
+      </fieldset>
+      {{/each}}
+    </div>
+
+    <footer class="sm-foot">
+      <button type="button" class="sh-ghost danger" data-action="smDelete"><i class="fa-solid fa-trash"></i> {{#if shop.isNew}}Discard{{else}}Delete{{/if}}</button>
+      <button type="button" class="sh-ghost" data-action="smPublish" {{#unless discordReady}}disabled{{/unless}} {{#if busy}}disabled{{/if}}>
+        <i class="fa-brands fa-discord"></i> {{#if shop.discord.msg}}Save and update Discord{{else}}Save and post to Discord{{/if}}
+      </button>
+      <button type="submit" class="sh-go"><i class="fa-solid fa-floppy-disk"></i> Save</button>
+    </footer>
+    {{else}}
+    <div class="sh-none"><i class="fa-solid fa-store"></i><p>Make your first shop with <strong>New shop</strong>.</p></div>
+    {{/if}}
+  </section>
+</div>

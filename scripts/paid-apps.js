@@ -138,7 +138,7 @@ export function mapsContext(phone) {
 }
 
 export function payContext(phone) {
-  const name = (id) => (id === "mart" ? "Mart Express" : game.actors.get(id)?.name ?? "Someone");
+  const name = (id) => (id === "mart" ? "Mart Express" : id === "shop" ? "Poké Mart" : game.actors.get(id)?.name ?? "Someone");
   return {
     balance: Store.fmtMoney(Store.money(this.actor)),
     ledger: phone.ledger.map((l) => ({

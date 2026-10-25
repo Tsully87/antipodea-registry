@@ -7,6 +7,7 @@ import * as Social from "./social.js";
 import * as Store from "./store.js";
 import * as Maps from "./maps.js";
 import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from "./social-app.js";
+import { ShopWindow } from "./shop-app.js";
 import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt, addSpotAt } from "./paid-apps.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -31,7 +32,8 @@ const HOME_APPS = [
   { app: "calendar", label: "Calendar", icon: "fa-calendar-days", color: "#e03131" },
   { app: "card", label: "Trainer Card", icon: "fa-id-badge", color: "#c4622d" },
   { app: "licence", label: "Licence", icon: "fa-id-card", color: "#1f7a7a" },
-  { app: "store", label: "App Store", icon: "fa-bag-shopping", color: "#4263eb", lock: "store" }
+  { app: "store", label: "App Store", icon: "fa-bag-shopping", color: "#4263eb", lock: "store" },
+  { app: "shop", label: "Poké Mart", icon: "fa-store", color: "#c4622d" }
 ];
 
 const APP_TITLES = {
@@ -616,6 +618,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onGo(event, target) {
     const app = target.dataset.app;
+    if (app === "shop") return ShopWindow.open(this.actor);
     const phone = this.phone;
     if (["camera", "store", ...SOCIAL_APPS].includes(app) && !Data.canUseApp(phone, app)) {
       return ui.notifications.info("That app needs a Rotom Phone.");

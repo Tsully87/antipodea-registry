@@ -1,0 +1,109 @@
+<div class="sh-wrap">
+  <header class="sh-head">
+    {{#if actor}}<img class="sh-face" src="{{actor.img}}" alt="">{{/if}}
+    <div class="sh-who">
+      {{#if many}}
+      <select name="trainer" aria-label="Trainer">
+        {{#each trainers}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+      </select>
+      {{else}}<strong>{{actor.name}}</strong>{{/if}}
+      <span class="sh-place"><i class="fa-solid fa-location-dot"></i> {{place}}</span>
+    </div>
+    <div class="sh-wallet"><span>Balance</span><strong>{{balance}}</strong></div>
+    {{#if isGM}}<button type="button" class="sh-ghost" data-action="shManage" title="Shop Manager"><i class="fa-solid fa-gear"></i></button>{{/if}}
+  </header>
+
+  {{#if shops.length}}
+  <nav class="sh-shops">
+    {{#each shops}}
+    <button type="button" class="sh-tab {{#if active}}active{{/if}}" data-action="shShop" data-shop="{{id}}">
+      <i class="fa-solid fa-store"></i> {{name}}{{#if @root.isGM}} <small>{{place}}</small>{{/if}}
+    </button>
+    {{/each}}
+  </nav>
+  {{/if}}
+
+  {{#if shop}}
+  <div class="sh-sign">
+    <div>
+      <h2>{{shop.name}}</h2>
+      {{#if shop.keeper}}<p class="sh-keeper">Run by {{shop.keeper}}</p>{{/if}}
+      {{#if shop.blurb}}<p class="sh-blurb">{{shop.blurb}}</p>{{/if}}
+    </div>
+    <div class="sh-mode" role="tablist">
+      <button type="button" role="tab" class="{{#if buying}}active{{/if}}" data-action="shMode" data-mode="buy"><i class="fa-solid fa-basket-shopping"></i> Buy</button>
+      <button type="button" role="tab" class="{{#unless buying}}active{{/unless}}" data-action="shMode" data-mode="sell"><i class="fa-solid fa-hand-holding-dollar"></i> Sell</button>
+    </div>
+  </div>
+
+  {{#if message}}<p class="sh-msg {{#if message.error}}bad{{/if}}">{{message.text}}</p>{{/if}}
+
+  <div class="sh-shelves">
+    {{#if buying}}
+      {{#each groups}}
+      <h3 class="sh-section">{{section}}</h3>
+      <ul class="sh-rows">
+        {{#each items}}
+        <li class="sh-row {{#if qty}}picked{{/if}}">
+          <img src="{{img}}" alt="">
+          <span class="sh-name">{{name}}{{#if owned}}<small>You have {{owned}}</small>{{/if}}</span>
+          <span class="sh-price">{{priceLabel}}</span>
+          <span class="sh-step">
+            <button type="button" data-action="shStep" data-item="{{id}}" data-d="-1" aria-label="One less {{name}}" {{#unless qty}}disabled{{/unless}}><i class="fa-solid fa-minus"></i></button>
+            <output>{{qty}}</output>
+            <button type="button" data-action="shStep" data-item="{{id}}" data-d="1" aria-label="One more {{name}}"><i class="fa-solid fa-plus"></i></button>
+          </span>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="sh-empty">The shelves are bare. Check back later.</p>
+      {{/each}}
+    {{else}}
+      <p class="sh-hint">{{shop.name}} buys items back at {{shop.rate}}% of their price.</p>
+      <ul class="sh-rows">
+        {{#each sellRows}}
+        <li class="sh-row {{#if sellQty}}picked{{/if}}">
+          <img src="{{img}}" alt="">
+          <span class="sh-name">{{name}}<small>You have {{qty}}</small></span>
+          <span class="sh-price">{{priceLabel}} each</span>
+          <span class="sh-step">
+            <button type="button" data-action="shStep" data-item="{{id}}" data-d="-1" data-max="{{qty}}" aria-label="Sell one less {{name}}" {{#unless sellQty}}disabled{{/unless}}><i class="fa-solid fa-minus"></i></button>
+            <output>{{sellQty}}</output>
+            <button type="button" data-action="shStep" data-item="{{id}}" data-d="1" data-max="{{qty}}" aria-label="Sell one more {{name}}"><i class="fa-solid fa-plus"></i></button>
+          </span>
+        </li>
+        {{else}}
+        <li class="sh-empty">Nothing on {{@root.actor.name}}'s sheet this shop will buy.</li>
+        {{/each}}
+      </ul>
+    {{/if}}
+  </div>
+
+  <footer class="sh-till">
+    <div class="sh-sum">
+      <span>{{#if buying}}Basket{{else}}Selling{{/if}}: <strong>{{count}}</strong> item{{#unless (eq count 1)}}s{{/unless}}</span>
+      <span>{{#if buying}}Total{{else}}You get{{/if}} <strong>{{total}}</strong></span>
+      <span class="{{#if short}}bad{{/if}}">Balance after <strong>{{after}}</strong></span>
+    </div>
+    <div class="sh-btns">
+      <button type="button" class="sh-ghost" data-action="shClear" {{#unless count}}disabled{{/unless}}>Clear</button>
+      <button type="button" class="sh-go" data-action="shCheckout" {{#unless count}}disabled{{/unless}} {{#if short}}disabled{{/if}}>
+        {{#if buying}}<i class="fa-solid fa-cash-register"></i> Buy{{else}}<i class="fa-solid fa-hand-holding-dollar"></i> Sell{{/if}}
+      </button>
+    </div>
+  </footer>
+
+  {{else}}
+  <div class="sh-none">
+    <i class="fa-solid fa-store-slash"></i>
+    {{#if noLocation}}
+    <p>{{#if actor}}{{actor.name}} isn't anywhere on the map yet. Ask the GM to set your location.{{else}}You don't have a trainer to shop with.{{/if}}</p>
+    {{else}}
+    <p>There's no shop in {{place}}.</p>
+    <p class="sh-hint">Stock up before you head out. A Rotom Phone with Mart Express can still order deliveries.</p>
+    {{/if}}
+    {{#if isGM}}<button type="button" class="sh-go" data-action="shManage"><i class="fa-solid fa-gear"></i> Open the Shop Manager</button>{{/if}}
+  </div>
+  {{/if}}
+</div>
