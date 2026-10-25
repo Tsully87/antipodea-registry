@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.6.0
+- **Move Trainers** (GM): one window to move any number of trainers to a place. It shows who's where at a glance, ticks a whole group or everyone on the current scene, and can include NPCs. Opens from the route button in the token controls or Shift+L.
+- **Scenes can be tagged with a place** (Scene Config, Basics tab). Activating the scene, or dropping a trainer token on it, moves those trainers there.
+- **Set location** for one trainer from their token HUD (pin button), the Actors sidebar right-click menu, or Shift+L with their token selected.
+- New API: `moveTrainers()` and `moveTo(actors, placeId)`.
+
 ## 1.5.0
 - New **Poké Mart**: a shop window players open from the token controls, Shift+M or the phone. It shows the shops in the city their trainer is in, with Buy and Sell tabs, sections, a basket and a running total. Money and items update on the trainer's sheet straight away, with no GM needed.
 - New **Shop Manager** for the GM: a shop per city, choose which Poké Mart sections it sells, mark items out of stock, set a markup, a buy-back rate and fixed prices.

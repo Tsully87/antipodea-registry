@@ -54,6 +54,19 @@ Texts, DMs, all three social apps, follows, reminders, App Store purchases and t
 
 Whichever GM is online does the queued work, so a bot GM account can take this over later.
 
+## Moving trainers (GM)
+
+Where a trainer is drives PokéMaps (city maps unlock once they've been there) and which Poké Marts they can shop at.
+
+- **Move Trainers window:** the route button in the token controls, or **Shift+L**. Trainers are grouped by where they are now. Tick them (or **Tick all** in a group, or **Tick tokens on this scene**), pick a place and press **Move**. **Show NPCs** adds NPCs.
+- **One trainer:** select their token and press **Shift+L**, use the pin button on their token HUD, or right-click them in the Actors sidebar and choose **Set Location**.
+- **Scenes:** in Scene Config (Basics tab), set **Antipodea place**. Activating that scene moves every trainer with a token on it there, and so does dropping a trainer token onto it. Leave it on None for the region map and anywhere that isn't a place.
+
+```js
+reg.moveTrainers();                                   // the window
+reg.moveTo(["Jamie", "Kuroi", "Rowan"], "budgie-beach"); // straight from a macro
+```
+
 ## Poké Mart (shops)
 
 Shops sell items from the **Poké Mart** Items folder. Each sub-folder is a section (Poké Balls, Medicine and so on).
