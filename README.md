@@ -74,7 +74,8 @@ reg.open("Trainer Name");               // opens their phone
 reg.open("Trainer Name", "licence");    // straight to an app
 reg.text("Jax Harlow", "Tazz", "lol");  // text as an NPC
 reg.rotomSay("Tazz", "Oi! Look out!");  // speak as their Rotom
-reg.openMine();                      // GM gets a picker
+reg.openMine();                      // GM gets the searchable picker (players and NPCs)
+reg.pickPhone();                     // same picker, GM only
 reg.testDiscord();                   // posts a test message to the webhook
 ```
 

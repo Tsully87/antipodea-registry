@@ -200,6 +200,35 @@ export function isActiveGM() {
   return active ? active.isSelf : true;
 }
 
+/**
+ * The same GM can have Foundry open in more than one window, and every one of them is
+ * the "active GM". Before doing something that must only happen once (a Discord post,
+ * the day's weather), a window writes its own random token to the network journal,
+ * waits for the server to settle, and only goes ahead if its token is the one that stuck.
+ */
+const CLAIM_WAIT = 1500;
+const myToken = foundry.utils.randomID();
+export async function claim(key) {
+  const j = Net.journal();
+  if (!j) return true;
+  const safe = String(key).replace(/[^\w-]/g, "_");
+  const path = `flags.${MODULE_ID}.claims.${safe}`;
+  const prev = foundry.utils.getProperty(j, path);
+  if (prev && prev.token !== myToken && Date.now() - (prev.at ?? 0) < 10 * 60 * 1000) return false;
+  await j.update({ [path]: { token: myToken, at: Date.now() } });
+  await new Promise((r) => setTimeout(r, CLAIM_WAIT));
+  return foundry.utils.getProperty(Net.journal(), path)?.token === myToken;
+}
+
+/** GM: forget claims older than two days so the journal doesn't grow forever. */
+async function pruneClaims() {
+  const j = Net.journal();
+  const claims = j?.getFlag(MODULE_ID, "claims") ?? {};
+  const old = Object.entries(claims).filter(([, v]) => Date.now() - (v?.at ?? 0) > 2 * 24 * 3600 * 1000);
+  if (!old.length) return;
+  await j.update(Object.fromEntries(old.map(([k]) => [`flags.${MODULE_ID}.claims.-=${k}`, null])));
+}
+
 /** A GM is logged in somewhere (needed for money, deliveries, Discord and live forecasts). */
 export function gmOnline() {
   return !!game.users.activeGM;
@@ -552,10 +581,18 @@ export async function processBacklog() {
     for (const p of Net.posts()) {
       if (p.discord || p.repostOf) continue;
       const page = Net.pageFor("post", p.id);
-      if (p.ms < cutoff) { await Net.patch(page, { discord: true }); continue; }
-      const sent = await postToSocialDiscord(p).catch(() => false);
-      if (sent || !socialDiscordOn(p)) await Net.patch(page, { discord: true });
+      if (p.ms < cutoff || !socialDiscordOn(p)) { await Net.patch(page, { discord: true }); continue; }
+      // Only one GM window posts it, and it's marked as sent before the post goes out,
+      // so a slow or flaky reply from Discord can't send it twice.
+      if (!await claim(`post-${p.id}`)) continue;
+      if (Net.pageFor("post", p.id)?.flags?.[MODULE_ID]?.discord) continue;
+      await Net.patch(page, { discord: true });
+      const sent = await postToSocialDiscord(p).catch((e) => { console.warn(`${MODULE_ID} | Discord post`, e); return null; });
+      // Discord said no (bad webhook, rate limit): try again later, up to 3 goes in all.
+      const tries = (page.flags?.[MODULE_ID]?.discordTries ?? 0) + 1;
+      if (sent === false && tries < 3) await Net.patch(Net.pageFor("post", p.id), { discord: false, discordTries: tries });
     }
+    await pruneClaims().catch(() => {});
   } finally {
     working = false;
   }

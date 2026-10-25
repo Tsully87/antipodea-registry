@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.4.1
+- Fixed social posts going to Discord more than once. If you had Foundry open as GM in more than one window, every window posted it. Now only one window posts each one, and a post is marked as sent before it goes out.
+- The weather now runs itself when the day changes, from one GM window only. Players no longer get "no permission" pop-ups for the weather macro. Turn off the old Hook Macros entry for it (Settings: "Weather: run the weather macro when the day changes" switches this off if you ever need to).
+- GM phone picker: Shift+P or the phone button now lists every trainer, players and NPCs, grouped by folder, with a search box and your recent phones at the top. Select an NPC's token first and its phone opens straight away.
+- New API: `api.pickPhone()` opens the GM picker (handy for a Stream Deck button).
+
 ## 1.4.0
 - Emergency alerts: when the Antipodea Weather macro reports something serious, every phone whose location is in that weather zone gets a red pop-up, Rotom Phone or not. Tapping it opens the Weather app if they have it, or the home screen.
 - Alerts cover earthquakes (Moderate shaking or worse), strong aftershocks, tsunami warnings, cyclone watches and warnings, severe east coast lows, Watch and Act or Emergency Warning bushfires, thick smoke, Mount Kahikatea at Alert Level 2+, Moderate or Major floods, and severe or extreme heatwaves.

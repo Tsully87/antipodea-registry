@@ -29,11 +29,12 @@ function myTrainer() {
 }
 
 async function openMine(tab) {
-  const owned = game.actors.filter((a) => isTrainer(a) && a.isOwner && (game.user.isGM ? a.hasPlayerOwner : true));
+  if (game.user.isGM) return gmPhonePicker(tab);
+  const owned = game.actors.filter((a) => isTrainer(a) && a.isOwner);
   const guess = myTrainer();
-  if (guess && !game.user.isGM) return RegistryPhone.open(guess, { tab });
-  if (owned.length <= 1 && guess) return RegistryPhone.open(guess, { tab });
+  if (guess) return RegistryPhone.open(guess, { tab });
   if (!owned.length) return ui.notifications.warn("No trainers to open a phone for.");
+  if (owned.length === 1) return RegistryPhone.open(owned[0], { tab });
 
   const options = owned.map((a) => `<option value="${a.id}">${foundry.utils.escapeHTML(a.name)}</option>`).join("");
   const id = await foundry.applications.api.DialogV2.prompt({
@@ -43,6 +44,87 @@ async function openMine(tab) {
     rejectClose: false
   });
   if (id) RegistryPhone.open(game.actors.get(id), { tab });
+}
+
+/* -------------------------------------------- */
+/*  GM: quick phone picker (players and NPCs)   */
+/* -------------------------------------------- */
+
+const RECENT_KEY = "recentPhones";
+function recentPhones() {
+  try { return game.settings.get(MODULE_ID, RECENT_KEY) ?? []; } catch (e) { return []; }
+}
+function rememberPhone(actor) {
+  if (!game.user.isGM || !actor) return;
+  const list = [actor.id, ...recentPhones().filter((id) => id !== actor.id)].slice(0, 8);
+  game.settings.set(MODULE_ID, RECENT_KEY, list).catch(() => {});
+}
+
+/**
+ * GM: a selected trainer token opens straight away. Otherwise a searchable list of every
+ * trainer, with recent phones first, then players, then NPCs by folder.
+ */
+async function gmPhonePicker(tab) {
+  const controlled = canvas?.tokens?.controlled?.map((t) => t.actor).filter(isTrainer) ?? [];
+  if (controlled.length === 1) {
+    rememberPhone(controlled[0]);
+    return RegistryPhone.open(controlled[0], { tab });
+  }
+  const all = game.actors.filter(isTrainer).sort((a, b) => a.name.localeCompare(b.name));
+  if (!all.length) return ui.notifications.warn("No trainers to open a phone for.");
+  const esc = (t) => foundry.utils.escapeHTML(String(t ?? ""));
+  const recent = recentPhones().map((id) => game.actors.get(id)).filter(isTrainer);
+  const groups = [];
+  if (recent.length) groups.push(["Recent", recent]);
+  groups.push(["Players", all.filter((a) => a.hasPlayerOwner)]);
+  const npcs = all.filter((a) => !a.hasPlayerOwner);
+  const byFolder = new Map();
+  for (const a of npcs) {
+    const f = a.folder?.name ?? "NPCs";
+    if (!byFolder.has(f)) byFolder.set(f, []);
+    byFolder.get(f).push(a);
+  }
+  for (const [f, list] of [...byFolder].sort((x, y) => x[0].localeCompare(y[0]))) groups.push([`NPC: ${f}`, list]);
+
+  const opt = (a) => `<option value="${a.id}" data-name="${esc(a.name.toLowerCase())}">${esc(a.name)}</option>`;
+  const html = groups.filter(([, l]) => l.length)
+    .map(([label, list]) => `<optgroup label="${esc(label)}">${list.map(opt).join("")}</optgroup>`).join("");
+  const content = `
+    <div class="form-group"><label>Search</label><input type="text" name="q" placeholder="Type a name" autofocus></div>
+    <div class="form-group"><select name="actor" size="12" style="width:100%;height:auto">${html}</select></div>
+    <p class="hint">Tip: select an NPC's token first to skip this list.</p>`;
+
+  const id = await foundry.applications.api.DialogV2.prompt({
+    window: { title: "Whose phone?", icon: "fa-solid fa-mobile-screen-button" },
+    position: { width: 360 },
+    content,
+    render: (event, dialog) => {
+      const root = dialog.element ?? event?.target?.element;
+      const q = root?.querySelector('input[name="q"]');
+      const sel = root?.querySelector('select[name="actor"]');
+      if (!q || !sel) return;
+      sel.selectedIndex = 0;
+      q.addEventListener("input", () => {
+        const term = q.value.trim().toLowerCase();
+        let first = null;
+        for (const o of sel.querySelectorAll("option")) {
+          const hit = !term || o.dataset.name.includes(term);
+          o.hidden = !hit;
+          if (hit && !first) first = o;
+        }
+        for (const g of sel.querySelectorAll("optgroup")) g.hidden = ![...g.children].some((o) => !o.hidden);
+        if (first) first.selected = true;
+      });
+      q.addEventListener("keydown", (e) => { if (e.key === "ArrowDown") { e.preventDefault(); sel.focus(); } });
+      sel.addEventListener("dblclick", () => root.querySelector('button[data-action="ok"]')?.click());
+    },
+    ok: { label: "Open", icon: "fa-solid fa-mobile-screen-button", callback: (event, button) => button.form.elements.actor.value },
+    rejectClose: false
+  });
+  const actor = id ? game.actors.get(id) : null;
+  if (!actor) return;
+  rememberPhone(actor);
+  RegistryPhone.open(actor, { tab });
 }
 
 function resolveActor(a) {
@@ -302,6 +384,12 @@ Hooks.once("init", () => {
     onChange: () => RegistryPhone.refresh()
   });
 
+  game.settings.register(MODULE_ID, RECENT_KEY, { scope: "client", config: false, type: Array, default: [] });
+  game.settings.register(MODULE_ID, "autoWeather", {
+    name: "Weather: run the weather macro when the day changes",
+    hint: "Only one GM window runs it, so players never get a permission pop-up. Turn off the old Hook Macros entry if you still have one.",
+    scope: "world", config: true, type: Boolean, default: true
+  });
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
@@ -322,6 +410,8 @@ Hooks.once("ready", () => {
     /** Open a trainer's phone. app: "home", "messages", "pokegram", "camera", "gallery", "calendar", "card", "licence" or "admin". */
     open: (actor, app) => RegistryPhone.open(resolveActor(actor), { app }),
     openMine,
+    /** GM: the quick phone picker (a selected trainer token opens straight away). */
+    pickPhone: (app) => gmPhonePicker(app),
     getRecord: Registry.getRecord,
     issueOffence: Registry.issueOffence,
     setEndorsement: Registry.setEndorsement,
@@ -355,9 +445,30 @@ Hooks.once("ready", () => {
 /* -------------------------------------------- */
 
 let deliverTimer = null;
+let weatherTimer = null;
+const dayOf = (t) => {
+  const d = game.seasonsStars?.api?.worldTimeToDate?.(t);
+  return d ? `${d.year}-${d.month}-${d.day}` : null;
+};
+
+/** Run the weather macro once per new day, from a single GM window. */
+async function autoWeather(worldTime) {
+  if (!game.settings.get(MODULE_ID, "autoWeather") || !Data.isActiveGM()) return;
+  const day = dayOf(worldTime);
+  if (!day) return;
+  if (!await Data.claim(`weather:${day}`)) return;
+  const name = game.settings.get(MODULE_ID, "weatherMacro") || "Antipodea Weather";
+  const macro = game.macros.getName(name) ?? game.macros.getName("Antipodea Weather");
+  if (!macro) return console.warn(`${MODULE_ID} | no weather macro called ${name}`);
+  try { await macro.execute({ auto: "true" }); }
+  catch (e) { console.error(`${MODULE_ID} | weather macro failed`, e); }
+}
+
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
   if (Data.isActiveGM()) {
+    clearTimeout(weatherTimer);
+    weatherTimer = setTimeout(() => autoWeather(worldTime), 1200);
     Data.refreshForecastCache(ZONES).catch(() => {});
     clearTimeout(deliverTimer);
     deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
