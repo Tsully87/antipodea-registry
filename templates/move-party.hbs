@@ -1,0 +1,37 @@
+<div class="mv-wrap">
+  <div class="mv-top">
+    <label class="mv-dest">Move to
+      <select name="dest">{{{places}}}</select>
+    </label>
+    <button type="button" class="sh-go" data-action="mvGo" {{#unless dest}}disabled{{/unless}} {{#unless count}}disabled{{/unless}}>
+      <i class="fa-solid fa-route"></i> Move {{count}}
+    </button>
+  </div>
+  <div class="mv-tools">
+    <button type="button" class="sh-ghost" data-action="mvHere" title="Tick everyone with a token on {{sceneName}}"><i class="fa-solid fa-map"></i> Tick tokens on this scene</button>
+    <button type="button" class="sh-ghost" data-action="mvNpcs">{{#if showNpcs}}Hide NPCs{{else}}Show NPCs{{/if}}</button>
+  </div>
+  {{#if scenePlace}}<p class="sm-hint"><i class="fa-solid fa-location-dot"></i> {{sceneName}} is tagged as {{scenePlace}}. Activating it moves trainers there automatically.</p>{{/if}}
+
+  <div class="mv-list">
+    {{#each groups}}
+    <section data-group="{{place}}">
+      <h3><span>{{place}} <small>{{count}}</small></span>
+        <button type="button" class="sm-mini" data-action="mvAll" data-group="{{place}}">Tick all</button></h3>
+      <ul>
+        {{#each list}}
+        <li>
+          <button type="button" class="mv-row {{#if picked}}picked{{/if}}" data-action="mvToggle" data-actor="{{id}}" aria-pressed="{{#if picked}}true{{else}}false{{/if}}">
+            <i class="fa-regular {{#if picked}}fa-square-check{{else}}fa-square{{/if}}"></i>
+            <img src="{{img}}" alt="">
+            <span class="mv-name">{{name}}<small>{{#if npc}}NPC{{else}}{{owner}}{{/if}}</small></span>
+          </button>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    {{else}}
+    <p class="sm-hint">No trainers yet.</p>
+    {{/each}}
+  </div>
+</div>

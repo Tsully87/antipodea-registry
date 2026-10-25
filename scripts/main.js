@@ -9,6 +9,7 @@ import * as Net from "./network.js";
 import { ZONES } from "./maps.js";
 import * as Shop from "./shop.js";
 import { ShopWindow, ShopManager } from "./shop-app.js";
+import * as Loc from "./location.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -47,6 +48,45 @@ async function openMine(tab) {
   });
   if (id) RegistryPhone.open(game.actors.get(id), { tab });
 }
+
+/** GM: one selected trainer token asks for just them, otherwise the Move Trainers window. */
+function moveTrainers() {
+  if (!game.user.isGM) return;
+  const sel = canvas?.tokens?.controlled?.map((t) => t.actor).filter(isTrainer) ?? [];
+  if (sel.length === 1) return Loc.pickFor(sel[0]);
+  return Loc.MoveParty.open();
+}
+
+/* Scenes tagged with a place move the trainers on them */
+Hooks.on("renderSceneConfig", (app, element) => Loc.injectSceneConfig(app, element));
+Hooks.on("updateScene", (scene, changes) => {
+  if (changes.active === true || foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.place`)) {
+    if (scene.active) Loc.syncScene(scene).catch((e) => console.warn(`${MODULE_ID} | scene place`, e));
+  }
+});
+Hooks.on("createToken", (token) => {
+  const scene = token.parent;
+  if (!Data.isActiveGM() || !Loc.scenePlace(scene) || !isTrainer(token.actor)) return;
+  Loc.moveAll([token.actor], Loc.scenePlace(scene)).then((n) => {
+    if (n) ui.notifications.info(`${token.actor.name} moved to ${scene.name}'s place.`);
+  });
+});
+
+/* A location button on trainer tokens' HUD (GM) */
+Hooks.on("renderTokenHUD", (hud, element) => {
+  const root = element instanceof HTMLElement ? element : element?.[0];
+  const actor = hud.object?.actor ?? hud.document?.actor;
+  if (!game.user.isGM || !root || !isTrainer(actor)) return;
+  const col = root.querySelector(".col.right") ?? root.querySelector(".right");
+  if (!col || col.querySelector(".antipodea-loc")) return;
+  const btn = document.createElement("button");
+  btn.type = "button";
+  btn.className = "control-icon antipodea-loc";
+  btn.title = "Set location (PokéMaps / Poké Mart)";
+  btn.innerHTML = '<i class="fa-solid fa-location-dot"></i>';
+  btn.addEventListener("click", (ev) => { ev.preventDefault(); ev.stopPropagation(); Loc.pickFor(actor); });
+  col.append(btn);
+});
 
 /** Open the shop for the player's trainer (or the selected token's, for the GM). */
 function openShop(actor) {
@@ -460,6 +500,13 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
+  game.keybindings.register(MODULE_ID, "moveTrainers", {
+    name: "Move trainers (GM)",
+    hint: "Opens the Move Trainers window. With one trainer token selected, asks where just that trainer is.",
+    editable: [{ key: "KeyL", modifiers: ["Shift"] }],
+    restricted: true,
+    onDown: () => { moveTrainers(); return true; }
+  });
   game.keybindings.register(MODULE_ID, "openShop", {
     name: "Open the Poké Mart",
     hint: "Opens the shop for wherever your trainer is.",
@@ -485,6 +532,10 @@ Hooks.once("ready", () => {
     openMine,
     /** Open the shop for a trainer (defaults to the player's own). GMs see every shop. */
     openShop: (actor) => openShop(resolveActor(actor)),
+    /** GM: the Move Trainers window. */
+    moveTrainers: () => Loc.MoveParty.open(),
+    /** GM: move trainers (actors, names or ids) to a place id, e.g. moveTo(["Jamie", "Kuroi"], "budgie-beach"). */
+    moveTo: (actors, pinId) => Loc.moveAll([].concat(actors).map(resolveActor).filter(Boolean), pinId),
     /** GM: the Shop Manager. */
     manageShops: () => ShopManager.open(),
     shops: Shop,
@@ -560,6 +611,7 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
 /* -------------------------------------------- */
 
 Hooks.on("updateActor", (actor, changes) => {
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone.location`)) Loc.MoveParty.refresh();
   if (ShopWindow.current?.actorId === actor.id) ShopWindow.refresh();
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money")) {
     RegistryPhone.refresh(actor.id);
@@ -598,6 +650,12 @@ Hooks.on("getHeaderControlsActorSheetV2", (sheet, controls) => {
 // Right-click an actor in the sidebar.
 Hooks.on("getActorContextOptions", (app, options) => {
   options.push({
+    name: "Set Location",
+    icon: '<i class="fa-solid fa-location-dot"></i>',
+    condition: (li) => game.user.isGM && isTrainer(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId)),
+    callback: (li) => Loc.pickFor(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId))
+  });
+  options.push({
     name: "Open Phone",
     icon: '<i class="fa-solid fa-mobile-screen-button"></i>',
     condition: (li) => {
@@ -620,6 +678,15 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: true,
     onChange: () => openMine()
+  };
+  tokens.tools.antipodeaMove = {
+    name: "antipodeaMove",
+    title: "Move Trainers",
+    icon: "fa-solid fa-route",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => Loc.MoveParty.open()
   };
   tokens.tools.antipodeaShop = {
     name: "antipodeaShop",

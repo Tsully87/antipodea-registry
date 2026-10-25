@@ -1098,3 +1098,27 @@
 .antipodea-shop .sm-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; border-top: 1px solid var(--sh-line); }
 .antipodea-shop .sm-foot .sh-ghost:not(.danger) { color: var(--sh-gum-deep); }
 .antipodea-shop .sm-foot .danger { margin-right: auto; }
+
+/* Move Trainers (GM) */
+.antipodea-shop .mv-wrap { display: flex; flex-direction: column; gap: 8px; height: 100%; padding: 12px 14px; box-sizing: border-box; }
+.antipodea-shop .mv-top { display: flex; align-items: flex-end; gap: 8px; }
+.antipodea-shop .mv-dest { flex: 1; display: flex; flex-direction: column; gap: 2px; font-size: 12px; font-weight: 600; color: var(--sh-muted); }
+.antipodea-shop .mv-dest select { color: var(--sh-ink); background: #fff; }
+.antipodea-shop .mv-tools { display: flex; flex-wrap: wrap; gap: 6px; }
+.antipodea-shop .mv-tools .sh-ghost { color: var(--sh-gum-deep); font-size: 12px; }
+.antipodea-shop .mv-list { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; }
+.antipodea-shop .mv-list h3 {
+  display: flex; justify-content: space-between; align-items: center; margin: 0 0 4px; border: 0;
+  font-size: 12px; font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--sh-gum-deep);
+}
+.antipodea-shop .mv-list h3 small { color: var(--sh-muted); font-weight: 400; letter-spacing: 0; }
+.antipodea-shop .mv-list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.antipodea-shop .mv-row {
+  width: 100%; display: grid; grid-template-columns: 18px 30px 1fr; align-items: center; gap: 8px; text-align: left; line-height: 1.3;
+  padding: 4px 8px; border: 1px solid var(--sh-line); border-radius: 6px; background: var(--sh-paper); color: var(--sh-ink);
+}
+.antipodea-shop .mv-row.picked { border-color: var(--sh-ochre); box-shadow: inset 3px 0 0 var(--sh-ochre); }
+.antipodea-shop .mv-row i { color: var(--sh-ochre); }
+.antipodea-shop .mv-row img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 0; }
+.antipodea-shop .mv-name { display: flex; flex-direction: column; }
+.antipodea-shop .mv-name small { font-size: 11px; color: var(--sh-muted); }
