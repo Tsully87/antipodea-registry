@@ -285,6 +285,7 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
         on: on.has(name),
         items: stock.filter((i) => i.section === name).map((i) => ({
           ...i,
+          base: Store.fmtMoney(i.cost),
           inStock: !shop.off?.[i.id],
           setPrice: shop.prices?.[i.id] ?? "",
           price: Store.fmtMoney(Shop.priceIn(shop, i))

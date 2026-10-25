@@ -1067,7 +1067,7 @@
 }
 .antipodea-shop .sm-list ul, .antipodea-shop .sm-receipts ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
 .antipodea-shop .sm-list li button {
-  width: 100%; text-align: left; display: flex; flex-direction: column; gap: 1px; line-height: 1.3;
+  width: 100%; text-align: left; display: flex; flex-direction: column; align-items: flex-start; gap: 1px; line-height: 1.3;
   padding: 6px 8px; border: 1px solid var(--sh-line); border-radius: 6px; background: #fff; color: var(--sh-ink);
 }
 .antipodea-shop .sm-list li button.active { border-color: var(--sh-ochre); box-shadow: inset 3px 0 0 var(--sh-ochre); }
@@ -1089,9 +1089,11 @@
 .antipodea-shop .sm-sec legend label { display: flex; align-items: center; gap: 4px; }
 .antipodea-shop .sm-mini { width: auto; font-size: 11px; padding: 1px 8px; line-height: 1.5; border: 1px solid var(--sh-line); background: #fff; color: var(--sh-ink); border-radius: 999px; }
 .antipodea-shop .sm-sec table { width: 100%; border-collapse: collapse; margin: 0; background: none; border: 0; }
-.antipodea-shop .sm-sec th { font-size: 11px; text-align: left; color: var(--sh-muted); background: none; border: 0; }
+.antipodea-shop .sm-sec table thead, .antipodea-shop .sm-sec table thead tr, .antipodea-shop .sm-sec table th { background: none; color: var(--sh-muted); text-shadow: none; }
+.antipodea-shop .sm-sec th { font-size: 11px; text-align: left; border: 0; padding: 2px 4px; }
 .antipodea-shop .sm-sec td { padding: 2px 4px; border-top: 1px solid var(--sh-line); font-variant-numeric: tabular-nums; background: none; }
-.antipodea-shop .sm-sec td img { width: 22px; height: 22px; vertical-align: middle; border: 0; margin-right: 4px; }
+.antipodea-shop .sm-sec td img { display: inline-block; width: 22px; height: 22px; vertical-align: middle; border: 0; margin-right: 4px; }
+.antipodea-shop .sm-sec tr:nth-child(even) td { background: none; }
 .antipodea-shop .sm-sec td input[type=number] { width: 80px; color: var(--sh-ink); background: #fff; }
 .antipodea-shop .sm-foot { display: flex; justify-content: flex-end; gap: 8px; padding-top: 8px; border-top: 1px solid var(--sh-line); }
 .antipodea-shop .sm-foot .sh-ghost:not(.danger) { color: var(--sh-gum-deep); }

@@ -62,7 +62,7 @@
             <tr>
               <td><input type="checkbox" name="stock" value="{{id}}" data-section="{{section}}" {{#if inStock}}checked{{/if}} aria-label="{{name}} in stock"></td>
               <td><img src="{{img}}" alt=""> {{name}}</td>
-              <td>${{cost}}</td>
+              <td>{{base}}</td>
               <td><input type="number" name="price" data-item="{{id}}" value="{{setPrice}}" min="0" placeholder="auto" aria-label="Set price for {{name}}"></td>
               <td>{{price}}</td>
             </tr>
