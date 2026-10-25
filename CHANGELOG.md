@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.5.0
+- New **Poké Mart**: a shop window players open from the token controls, Shift+M or the phone. It shows the shops in the city their trainer is in, with Buy and Sell tabs, sections, a basket and a running total. Money and items update on the trainer's sheet straight away, with no GM needed.
+- New **Shop Manager** for the GM: a shop per city, choose which Poké Mart sections it sells, mark items out of stock, set a markup, a buy-back rate and fixed prices.
+- Shops buy items back (50% by default). The Pokédex and phones can't be sold.
+- **#poke-mart on Discord**: each shop gets a forum post with its price list, updated when you save the shop, and every purchase and sale is logged in a Receipts post.
+- Purchases and sales show in PokéPay history.
+- Central Poké Mart (Vinnie Costa, Bunya City) is set up the first time a GM logs in.
+
 ## 1.4.1
 - Fixed social posts going to Discord more than once. If you had Foundry open as GM in more than one window, every window posted it. Now only one window posts each one, and a post is marked as sent before it goes out.
 - The weather now runs itself when the day changes, from one GM window only. Players no longer get "no permission" pop-ups for the weather macro. Turn off the old Hook Macros entry for it (Settings: "Weather: run the weather macro when the day changes" switches this off if you ever need to).

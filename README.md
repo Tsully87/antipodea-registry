@@ -54,6 +54,22 @@ Texts, DMs, all three social apps, follows, reminders, App Store purchases and t
 
 Whichever GM is online does the queued work, so a bot GM account can take this over later.
 
+## Poké Mart (shops)
+
+Shops sell items from the **Poké Mart** Items folder. Each sub-folder is a section (Poké Balls, Medicine and so on).
+
+- **Players:** the store button in the token controls, **Shift+M**, or the Poké Mart icon on the phone. It shows the shops in the city their trainer is in (their PokéMaps location). Buying and selling go straight onto their sheet, with no GM needed.
+- **GM:** open the **Shop Manager** (Module Settings, or the gear in the shop window). Make a shop per city, pick its sections, untick out-of-stock items, set a markup, a buy-back rate and any fixed prices. GMs can see and preview every shop.
+- **Selling:** shops buy back items with a price at their buy-back rate (50% by default). Key items in "Poké Mart: items shops won't buy" can't be sold.
+- **Discord:** make a forum channel (#poke-mart), add a webhook to it, and paste the URL into "Poké Mart: Discord webhook URL". Then **Save and post to Discord** gives each shop its own forum post with its price list, which updates when you save that shop. Every purchase and sale goes to a **Receipts** post. Receipts made with no GM online post when a GM next logs in.
+
+```js
+const reg = game.modules.get("antipodea-registry").api;
+reg.openShop();            // the player's shop, or the selected token's
+reg.openShop("Jamie");     // a trainer by name
+reg.manageShops();         // GM: Shop Manager
+```
+
 ## Registry
 
 - **Trainer Card:** photo, Trainer ID, Home Town, Tier and 12 badge slots.
