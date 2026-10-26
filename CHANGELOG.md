@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.6.1
+- Poké Mart receipts on Discord no longer show how much money the trainer has left. They show what was bought or sold and the total.
+
 ## 1.6.0
 - **Move Trainers** (GM): one window to move any number of trainers to a place. It shows who's where at a glance, ticks a whole group or everyone on the current scene, and can include NPCs. Opens from the route button in the token controls or Shift+L.
 - **Scenes can be tagged with a place** (Scene Config, Basics tab). Activating the scene, or dropping a trainer token on it, moves those trainers there.

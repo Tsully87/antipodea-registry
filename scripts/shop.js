@@ -410,8 +410,7 @@ async function postReceipt(rc) {
     author: { name: `${rc.who} ${buying ? "bought" : "sold"} at ${rc.shop}, ${rc.place}` },
     description: rc.lines.map((l) => `${l.qty} x ${l.name}  ${money(l.total)}`).join("\n"),
     fields: [
-      { name: buying ? "Total" : "Paid out", value: money(rc.total), inline: true },
-      { name: "Balance after", value: money(rc.balance), inline: true }
+      { name: buying ? "Total" : "Paid out", value: money(rc.total), inline: true }
     ],
     footer: { text: Time.formatLong(rc.wt) }
   };
