@@ -1122,3 +1122,36 @@
 .antipodea-shop .mv-row img { width: 30px; height: 30px; border-radius: 50%; object-fit: cover; border: 0; }
 .antipodea-shop .mv-name { display: flex; flex-direction: column; }
 .antipodea-shop .mv-name small { font-size: 11px; color: var(--sh-muted); }
+
+/* -------------------------------------------- */
+/*  Pokédex                                     */
+/* -------------------------------------------- */
+
+.antipodea-phone .ap-dex-summary { font-size: 13px; font-weight: 700; color: var(--ap-ink); margin-bottom: 8px; }
+.antipodea-phone .ap-dex-summary small { font-weight: 400; color: #777; }
+.antipodea-phone .ap-dex > input[type=text] { margin-bottom: 10px; }
+.antipodea-phone .ap-dex-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.antipodea-phone .ap-dex-tile {
+  display: flex; flex-direction: column; align-items: center; gap: 2px;
+  padding: 6px 2px 4px; border: 1px solid rgba(0,0,0,.08); border-radius: 10px; background: #fff;
+}
+.antipodea-phone .ap-dex-tile img { width: 36px; height: 36px; object-fit: contain; image-rendering: pixelated; }
+.antipodea-phone .ap-dex-tile small { font-size: 10px; color: #888; }
+.antipodea-phone .ap-dex-tile.status-unknown img { filter: brightness(0); opacity: .5; }
+.antipodea-phone .ap-dex-tile.status-owned { border-color: var(--ap-teal); box-shadow: inset 0 0 0 1px var(--ap-teal); }
+
+.antipodea-phone .ap-dex-head { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+.antipodea-phone .ap-dex-head img { width: 72px; height: 72px; object-fit: contain; image-rendering: pixelated; }
+.antipodea-phone .ap-dex-head h4 { margin: 0; border: none; font-size: 18px; }
+.antipodea-phone .ap-dex-head small { color: #888; }
+.antipodea-phone .ap-dex-types { display: flex; gap: 4px; margin-top: 4px; }
+.antipodea-phone .ap-dex-type { padding: 2px 8px; border-radius: 10px; font-size: 10px; font-weight: 700; color: #fff; text-transform: uppercase; letter-spacing: .03em; }
+.antipodea-phone .ap-dex-entry { font-size: 13px; line-height: 1.4; color: var(--ap-ink); }
+.antipodea-phone .ap-dex-size { font-size: 12px; color: #777; margin-top: -4px; }
+.antipodea-phone .ap-dex-barstats { display: flex; flex-direction: column; gap: 4px; }
+.antipodea-phone .ap-dex-bar { display: grid; grid-template-columns: 70px 1fr 24px; align-items: center; gap: 6px; font-size: 11px; color: #555; }
+.antipodea-phone .ap-dex-barfill { height: 6px; border-radius: 3px; background: rgba(0,0,0,.08); overflow: hidden; }
+.antipodea-phone .ap-dex-barfill > div { height: 100%; background: var(--ap-teal); }
+.antipodea-phone .ap-dex-moves { list-style: none; margin: 0; padding: 0; columns: 2; font-size: 12px; }
+.antipodea-phone .ap-dex-moves li { display: flex; gap: 6px; padding: 2px 0; }
+.antipodea-phone .ap-dex-moves li span { color: #999; min-width: 18px; }

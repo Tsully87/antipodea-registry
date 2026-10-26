@@ -9,6 +9,7 @@ import * as Maps from "./maps.js";
 import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from "./social-app.js";
 import { ShopWindow } from "./shop-app.js";
 import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt, addSpotAt } from "./paid-apps.js";
+import { dexContext, dexActions } from "./dex-app.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const FormDataExt = foundry.applications.ux?.FormDataExtended ?? globalThis.FormDataExtended;
@@ -17,7 +18,7 @@ const esc = (s) => foundry.utils.escapeHTML(String(s ?? ""));
 
 export const TEMPLATE_ROOT = `modules/${MODULE_ID}/templates`;
 export const APP_PARTIALS = ["home", "card", "licence", "admin", "messages", "thread", "contacts", "social", "camera", "gallery", "photo", "calendar",
-  "store", "translator", "weather", "pokemaps", "pokepay", "mart"]
+  "store", "translator", "weather", "pokemaps", "pokepay", "mart", "dex"]
   .map((n) => `${TEMPLATE_ROOT}/apps/${n}.hbs`);
 
 /** App icons on the home screen, in order. */
@@ -30,6 +31,7 @@ const HOME_APPS = [
   { app: "camera", label: "Camera", icon: "fa-camera", color: "#3d3f44", lock: "camera" },
   { app: "gallery", label: "Gallery", icon: "fa-images", color: "#f08c00" },
   { app: "calendar", label: "Calendar", icon: "fa-calendar-days", color: "#e03131" },
+  { app: "dex", label: "Pokédex", icon: "fa-book-open", color: "#2b6cb0" },
   { app: "card", label: "Trainer Card", icon: "fa-id-badge", color: "#c4622d" },
   { app: "licence", label: "Licence", icon: "fa-id-card", color: "#1f7a7a" },
   { app: "store", label: "App Store", icon: "fa-bag-shopping", color: "#4263eb", lock: "store" },
@@ -40,7 +42,7 @@ const APP_TITLES = {
   messages: "Messages", thread: "", contacts: "Contacts", pokegram: "PokéGram", poketube: "PokéTube", tiktogepi: "TikTogepi",
   store: "App Store", translator: "Translator", weather: "Weather", pokemaps: "PokéMaps", pokepay: "PokéPay", mart: "Mart Express",
   camera: "Camera", gallery: "Gallery", photo: "Photo", calendar: "Calendar",
-  card: "Trainer Card", licence: "Riding Licence", admin: "Registry"
+  card: "Trainer Card", licence: "Riding Licence", admin: "Registry", dex: "Pokédex"
 };
 
 /** Where the back arrow goes from each app. */
@@ -75,6 +77,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     this.photoId = null;
     this.calOffset = 0;
     this.calDay = null;
+    this.dexSel = null;
     this.feedAuthor = null;
     this.composeImg = null;
     this.attachImg = null;
@@ -103,9 +106,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       apAttachClear: RegistryPhone.#onAttachClear,
       apAddContact: RegistryPhone.#onAddContact,
       apRemoveContact: RegistryPhone.#onRemoveContact,
-      // Social apps and paid apps live in their own files
+      // Social apps, paid apps and the Pokédex live in their own files
       ...socialActions,
       ...paidActions,
+      ...dexActions,
       apCamFilter: RegistryPhone.#onCamFilter,
       // Camera and Gallery
       apSnap: RegistryPhone.#onSnap,
@@ -207,6 +211,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   /** Switch screens. Used by the action handlers in this file and the app files. */
   go(app, extra = {}) {
     if (app !== "pokemaps") { this.cityView = null; this.citySpot = null; this.cityEdit = false; }
+    if (app !== "dex") this.dexSel = null;
     this.app = app;
     Object.assign(this, extra);
     if (app === "thread" && this.other) Data.markRead(this.actor, this.other, this.threadCh);
@@ -261,6 +266,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       case "pokemaps": Object.assign(ctx, mapsContext.call(this, phone)); break;
       case "pokepay": Object.assign(ctx, payContext.call(this, phone)); break;
       case "mart": Object.assign(ctx, martContext.call(this, phone)); break;
+      case "dex": Object.assign(ctx, await dexContext.call(this, phone)); break;
       case "camera": {
         ctx.canSnap = !!canvas?.ready && !!canvas.scene;
         ctx.pro = Data.hasApp(phone, "procamera");
@@ -535,6 +541,12 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       });
     });
 
+    // Pokédex: filter the list as you type, debounced so every keystroke isn't a full re-render.
+    html.querySelector('[data-draft="dex-search"]')?.addEventListener("input", () => {
+      clearTimeout(this._dexSearchTimer);
+      this._dexSearchTimer = setTimeout(() => this.render(), 200);
+    });
+
     // Photo send picker.
     html.querySelector("[data-photo-send]")?.addEventListener("change", (ev) => {
       if (ev.currentTarget.value) html.querySelector("[data-action=apPhotoSend]")?.removeAttribute("disabled");
@@ -640,6 +652,10 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     if (this.app === "pokemaps" && this.cityView) {
       this.cityView = null;
       this.citySpot = null;
+      return this.render();
+    }
+    if (this.app === "dex" && this.dexSel) {
+      this.dexSel = null;
       return this.render();
     }
     if (this.app === "thread" && this.threadBack) {

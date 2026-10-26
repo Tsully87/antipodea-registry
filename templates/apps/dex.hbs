@@ -1,0 +1,78 @@
+{{#if dex.detail}}
+<div class="ap-dex ap-dex-detail">
+  {{#if dex.detail.unknown}}
+  <div class="ap-emptystate small">
+    <i class="fa-solid fa-circle-question"></i>
+    <p>No data yet. Encounter or catch #{{dex.detail.number}} to fill in this entry.</p>
+  </div>
+  {{else}}
+  <div class="ap-dex-head">
+    <img class="ap-dex-sprite" src="{{dex.detail.sprite}}" alt="{{dex.detail.name}}">
+    <div>
+      <small>#{{dex.detail.number}}{{#unless dex.detail.owned}} · Seen{{/unless}}</small>
+      <h4>{{dex.detail.name}}</h4>
+      <div class="ap-dex-types">{{#each dex.detail.types}}<span class="ap-dex-type" style="background: {{color}}">{{name}}</span>{{/each}}</div>
+    </div>
+  </div>
+
+  {{#if dex.detail.dexentry}}<p class="ap-dex-entry">{{dex.detail.dexentry}}</p>{{/if}}
+
+  <p class="ap-dex-size">{{dex.detail.sizeClass}} &middot; {{dex.detail.heightLabel}} &middot; {{dex.detail.weightLabel}}</p>
+
+  {{#if dex.detail.habitats.length}}
+  <h4 class="ap-subhead">Habitat</h4>
+  <p>{{#each dex.detail.habitats}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+  {{/if}}
+
+  {{#if dex.detail.owned}}
+  <h4 class="ap-subhead">Base Stats</h4>
+  <div class="ap-dex-barstats">
+    {{#each dex.detail.stats}}
+    <div class="ap-dex-bar"><span>{{label}}</span><div class="ap-dex-barfill"><div style="width: {{value}}0%"></div></div><em>{{value}}</em></div>
+    {{/each}}
+  </div>
+
+  <h4 class="ap-subhead">Abilities</h4>
+  <p>
+    {{#each dex.detail.abilities.basic}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}
+    {{#if dex.detail.abilities.advanced.length}}<br><small>Advanced: {{#each dex.detail.abilities.advanced}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</small>{{/if}}
+    {{#if dex.detail.abilities.high.length}}<br><small>High: {{#each dex.detail.abilities.high}}{{this}}{{/each}}</small>{{/if}}
+  </p>
+
+  {{#if dex.detail.capabilities.length}}
+  <h4 class="ap-subhead">Capabilities</h4>
+  <p>{{#each dex.detail.capabilities}}{{label}} {{value}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+  {{/if}}
+
+  {{#if dex.detail.eggGroups.length}}
+  <h4 class="ap-subhead">Egg Groups</h4>
+  <p>{{#each dex.detail.eggGroups}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+  {{/if}}
+
+  {{#if dex.detail.moves.length}}
+  <h4 class="ap-subhead">Level-Up Moves</h4>
+  <ul class="ap-dex-moves">
+    {{#each dex.detail.moves}}<li><span>{{level}}</span>{{name}}</li>{{/each}}
+  </ul>
+  {{/if}}
+  {{/if}}
+  {{/if}}
+</div>
+{{else}}
+<div class="ap-dex">
+  <div class="ap-dex-summary">Seen {{dex.seenCount}} / Owned {{dex.ownedCount}} <small>of {{dex.total}}</small></div>
+  <input type="text" data-draft="dex-search" value="{{dex.search}}" placeholder="Search by name or number">
+  {{#if dex.entries.length}}
+  <div class="ap-dex-grid">
+    {{#each dex.entries}}
+    <button type="button" class="ap-dex-tile status-{{status}}" data-action="apDexSelect" data-slug="{{slug}}" data-tooltip="{{name}}">
+      <img src="{{sprite}}" alt="" loading="lazy">
+      <small>#{{number}}</small>
+    </button>
+    {{/each}}
+  </div>
+  {{else}}
+  <p class="ap-warn">No matches.</p>
+  {{/if}}
+</div>
+{{/if}}
