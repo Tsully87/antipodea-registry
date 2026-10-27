@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.7.0
+- New **Pokédex** app on the phone, replacing the blank seen/owned list PTR shows on the trainer sheet. Unseen species show as a silhouette; seen species show artwork, dex number, type, size and habitat; owned species add base stats, abilities, capabilities, egg groups and level-up moves. Search by name or dex number. Limited to the species in Pokedex 1.05 (748 PTR entries).
+- Species artwork is pulled from PokéAPI's sprite CDN by dex number, since PTR's own compendium has no per-species art.
+
 ## 1.6.1
 - Poké Mart receipts on Discord no longer show how much money the trainer has left. They show what was bought or sold and the total.
 
