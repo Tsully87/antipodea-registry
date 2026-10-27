@@ -12,6 +12,8 @@ import { ShopWindow, ShopManager } from "./shop-app.js";
 import * as Loc from "./location.js";
 import * as DexJournal from "./dex-journal.js";
 import * as DexDiscord from "./dex-discord.js";
+import * as Surv from "./survival.js";
+import { CraftWindow, DropsWindow, EndOfDayWindow } from "./survival-app.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -97,6 +99,14 @@ function openShop(actor) {
     actor = controlled ?? (game.user.isGM ? null : myTrainer());
   }
   return ShopWindow.open(actor);
+}
+
+function openCraft(actor) {
+  if (!actor) {
+    const controlled = canvas?.tokens?.controlled?.map((t) => t.actor).find((a) => isTrainer(a) && a.isOwner);
+    actor = controlled ?? (game.user.isGM ? null : myTrainer());
+  }
+  return CraftWindow.open(actor);
 }
 
 /** First time: set up Vinnie's in Bunya City so there's a shop to start with. */
@@ -521,6 +531,11 @@ Hooks.once("init", () => {
     hint: "Only one GM window runs it, so players never get a permission pop-up. Turn off the old Hook Macros entry if you still have one.",
     scope: "world", config: true, type: Boolean, default: true
   });
+  game.settings.register(MODULE_ID, "autoEndOfDay", {
+    name: "Survival: pop up End of Day when the day changes",
+    hint: "Only opens if at least one trainer is tagged Out Bush in Move Trainers. Turn off to run End of Day manually from the token controls.",
+    scope: "world", config: true, type: Boolean, default: true
+  });
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
@@ -567,6 +582,13 @@ Hooks.once("ready", () => {
     /** GM: add a journal page (seeded with PTR's stock text) for any Antipodea species missing one. */
     seedDexEntries: () => DexJournal.seedMissing(),
     shops: Shop,
+    /** Open the Crafting window (Craft/Forage) for a trainer (defaults to the player's own). */
+    openCraft: (actor) => openCraft(resolveActor(actor)),
+    /** GM: the Pokémon Drops tool. */
+    drops: () => DropsWindow.open(),
+    /** GM: the End of Day tool (also pops up itself when the day changes, if anyone's out bush). */
+    endOfDay: () => EndOfDayWindow.open(),
+    survival: Surv,
     /** GM: the quick phone picker (a selected trainer token opens straight away). */
     pickPhone: (app) => gmPhonePicker(app),
     getRecord: Registry.getRecord,
@@ -621,6 +643,18 @@ async function autoWeather(worldTime) {
   catch (e) { console.error(`${MODULE_ID} | weather macro failed`, e); }
 }
 
+let endOfDayTimer = null;
+
+/** Pop up the End of Day tool once per new day, from a single GM window, if anyone's out bush. */
+async function autoEndOfDay(worldTime) {
+  if (!game.settings.get(MODULE_ID, "autoEndOfDay") || !Data.isActiveGM()) return;
+  const day = dayOf(worldTime);
+  if (!day) return;
+  if (!game.actors.some((a) => isTrainer(a) && Surv.isOutBush(a))) return;
+  if (!await Data.claim(`endofday:${day}`)) return;
+  EndOfDayWindow.open();
+}
+
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
   if (Data.isActiveGM()) {
@@ -629,6 +663,8 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
     Data.refreshForecastCache(ZONES).catch(() => {});
     clearTimeout(deliverTimer);
     deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
+    clearTimeout(endOfDayTimer);
+    endOfDayTimer = setTimeout(() => autoEndOfDay(worldTime).catch((e) => console.error(`${MODULE_ID} | End of Day popup failed`, e)), 1500);
   }
   Notify.onTimeChanged(worldTime, delta);
   RegistryPhone.refresh();
@@ -745,5 +781,32 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: true,
     onChange: () => openShop()
+  };
+  tokens.tools.antipodeaCraft = {
+    name: "antipodeaCraft",
+    title: "Crafting",
+    icon: "fa-solid fa-fire",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: true,
+    onChange: () => openCraft()
+  };
+  tokens.tools.antipodeaDrops = {
+    name: "antipodeaDrops",
+    title: "Pokémon Drops",
+    icon: "fa-solid fa-paw",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => DropsWindow.open()
+  };
+  tokens.tools.antipodeaEndOfDay = {
+    name: "antipodeaEndOfDay",
+    title: "End of Day",
+    icon: "fa-solid fa-campground",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => EndOfDayWindow.open()
   };
 });

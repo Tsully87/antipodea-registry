@@ -1,6 +1,7 @@
 import { MODULE_ID } from "./constants.js";
 import * as Maps from "./maps.js";
 import { getPhone, setLocation, isActiveGM } from "./phone-data.js";
+import { isOutBush, setOutBush } from "./survival.js";
 
 /**
  * Where trainers are. Three ways for the GM to move them without opening phones:
@@ -67,7 +68,8 @@ export class MoveParty extends HandlebarsApplicationMixin(ApplicationV2) {
       mvAll: MoveParty.#onAll,
       mvNpcs: MoveParty.#onNpcs,
       mvGo: MoveParty.#onGo,
-      mvHere: MoveParty.#onHere
+      mvHere: MoveParty.#onHere,
+      mvBush: MoveParty.#onBush
     }
   };
 
@@ -91,7 +93,7 @@ export class MoveParty extends HandlebarsApplicationMixin(ApplicationV2) {
       const loc = getPhone(a).location;
       const owner = game.users.find((u) => !u.isGM && u.character?.id === a.id)?.name
         ?? game.users.find((u) => !u.isGM && a.testUserPermission(u, "OWNER"))?.name ?? "";
-      return { id: a.id, name: a.name, img: a.img, owner, npc: !a.hasPlayerOwner, place: loc ? Maps.pinById(loc)?.name ?? loc : "Nowhere", nowhere: !loc, picked: this.picked.has(a.id) };
+      return { id: a.id, name: a.name, img: a.img, owner, npc: !a.hasPlayerOwner, place: loc ? Maps.pinById(loc)?.name ?? loc : "Nowhere", nowhere: !loc, picked: this.picked.has(a.id), outBush: isOutBush(a) };
     });
     // Group by where they are now, so parties stand out
     const groups = new Map();
@@ -136,6 +138,14 @@ export class MoveParty extends HandlebarsApplicationMixin(ApplicationV2) {
 
   static #onNpcs() {
     this.showNpcs = !this.showNpcs;
+    this.render();
+  }
+
+  static async #onBush(event, target) {
+    event.stopPropagation();
+    const actor = game.actors.get(target.dataset.actor);
+    if (!actor) return;
+    await setOutBush(actor, !isOutBush(actor));
     this.render();
   }
 

@@ -1113,8 +1113,9 @@
 }
 .antipodea-shop .mv-list h3 small { color: var(--sh-muted); font-weight: 400; letter-spacing: 0; }
 .antipodea-shop .mv-list ul { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 4px; }
+.antipodea-shop .mv-list li { display: flex; align-items: center; gap: 4px; }
 .antipodea-shop .mv-row {
-  width: 100%; display: grid; grid-template-columns: 18px 30px 1fr; align-items: center; gap: 8px; text-align: left; line-height: 1.3;
+  width: 100%; flex: 1; display: grid; grid-template-columns: 18px 30px 1fr; align-items: center; gap: 8px; text-align: left; line-height: 1.3;
   padding: 4px 8px; border: 1px solid var(--sh-line); border-radius: 6px; background: var(--sh-paper); color: var(--sh-ink);
 }
 .antipodea-shop .mv-row.picked { border-color: var(--sh-ochre); box-shadow: inset 3px 0 0 var(--sh-ochre); }
@@ -1161,3 +1162,35 @@
 .antipodea-phone .ap-dex-gm { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; padding: 8px; border: 1px dashed #c9a; border-radius: 6px; background: rgba(170, 60, 150, .06); }
 .antipodea-phone .ap-dex-locked { color: #999; font-style: italic; }
 .antipodea-phone .ap-dex-locked i { margin-right: 4px; }
+
+.antipodea-shop .mv-bush {
+  flex: none; width: 32px; height: 32px; display: flex; align-items: center; justify-content: center;
+  border: 1px solid var(--sh-line); border-radius: 6px; background: var(--sh-paper); color: var(--sh-muted);
+}
+.antipodea-shop .mv-bush.on { background: var(--sh-gum); border-color: var(--sh-gum-deep); color: #fff; }
+
+/* Crafting (player) */
+.antipodea-shop .cf-recipe { display: flex; align-items: center; gap: 10px; }
+.antipodea-shop .cf-recipe .sh-name { flex: 1; }
+.antipodea-shop .cf-need { display: flex; flex-wrap: wrap; gap: 4px; align-items: center; font-size: 12px; }
+.antipodea-shop .cf-mat { padding: 2px 6px; border-radius: 999px; background: #e3efe7; color: var(--sh-gum-deep); }
+.antipodea-shop .cf-mat.bad { background: #f6e1dd; color: var(--sh-red); }
+.antipodea-shop .cf-dc { padding: 2px 6px; border-radius: 999px; background: rgba(0,0,0,.08); color: var(--sh-muted); font-weight: 600; }
+.antipodea-shop .cf-forage { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px; }
+
+/* Pokémon Drops (GM) */
+.antipodea-shop.antipodea-drops .form-group { margin-bottom: 10px; }
+.antipodea-shop.antipodea-drops select { color: var(--sh-ink); background: #fff; }
+
+/* End of Day (GM) */
+.antipodea-shop .ed-zones { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.antipodea-shop .ed-zone { border: 1px solid var(--sh-line); border-radius: 8px; padding: 8px 10px; background: var(--sh-paper); }
+.antipodea-shop .ed-zone h3 { display: flex; justify-content: space-between; align-items: baseline; margin: 0 0 2px; border: 0; font-size: 13px; font-weight: 700; color: var(--sh-gum-deep); }
+.antipodea-shop .ed-zone h3 small { font-weight: 400; color: var(--sh-muted); }
+.antipodea-shop .ed-hazards { list-style: none; margin: 6px 0 0; padding: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.antipodea-shop .ed-hazard {
+  display: flex; align-items: center; gap: 4px; padding: 3px 8px; border-radius: 999px;
+  border: 1px solid var(--sh-line); background: #fff; color: var(--sh-muted); font-size: 12px;
+}
+.antipodea-shop .ed-hazard.on { border-color: var(--sh-ochre); color: var(--sh-ink); background: #fbeecb; }
+.antipodea-shop .ed-hazard.on.severe { border-color: var(--sh-red); background: #f6e1dd; color: var(--sh-red); font-weight: 700; }

@@ -1,5 +1,14 @@
 # Changelog
 
+## 1.8.0 (unreleased)
+- New **Survival and Crafting**, per the signed-off vault note: Food and Water, Foraging, Pokémon Drops and Crafting.
+- **Crafting** window (token controls, everyone): Craft and Forage tabs. Craft checks Survival against a recipe's DC and consumes materials on a pass (ruined on a bad miss). Forage rolls Survival for a trainer who's Out Bush, finding materials from a table keyed to their zone.
+- **Pokémon Drops** tool (GM): after a fight, pick the harvester and the defeated/caught Pokémon's first Type to roll the right skill (Survival, Athletics or Pokémon Ed) for 1 material. Nothing drops unless a player chooses to harvest.
+- **End of Day** tool (GM): pops up when the world clock's day changes, if anyone is tagged Out Bush. Shows every out-bush trainer grouped by zone with today's weather and suggested hazard flags (tick to apply, shift-click for Severe), checks food (a Ration, or push through on Focus vs DC 10/15 that climbs +5 a day missed) and weather exposure (Survival vs DC 10/14 if not geared for it) for everyone, and stacks Worn Down on a miss.
+- **Out Bush toggle** in Move Trainers: a tree icon next to each trainer flags them as out in the field rather than in town. Foraging and End of Day only apply to tagged trainers.
+- Settings: "Survival: pop up End of Day when the day changes" (on by default).
+- New API: `Survival.craft()`, `Survival.forage()`, `Survival.harvest()`, `Survival.rollCheck()`, `Survival.isOutBush()` / `setOutBush()`, `Survival.endOfDayPreview()` / `applyEndOfDay()`.
+
 ## 1.7.6
 - Pokédex grid: bigger, darker dex numbers and more breathing room between tiles, so they're actually readable instead of faint grey text crammed under the sprite.
 

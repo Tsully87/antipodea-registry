@@ -26,6 +26,9 @@
             <img src="{{img}}" alt="">
             <span class="mv-name">{{name}}<small>{{#if npc}}NPC{{else}}{{owner}}{{/if}}</small></span>
           </button>
+          <button type="button" class="mv-bush {{#if outBush}}on{{/if}}" data-action="mvBush" data-actor="{{id}}" title="{{#if outBush}}Out bush — click to bring them back to town{{else}}In town — click to send them out bush{{/if}}">
+            <i class="fa-solid fa-tree"></i>
+          </button>
         </li>
         {{/each}}
       </ul>

@@ -83,6 +83,21 @@ reg.openShop("Jamie");     // a trainer by name
 reg.manageShops();         // GM: Shop Manager
 ```
 
+## Survival and Crafting
+
+Rules live in the vault note "Survival and Crafting". Only trainers tagged **Out Bush** in Move Trainers (the tree icon next to their name) are affected by foraging and End of Day.
+
+- **Crafting window:** the fire button in the token controls, or `reg.openCraft()`. **Craft** rolls Survival against a recipe's DC and consumes materials on a pass (ruined on a bad miss, beating the DC by 5+ makes two). **Forage** rolls Survival for an hour out bush and finds materials from a table keyed to the trainer's zone.
+- **Pokémon Drops (GM):** the paw button, or `reg.drops()`. After a fight, pick who's harvesting and the defeated/caught Pokémon's first Type, for a DC 10 check (Survival, Athletics or Pokémon Ed, depending on the type) and 1 material. Nothing drops unless someone chooses to harvest.
+- **End of Day (GM):** the campground button, or `reg.endOfDay()`. Pops up itself when the world clock's day changes, if anyone is tagged Out Bush. Out-bush trainers are grouped by zone with today's weather and suggested hazard flags (tick to apply, Shift-click for Severe). **Apply** checks food (eats a Ration, or pushes through on Focus against DC 10, +5 for each extra day missed) and water (DC 15, same escalation) for everyone, then weather exposure (Survival vs DC 10, or 14 if Severe, unless they're carrying the right gear), stacking Worn Down on a miss.
+
+```js
+reg.openCraft();   // the player's Crafting window, or the selected token's
+reg.drops();       // GM: Pokémon Drops
+reg.endOfDay();    // GM: End of Day
+reg.survival;       // the survival.js module (recipes, drop table, checks, etc.)
+```
+
 ## Registry
 
 - **Trainer Card:** photo, Trainer ID, Home Town, Tier and 12 badge slots.
@@ -126,6 +141,7 @@ reg.testDiscord();                   // posts a test message to the webhook
 | App Store: prices | translator=1500, weather=500, procamera=1000, pokemaps=750, pokepay=250, mart=500 |
 | Translator: languages | Kantonian, Johtonian, Hoennian, Sinnohan, Unovan, Kalosian, Alolan, Galarian, Paldean |
 | Weather: macro name | ANTIPODEA WEATHER |
+| Survival: pop up End of Day when the day changes | On |
 | PokéMaps: map image / km per pixel | none / 4.11 |
 | Mart Express: folder / markup / delivery days | Poké Mart / 25% / 1 |
 | Phone: notification sound | On (per player) |

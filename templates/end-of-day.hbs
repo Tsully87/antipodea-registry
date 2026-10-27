@@ -1,0 +1,32 @@
+<div class="sh-wrap ed-wrap">
+  <p class="sh-hint">Every out-bush trainer, grouped by zone. Tick a hazard to apply it; shift-click to flag it Severe. Food/water and Worn Down are checked for everyone automatically.</p>
+
+  {{#if empty}}
+  <p class="sh-empty">Nobody is out bush right now.</p>
+  {{else}}
+  <div class="ed-zones">
+    {{#each zones}}
+    <section class="ed-zone">
+      <h3>{{zone}}<small>{{trainers}}</small></h3>
+      <p class="sh-hint">{{weather}}</p>
+      <ul class="ed-hazards">
+        {{#each hazards}}
+        <li>
+          <button type="button" class="ed-hazard {{#if active}}on{{/if}} {{#if severe}}severe{{/if}}" data-action="edHazard" data-zone="{{zone}}" data-key="{{key}}">
+            <i class="fa-regular {{#if active}}fa-square-check{{else}}fa-square{{/if}}"></i>
+            {{label}}{{#if severe}} <small>Severe</small>{{/if}}
+          </button>
+        </li>
+        {{/each}}
+      </ul>
+    </section>
+    {{/each}}
+  </div>
+  {{/if}}
+
+  <footer class="sh-till">
+    <button type="button" class="sh-go" data-action="edApply" {{#if empty}}disabled{{/if}} {{#if busy}}disabled{{/if}}>
+      <i class="fa-solid fa-campground"></i> {{#if done}}Apply again{{else}}Apply End of Day{{/if}}
+    </button>
+  </footer>
+</div>

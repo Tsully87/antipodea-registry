@@ -1,0 +1,48 @@
+<div class="sh-wrap cf-wrap">
+  <header class="sh-head">
+    {{#if actor}}<img class="sh-face" src="{{actor.img}}" alt="">{{/if}}
+    <div class="sh-who">
+      {{#if many}}
+      <select name="trainer" aria-label="Trainer">
+        {{#each trainers}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+      </select>
+      {{else}}<strong>{{actor.name}}</strong>{{/if}}
+      <span class="sh-place"><i class="fa-solid fa-tree"></i> {{#if outBush}}Out bush — {{zone}}{{else}}In town{{/if}}</span>
+    </div>
+  </header>
+
+  <div class="sh-sign">
+    <div class="sh-mode" role="tablist">
+      <button type="button" role="tab" class="{{#if craft}}active{{/if}}" data-action="cfTab" data-tab="craft"><i class="fa-solid fa-hammer"></i> Craft</button>
+      <button type="button" role="tab" class="{{#unless craft}}active{{/unless}}" data-action="cfTab" data-tab="forage"><i class="fa-solid fa-leaf"></i> Forage</button>
+    </div>
+  </div>
+
+  {{#if message}}<p class="sh-msg {{#if message.error}}bad{{/if}}">{{message.text}}</p>{{/if}}
+
+  <div class="sh-shelves cf-list">
+    {{#if craft}}
+      <ul class="sh-rows cf-recipes">
+        {{#each recipes}}
+        <li class="sh-row cf-recipe">
+          <span class="sh-name">{{name}}<small>{{makes}}</small></span>
+          <span class="cf-need">
+            {{#each need}}<span class="cf-mat {{#if short}}bad{{/if}}">{{has}}/{{qty}} {{mat}}</span>{{/each}}
+            <span class="cf-dc">DC {{dc}}</span>
+          </span>
+          <button type="button" class="sh-go" data-action="cfMake" data-recipe="{{id}}" {{#unless canMake}}disabled{{/unless}}>
+            <i class="fa-solid fa-hammer"></i> Craft
+          </button>
+        </li>
+        {{/each}}
+      </ul>
+    {{else}}
+      <div class="cf-forage">
+        <p class="sh-hint">{{#if outBush}}Foraging in <strong>{{zoneGroup}}</strong> ({{zone}}). Rolls Survival; each die of 4+ finds a material.{{else}}You need to be out bush to forage. Ask the GM to tag you as out bush in Move Trainers.{{/if}}</p>
+        <button type="button" class="sh-go" data-action="cfForage" {{#unless outBush}}disabled{{/unless}}>
+          <i class="fa-solid fa-leaf"></i> Forage for an hour
+        </button>
+      </div>
+    {{/if}}
+  </div>
+</div>

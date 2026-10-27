@@ -1,0 +1,20 @@
+<div class="sh-wrap dp-wrap">
+  <p class="sh-hint">After a fight, a trainer can spend a few minutes harvesting a defeated or caught wild Pokémon for materials. Pick who's harvesting and that Pokémon's first Type.</p>
+
+  {{#if message}}<p class="sh-msg {{#if message.error}}bad{{/if}}">{{message.text}}</p>{{/if}}
+
+  <div class="form-group">
+    <label>Harvester</label>
+    <select name="trainer">{{#each trainers}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+  </div>
+  <div class="form-group">
+    <label>Pokémon's first Type</label>
+    <select name="ptype">{{#each types}}<option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}</select>
+  </div>
+
+  {{#if drop}}
+  <p class="sh-hint">That's a <strong>{{drop.skillLabel}}</strong> check (DC 10) for 1 <strong>{{drop.material}}</strong>.</p>
+  {{/if}}
+
+  <button type="button" class="sh-go" data-action="dpHarvest"><i class="fa-solid fa-paw"></i> Harvest</button>
+</div>
