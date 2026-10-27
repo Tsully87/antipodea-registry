@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.5
+- Fixed: the Pokédex screen itself never actually showed anything. The phone's main template switches between apps with one line per app, and the Pokédex's line was missing since it was first built — the search box, grid, filters and detail view were all working correctly underneath, they just never got included on screen. Everything from 1.7.0 through 1.7.4 is now visible for the first time.
+
 ## 1.7.4
 - Pokédex posts to Discord: when a trainer sees or catches an Antipodea species for the first time, a line posts through its own webhook (separate from the Registry, Poké Mart and social webhooks, so it can go to its own channel). Setting: "Pokédex: post new entries to Discord", webhook under "Pokédex: Discord webhook URL".
 - GM tool: from a trainer's Pokédex entry, the GM can mark it Owned, Seen only, or Clear it back to unknown, without needing an in-world scan. Shows up only for the GM, on that trainer's Pokédex.
