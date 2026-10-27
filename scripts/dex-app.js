@@ -63,8 +63,21 @@ function buildDetail(entry, doc) {
   return base;
 }
 
-/** Only entries the trainer has actually found are name-searchable, so search can't be used to peek at "???" entries. */
-function matches(entry, q) {
+const STATUS_FILTERS = [
+  { key: "owned", label: "Owned" },
+  { key: "seen", label: "Seen only" },
+  { key: "unknown", label: "Not found" }
+];
+/** Standard Pokédex type order, trimmed to whatever types actually turn up in Antipodea. */
+const TYPE_ORDER = Object.keys(TYPE_COLORS);
+
+/**
+ * Only entries the trainer has actually found are name- or type-searchable, so filters
+ * can't be used to peek at what a "???" entry is.
+ */
+function matches(entry, q, status, type) {
+  if (status && entry.status !== status) return false;
+  if (type && (entry.status === "unknown" || !entry.types.includes(type))) return false;
   if (!q) return true;
   if (String(entry.number).includes(q)) return true;
   return entry.status !== "unknown" && entry.name.toLowerCase().includes(q);
@@ -72,9 +85,12 @@ function matches(entry, q) {
 
 export async function dexContext(phone) {
   const q = (this._drafts["dex-search"] ?? "").trim().toLowerCase();
+  const status = this.dexFilterStatus ?? "";
+  const type = this.dexFilterType ?? "";
   const all = await DexData.dexList(this.actor);
   const seenCount = all.filter((e) => e.status !== "unknown").length;
   const ownedCount = all.filter((e) => e.status === "owned").length;
+  const typesPresent = new Set(all.flatMap((e) => e.types));
 
   let detail = null;
   if (this.dexSel) {
@@ -93,7 +109,10 @@ export async function dexContext(phone) {
       seenCount,
       ownedCount,
       search: this._drafts["dex-search"] ?? "",
-      entries: all.filter((e) => matches(e, q)).map((e) => ({
+      statusFilters: STATUS_FILTERS.map((f) => ({ ...f, active: f.key === status })),
+      typeOptions: TYPE_ORDER.filter((t) => typesPresent.has(t)).map((t) => ({ name: t, selected: t === type })),
+      type,
+      entries: all.filter((e) => matches(e, q, status, type)).map((e) => ({
         slug: e.slug,
         number: e.number,
         name: e.status === "unknown" ? "???" : e.name,
@@ -113,6 +132,11 @@ export const dexActions = {
   },
   apDexClear() {
     this.dexSel = null;
+    this.render();
+  },
+  apDexFilterStatus(event, target) {
+    const key = target.dataset.status;
+    this.dexFilterStatus = this.dexFilterStatus === key ? null : key;
     this.render();
   }
 };

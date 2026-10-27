@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.3
+- Pokédex: filter the list by status (Owned / Seen only / Not found) and by type. Like search, a type filter only ever matches species you've actually found — it can't be used to peek at what a "???" entry is.
+
 ## 1.7.2
 - **Antipodea Dex Entries**: a new journal (GM: `api.openDexEntries()`, or just find it in the Journal sidebar) with one page per Antipodea species. Rewrite any entry in Manuka's voice straight in Foundry's normal editor — no code needed — and the Pokédex shows your version instead of PTR's stock text. Every page starts seeded with PTR's own flavour text so nothing shows blank while you work through them; new pages are added automatically (for the active GM, same as the weather and shops) whenever a species is missing one.
 

@@ -78,6 +78,8 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     this.calOffset = 0;
     this.calDay = null;
     this.dexSel = null;
+    this.dexFilterStatus = null;
+    this.dexFilterType = null;
     this.feedAuthor = null;
     this.composeImg = null;
     this.attachImg = null;

@@ -62,6 +62,17 @@
 <div class="ap-dex">
   <div class="ap-dex-summary">Seen {{dex.seenCount}} / Owned {{dex.ownedCount}} <small>of {{dex.total}}</small></div>
   <input type="text" data-draft="dex-search" value="{{dex.search}}" placeholder="Search by name or number">
+  <div class="ap-dex-filters">
+    <div class="ap-dex-chips">
+      {{#each dex.statusFilters}}<button type="button" class="ap-pill small {{#unless active}}ghost{{/unless}}" data-action="apDexFilterStatus" data-status="{{key}}">{{label}}</button>{{/each}}
+    </div>
+    {{#if dex.typeOptions.length}}
+    <select data-state="dexFilterType">
+      <option value="">All types</option>
+      {{#each dex.typeOptions}}<option value="{{name}}" {{#if selected}}selected{{/if}}>{{name}}</option>{{/each}}
+    </select>
+    {{/if}}
+  </div>
   {{#if dex.entries.length}}
   <div class="ap-dex-grid">
     {{#each dex.entries}}

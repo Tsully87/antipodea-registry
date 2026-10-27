@@ -1155,3 +1155,6 @@
 .antipodea-phone .ap-dex-moves { list-style: none; margin: 0; padding: 0; columns: 2; font-size: 12px; }
 .antipodea-phone .ap-dex-moves li { display: flex; gap: 6px; padding: 2px 0; }
 .antipodea-phone .ap-dex-moves li span { color: #999; min-width: 18px; }
+.antipodea-phone .ap-dex-filters { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
+.antipodea-phone .ap-dex-chips { display: flex; flex-wrap: wrap; gap: 4px; }
+.antipodea-phone .ap-dex-filters select { width: 100%; }
