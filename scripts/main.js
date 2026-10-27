@@ -357,6 +357,16 @@ Hooks.once("init", () => {
     scope: "world", config: true, type: Boolean, default: true,
     onChange: () => RegistryPhone.refresh()
   });
+  game.settings.register(MODULE_ID, "hidePtrDex", {
+    name: "Phone: Pokédex replaces PTR's Dex button for players",
+    hint: "Removes the trainer sheet's \"Dex\" header button (PTR's own blank seen/owned screen) for players, since the Phone's Pokédex shows the real information instead. GMs still see PTR's button too.",
+    scope: "world", config: true, type: Boolean, default: true,
+    onChange: () => {
+      for (const app of Object.values(ui.windows)) {
+        if (isTrainer(app.actor)) app.render();
+      }
+    }
+  });
   game.settings.register(MODULE_ID, "pokegramToDiscord", {
     name: "Phone: post social apps to Discord",
     hint: "New PokéGram, PokéTube and TikTogepi posts are copied to Discord through the webhooks below. Leave a webhook blank to skip that app.",
@@ -626,6 +636,12 @@ Hooks.on("updateActor", (actor, changes) => {
 // Actor sheet header button, ApplicationV1 sheets.
 Hooks.on("getActorSheetHeaderButtons", (sheet, buttons) => {
   const actor = sheet.actor;
+  // The Phone's Pokédex replaces PTR's own "Dex" button (PTUDexSheet) for players, since
+  // that screen shows no info for seen/owned Pokémon. GMs keep it, in case it's ever needed.
+  if (isTrainer(actor) && !game.user.isGM && game.settings.get(MODULE_ID, "hidePtrDex")) {
+    const i = buttons.findIndex((b) => b.class === "dex-screen");
+    if (i !== -1) buttons.splice(i, 1);
+  }
   if (!isTrainer(actor) || !(actor.isOwner || game.user.isGM)) return;
   buttons.unshift({
     label: "Phone",
