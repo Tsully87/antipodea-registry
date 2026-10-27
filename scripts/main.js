@@ -11,6 +11,7 @@ import * as Shop from "./shop.js";
 import { ShopWindow, ShopManager } from "./shop-app.js";
 import * as Loc from "./location.js";
 import * as DexJournal from "./dex-journal.js";
+import * as DexDiscord from "./dex-discord.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -369,6 +370,17 @@ Hooks.once("init", () => {
       }
     }
   });
+  game.settings.register(MODULE_ID, "dexDiscord", {
+    name: "Pokédex: post new entries to Discord",
+    hint: "When a trainer sees or catches an Antipodea species for the first time, a line posts through the webhook below. Covers scans and the GM's manual seen/owned toggle on the Pokédex.",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "dexWebhookUrl", {
+    name: "Pokédex: Discord webhook URL",
+    hint: "Stored on your user account only. Make a webhook in whichever channel you want new dex entries posted to.",
+    scope: userScope, config: true, type: String, default: "",
+    restricted: true
+  });
   game.settings.register(MODULE_ID, "pokegramToDiscord", {
     name: "Phone: post social apps to Discord",
     hint: "New PokéGram, PokéTube and TikTogepi posts are copied to Discord through the webhooks below. Leave a webhook blank to skip that app.",
@@ -626,13 +638,28 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
 /*  Live refresh                                */
 /* -------------------------------------------- */
 
-Hooks.on("updateActor", (actor, changes) => {
+// Pokédex: stash seen/owned just before a dex-touching update, so the updateActor hook
+// below can diff against it. The same `options` object is passed to both hooks.
+Hooks.on("preUpdateActor", (actor, changes, options) => {
+  if (isTrainer(actor) && foundry.utils.hasProperty(changes, "system.dex")) {
+    options.antipodeaDexBefore = {
+      seen: [...(actor.system.dex?.seen ?? [])],
+      owned: [...(actor.system.dex?.owned ?? [])]
+    };
+  }
+});
+
+Hooks.on("updateActor", (actor, changes, options) => {
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone.location`)) Loc.MoveParty.refresh();
   if (ShopWindow.current?.actorId === actor.id) ShopWindow.refresh();
-  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money")) {
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money") || foundry.utils.hasProperty(changes, "system.dex")) {
     RegistryPhone.refresh(actor.id);
   }
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone`)) Notify.onPhoneChanged(actor);
+  if (options.antipodeaDexBefore) {
+    DexDiscord.announceDexChanges(actor, options.antipodeaDexBefore, actor.system.dex ?? {})
+      .catch((e) => console.warn(`${MODULE_ID} | dex discord`, e));
+  }
 });
 
 /* -------------------------------------------- */

@@ -5,6 +5,12 @@
     <i class="fa-solid fa-circle-question"></i>
     <p>No data yet. Encounter or catch #{{dex.detail.number}} to fill in this entry.</p>
   </div>
+  {{#if isGM}}
+  <div class="ap-dex-gm">
+    <button type="button" class="ap-pill small" data-action="apDexMarkSeen" data-slug="{{dex.detail.slug}}">Mark seen</button>
+    <button type="button" class="ap-pill small" data-action="apDexMarkOwned" data-slug="{{dex.detail.slug}}">Mark owned</button>
+  </div>
+  {{/if}}
   {{else}}
   <div class="ap-dex-head">
     <img class="ap-dex-sprite" src="{{dex.detail.sprite}}" alt="{{dex.detail.name}}">
@@ -15,6 +21,14 @@
     </div>
   </div>
 
+  {{#if isGM}}
+  <div class="ap-dex-gm">
+    <button type="button" class="ap-pill small {{#unless dex.detail.owned}}ghost{{/unless}}" data-action="apDexMarkOwned" data-slug="{{dex.detail.slug}}">Owned</button>
+    <button type="button" class="ap-pill small {{#if dex.detail.owned}}ghost{{/if}}" data-action="apDexMarkSeen" data-slug="{{dex.detail.slug}}">Seen only</button>
+    <button type="button" class="ap-pill small ghost" data-action="apDexMarkUnknown" data-slug="{{dex.detail.slug}}">Clear</button>
+  </div>
+  {{/if}}
+
   {{#if dex.detail.dexentry}}<p class="ap-dex-entry">{{dex.detail.dexentry}}</p>{{/if}}
 
   <p class="ap-dex-size">{{dex.detail.sizeClass}} &middot; {{dex.detail.heightLabel}} &middot; {{dex.detail.weightLabel}}</p>
@@ -22,6 +36,9 @@
   {{#if dex.detail.habitats.length}}
   <h4 class="ap-subhead">Habitat</h4>
   <p>{{#each dex.detail.habitats}}{{this}}{{#unless @last}}, {{/unless}}{{/each}}</p>
+  {{else if dex.detail.habitatsLocked}}
+  <h4 class="ap-subhead">Habitat</h4>
+  <p class="ap-dex-locked"><i class="fa-solid fa-lock"></i> Explore more of Antipodea to learn this one's habitat.</p>
   {{/if}}
 
   {{#if dex.detail.owned}}

@@ -1,5 +1,11 @@
 # Changelog
 
+## 1.7.4
+- Pokédex posts to Discord: when a trainer sees or catches an Antipodea species for the first time, a line posts through its own webhook (separate from the Registry, Poké Mart and social webhooks, so it can go to its own channel). Setting: "Pokédex: post new entries to Discord", webhook under "Pokédex: Discord webhook URL".
+- GM tool: from a trainer's Pokédex entry, the GM can mark it Owned, Seen only, or Clear it back to unknown, without needing an in-world scan. Shows up only for the GM, on that trainer's Pokédex.
+- A species' Habitat is now locked behind exploring: it only shows once the trainer's been to a zone on PokéMaps that has that terrain. Like search and the filters, it never gives away which terrain is being withheld.
+- Fixed: the Pokédex didn't refresh on its own when a trainer's seen/owned list changed while the phone was open.
+
 ## 1.7.3
 - Pokédex: filter the list by status (Owned / Seen only / Not found) and by type. Like search, a type filter only ever matches species you've actually found — it can't be used to peek at what a "???" entry is.
 

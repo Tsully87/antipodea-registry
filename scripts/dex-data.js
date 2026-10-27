@@ -55,6 +55,12 @@ export async function dexList(actor) {
   return entries;
 }
 
+/** Bare index info (name, number, types) for one slug, with no compendium document fetch. */
+export async function indexEntry(slug) {
+  const index = await loadIndex();
+  return index.get(slug) ?? null;
+}
+
 /** The full species Item (stats, moves, habitats, dex entry, etc.) for the detail view. */
 export async function speciesDoc(slug) {
   const index = await loadIndex();

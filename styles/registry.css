@@ -1158,3 +1158,6 @@
 .antipodea-phone .ap-dex-filters { display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px; }
 .antipodea-phone .ap-dex-chips { display: flex; flex-wrap: wrap; gap: 4px; }
 .antipodea-phone .ap-dex-filters select { width: 100%; }
+.antipodea-phone .ap-dex-gm { display: flex; flex-wrap: wrap; gap: 4px; margin: 8px 0; padding: 8px; border: 1px dashed #c9a; border-radius: 6px; background: rgba(170, 60, 150, .06); }
+.antipodea-phone .ap-dex-locked { color: #999; font-style: italic; }
+.antipodea-phone .ap-dex-locked i { margin-right: 4px; }

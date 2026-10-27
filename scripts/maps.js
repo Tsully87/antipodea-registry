@@ -65,6 +65,44 @@ export const DEFAULT_PINS = [
   P("Matai Isle", 968, 706, "town", "Tussock Plains")
 ];
 
+/**
+ * Which of PTR's own Habitat List terrain tags (Grassland, Forest, Wetlands, Ocean,
+ * Tundra, Mountain, Cave, Urban, Desert, Arctic, Beach) turn up in each zone, for the
+ * Pokédex's habitat-unlock-by-exploring feature below. Every coastal zone gets Cave too
+ * (flavoured as beach caves), since Tony wanted that everywhere there's a coastline.
+ */
+export const ZONE_HABITATS = {
+  "The Big Wet": ["Wetlands", "Forest"],
+  "Rainforest Reach": ["Forest", "Wetlands"],
+  "Bunya Coast": ["Beach", "Ocean", "Urban", "Cave"],
+  "Waratah Coast": ["Beach", "Ocean", "Cave"],
+  "Gumleaf Coast": ["Beach", "Forest", "Cave"],
+  "Banksia Coast": ["Beach", "Grassland", "Cave"],
+  "The Red Heart": ["Desert", "Grassland", "Cave"],
+  "Snowgum High Country": ["Mountain", "Tundra"],
+  "Huon Isle": ["Forest", "Mountain"],
+  "Pōhutukawa Isle": ["Urban", "Beach", "Ocean", "Cave"],
+  "Tussock Plains": ["Grassland"],
+  "Rimu Coast": ["Beach", "Forest", "Cave"]
+};
+
+/**
+ * Habitat tags this phone has earned by exploring: every tag belonging to a zone the
+ * trainer is currently in or has visited before (same "here or been here" rule as
+ * `cityUnlocked`). GMs aren't restricted, so this returns `null` for them, meaning "show
+ * everything" to whatever reads it.
+ */
+export function unlockedHabitats(phone) {
+  if (game.user.isGM) return null;
+  const zones = new Set();
+  for (const pin of pins()) {
+    if (pin.zone && (phone.location === pin.id || (phone.visited ?? []).includes(pin.id))) zones.add(pin.zone);
+  }
+  const tags = new Set();
+  for (const zone of zones) for (const tag of ZONE_HABITATS[zone] ?? []) tags.add(tag);
+  return tags;
+}
+
 /** Kinds of labelled spot on a city map. */
 export const SPOT_TYPES = {
   district: { label: "District", icon: "fa-city", color: "#495057" },

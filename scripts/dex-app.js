@@ -1,5 +1,6 @@
 import * as DexData from "./dex-data.js";
 import * as DexJournal from "./dex-journal.js";
+import * as Maps from "./maps.js";
 
 /**
  * The Pokédex app. Runs as methods on the phone window (`this` is the RegistryPhone),
@@ -31,8 +32,20 @@ function capabilityRows(cap) {
   return order.filter(([key]) => cap[key]).map(([key, label]) => ({ label, value: cap[key] }));
 }
 
-function buildDetail(entry, doc) {
+/**
+ * Habitat is locked behind exploring, same spirit as PokéMaps' city unlocking: a
+ * species' habitat terrain(s) only show once the trainer has been somewhere that has
+ * them. `unlocked === null` means no restriction (GM view). Doesn't reveal which terrain
+ * is being withheld, only that one is — same info-safety rule as search and filters.
+ */
+function visibleHabitats(raw, unlocked) {
+  const habitats = unlocked === null ? raw : raw.filter((h) => unlocked.has(h));
+  return { habitats, habitatsLocked: raw.length > 0 && habitats.length === 0 };
+}
+
+function buildDetail(entry, doc, unlockedHabitats) {
   const s = doc?.system ?? {};
+  const { habitats, habitatsLocked } = visibleHabitats(s.habitats ?? [], unlockedHabitats);
   const base = {
     slug: entry.slug,
     number: entry.number,
@@ -43,7 +56,8 @@ function buildDetail(entry, doc) {
     sizeClass: s.size?.sizeClass ?? "",
     heightLabel: s.size ? `${s.size.height} m` : "",
     weightLabel: s.size ? `${s.size.weight} kg` : "",
-    habitats: s.habitats ?? [],
+    habitats,
+    habitatsLocked,
     dexentry: DexJournal.entryFor(entry.slug) ?? s.dexentry ?? ""
   };
   if (base.owned) {
@@ -96,10 +110,10 @@ export async function dexContext(phone) {
   if (this.dexSel) {
     const entry = all.find((e) => e.slug === this.dexSel);
     if (entry?.status === "unknown") {
-      detail = { unknown: true, number: entry.number };
+      detail = { unknown: true, number: entry.number, slug: entry.slug };
     } else if (entry) {
       const doc = await DexData.speciesDoc(entry.slug);
-      detail = buildDetail(entry, doc);
+      detail = buildDetail(entry, doc, Maps.unlockedHabitats(phone));
     }
   }
 
@@ -125,6 +139,24 @@ export async function dexContext(phone) {
   };
 }
 
+/**
+ * GM-only: set a trainer's seen/owned status for one species directly, for species a
+ * scan can't reasonably cover (a gift Pokémon, a plot event, fixing a missed scan).
+ * Writes straight to the same `system.dex.seen`/`.owned` arrays PTR's own scan uses, so
+ * nothing else needs to know this didn't come from a scan.
+ */
+async function setDexStatus(actor, slug, status) {
+  if (!game.user.isGM || !actor || !slug) return;
+  const dex = actor.system.dex ?? {};
+  const seen = new Set(dex.seen ?? []);
+  const owned = new Set(dex.owned ?? []);
+  seen.delete(slug);
+  owned.delete(slug);
+  if (status === "seen" || status === "owned") seen.add(slug);
+  if (status === "owned") owned.add(slug);
+  await actor.update({ "system.dex.seen": [...seen], "system.dex.owned": [...owned] });
+}
+
 export const dexActions = {
   apDexSelect(event, target) {
     this.dexSel = this.dexSel === target.dataset.slug ? null : target.dataset.slug;
@@ -137,6 +169,18 @@ export const dexActions = {
   apDexFilterStatus(event, target) {
     const key = target.dataset.status;
     this.dexFilterStatus = this.dexFilterStatus === key ? null : key;
+    this.render();
+  },
+  async apDexMarkSeen(event, target) {
+    await setDexStatus(this.actor, target.dataset.slug, "seen");
+    this.render();
+  },
+  async apDexMarkOwned(event, target) {
+    await setDexStatus(this.actor, target.dataset.slug, "owned");
+    this.render();
+  },
+  async apDexMarkUnknown(event, target) {
+    await setDexStatus(this.actor, target.dataset.slug, "unknown");
     this.render();
   }
 };
