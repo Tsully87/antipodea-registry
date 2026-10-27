@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.7.6
+- Pokédex grid: bigger, darker dex numbers and more breathing room between tiles, so they're actually readable instead of faint grey text crammed under the sprite.
+
 ## 1.7.5
 - Fixed: the Pokédex screen itself never actually showed anything. The phone's main template switches between apps with one line per app, and the Pokédex's line was missing since it was first built — the search box, grid, filters and detail view were all working correctly underneath, they just never got included on screen. Everything from 1.7.0 through 1.7.4 is now visible for the first time.
 
