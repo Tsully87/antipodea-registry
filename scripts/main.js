@@ -10,6 +10,7 @@ import { ZONES } from "./maps.js";
 import * as Shop from "./shop.js";
 import { ShopWindow, ShopManager } from "./shop-app.js";
 import * as Loc from "./location.js";
+import * as DexJournal from "./dex-journal.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -233,6 +234,7 @@ async function startNetwork() {
     await Data.processBacklog();
     await Data.prune();
     await seedShops();
+    DexJournal.seedMissing().catch((e) => console.warn(`${MODULE_ID} | dex journal seed`, e));
     Shop.processReceipts().catch((e) => console.warn(`${MODULE_ID} | receipts`, e));
     Data.refreshForecastCache(ZONES).catch((e) => console.warn(`${MODULE_ID} | forecast cache`, e));
   } else {
@@ -548,6 +550,10 @@ Hooks.once("ready", () => {
     moveTo: (actors, pinId) => Loc.moveAll([].concat(actors).map(resolveActor).filter(Boolean), pinId),
     /** GM: the Shop Manager. */
     manageShops: () => ShopManager.open(),
+    /** GM: open the Antipodea Dex Entries journal to rewrite flavour text in Manuka's voice. */
+    openDexEntries: () => DexJournal.journal()?.sheet.render(true),
+    /** GM: add a journal page (seeded with PTR's stock text) for any Antipodea species missing one. */
+    seedDexEntries: () => DexJournal.seedMissing(),
     shops: Shop,
     /** GM: the quick phone picker (a selected trainer token opens straight away). */
     pickPhone: (app) => gmPhonePicker(app),

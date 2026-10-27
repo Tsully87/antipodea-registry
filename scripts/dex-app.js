@@ -1,4 +1,5 @@
 import * as DexData from "./dex-data.js";
+import * as DexJournal from "./dex-journal.js";
 
 /**
  * The Pokédex app. Runs as methods on the phone window (`this` is the RegistryPhone),
@@ -43,7 +44,7 @@ function buildDetail(entry, doc) {
     heightLabel: s.size ? `${s.size.height} m` : "",
     weightLabel: s.size ? `${s.size.weight} kg` : "",
     habitats: s.habitats ?? [],
-    dexentry: s.dexentry ?? ""
+    dexentry: DexJournal.entryFor(entry.slug) ?? s.dexentry ?? ""
   };
   if (base.owned) {
     Object.assign(base, {
