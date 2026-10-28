@@ -386,7 +386,7 @@ export const RECIPES = [
   { id: "splint", name: "Splint", materials: { Timber: 1, "Plant Fibre": 1 }, dc: 12, makes: "Bandages", result: "Bandages" },
   { id: "hide-oilskin", name: "Hide Oilskin", materials: { Hide: 2, Silk: 1 }, dc: 14, makes: "Oilskin Coat", result: "Oilskin Coat" },
   { id: "fur-layers", name: "Fur Layers", materials: { Hide: 2, Fluff: 2 }, dc: 14, makes: "Thermal Layers", result: "Thermal Layers" },
-  { id: "bush-swag", name: "Bush Swag", materials: { Hide: 3, Fluff: 2, "Plant Fibre": 2 }, dc: 16, makes: "a one-person weatherproof swag for the night (as a Tent, but packs down to nothing)" }
+  { id: "bush-swag", name: "Bush Swag", materials: { Hide: 3, Fluff: 2, "Plant Fibre": 2 }, dc: 16, makes: "Swag", result: "Swag" }
 ];
 
 /** What a trainer has vs needs for a recipe, with the Survivalist discount applied if they have it. */

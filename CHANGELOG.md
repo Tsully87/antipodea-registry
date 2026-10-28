@@ -1,6 +1,9 @@
 # Changelog
 
-## 1.8.0 (unreleased)
+## 1.8.1
+- Added the missing **Swag** item (Travel and Camping, $1,500) — the one-person weatherproof bedroll from the gear table that Bush Swag crafts. It existed in the rules but was never actually created in Foundry, so Bush Swag couldn't hand anything out. It can now be bought or crafted.
+
+## 1.8.0
 - New **Survival and Crafting**, per the signed-off vault note: Food and Water, Foraging, Pokémon Drops and Crafting.
 - **Crafting** window (token controls, everyone): Craft and Forage tabs. Craft checks Survival against a recipe's DC and consumes materials on a pass (ruined on a bad miss). Forage rolls Survival for a trainer who's Out Bush, finding materials from a table keyed to their zone.
 - **Pokémon Drops** tool (GM): after a fight, pick the harvester and the defeated/caught Pokémon's first Type to roll the right skill (Survival, Athletics or Pokémon Ed) for 1 material. Nothing drops unless a player chooses to harvest.
