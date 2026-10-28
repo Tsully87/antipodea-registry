@@ -604,6 +604,12 @@
 .antipodea-phone .ap-cal-day.selected { background: #e03131; color: #fff; }
 .antipodea-phone .ap-cal-day i { position: absolute; bottom: 4px; left: 50%; width: 5px; height: 5px; margin-left: -2.5px; border-radius: 50%; background: #1f7a7a; }
 .antipodea-phone .ap-cal-day.selected i { background: #fff; }
+.antipodea-phone .ap-cal-day i.ap-dot-fest { left: 50%; margin-left: -6px; background: #e03131; }
+.antipodea-phone .ap-cal-day i.ap-dot-founder { left: 50%; margin-left: -6px; background: #8d6e63; }
+.antipodea-phone .ap-cal-day i:not(.ap-dot-fest):not(.ap-dot-founder) ~ i.ap-dot-fest,
+.antipodea-phone .ap-cal-day i:not(.ap-dot-fest):not(.ap-dot-founder) ~ i.ap-dot-founder { margin-left: 2px; }
+.antipodea-phone .ap-cal-day.selected i.ap-dot-fest,
+.antipodea-phone .ap-cal-day.selected i.ap-dot-founder { background: #fff; }
 .antipodea-phone .ap-agenda { list-style: none; margin: 0; padding: 0; }
 .antipodea-phone .ap-agenda li {
   display: flex; align-items: center; gap: 8px; padding: 7px 10px; margin-bottom: 5px;
@@ -611,6 +617,10 @@
 }
 .antipodea-phone .ap-agenda li.event { border-left-color: var(--ap-ochre); }
 .antipodea-phone .ap-agenda li.event > i { color: var(--ap-ochre); }
+.antipodea-phone .ap-agenda li.festival { border-left-color: #e03131; }
+.antipodea-phone .ap-agenda li.festival > i { color: #e03131; }
+.antipodea-phone .ap-agenda li.founders { border-left-color: #8d6e63; }
+.antipodea-phone .ap-agenda li.founders > i { color: #8d6e63; }
 .antipodea-phone .ap-agenda li.done .ap-what { text-decoration: line-through; opacity: .5; }
 .antipodea-phone .ap-agenda li.ap-hint { background: none; border: none; color: #999; }
 .antipodea-phone .ap-agenda.compact li { padding: 4px 8px; }

@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.9.0
+- New **Antipodea Calendar**, per the signed-off vault note: a Seasons & Stars calendar that keeps the Gregorian month/weekday names and structure but carries none of the built-in real-world holidays (New Year's, Valentine's, Guy Fawkes, etc.) — only 50 homebrew events. Installs automatically for the GM on load, replacing the active calendar.
+  - 15 major festivals (Turning Tide, Budgie Beach Carnival, Autumn Muster, Drop Bear Day, Lantern Night, Shearing Festival, Longest Night, Gym Circuit Kickoff, Frost Fair, Wattle Bloom, Grand Contest Festival, Founders' Day (Bunya City), Hatch Day, Elite Four Tournament, Stocktake Sale), seven of them running multiple days.
+  - 35 Founders' Days, one for every other city and town.
+  - **Discord**: the 15 majors post a day-of announcement when they start, and a weekly heads-up (Mondays) listing what's coming in the next fortnight. Founders' Days never post — phone calendar only, so the channel doesn't fill up with civic anniversaries. New setting "Calendar: post festivals to Discord" and its own webhook URL, same per-feature pattern as the other Discord integrations.
+  - **Phone Calendar app**: festivals and Founders' Days now show as dots on the month grid (red for festivals, brown for Founders' Days) and in the day/upcoming agenda lists, alongside reminders and GM-posted events.
+  - New API: `Calendar.install()`, `Calendar.eventsOnDate()`, `Calendar.upcomingEvents()`, `Calendar.upcomingMajors()`.
+
 ## 1.8.2
 - Crafting now gates recipes by Survival rank, per the signed-off design: Bush Shelter, Charcoal Filter, Bush Remedy and Splint need Novice; Hide Oilskin and Fur Layers need Adept; Bush Swag needs Expert. Checked against the trainer's actual `system.skills.survival.rank`. Recipes below your rank show the requirement, grey out, and Craft is disabled (with a tooltip) instead of silently letting anyone attempt anything.
 

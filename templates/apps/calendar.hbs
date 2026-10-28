@@ -8,7 +8,7 @@
   {{#each grid.weekdays}}<span class="ap-cal-wd">{{this}}</span>{{/each}}
   {{#each grid.blanks}}<span></span>{{/each}}
   {{#each grid.cells}}
-  <button type="button" class="ap-cal-day {{#if isToday}}today{{/if}} {{#if selected}}selected{{/if}}" data-action="apCalDay" data-start="{{start}}">{{day}}{{#if dot}}<i></i>{{/if}}</button>
+  <button type="button" class="ap-cal-day {{#if isToday}}today{{/if}} {{#if selected}}selected{{/if}}" data-action="apCalDay" data-start="{{start}}">{{day}}{{#if dot}}<i></i>{{/if}}{{#if festDot}}<i class="ap-dot-fest"></i>{{else if founderDot}}<i class="ap-dot-founder"></i>{{/if}}</button>
   {{/each}}
 </div>
 {{else}}
@@ -18,10 +18,14 @@
 <h4 class="ap-subhead">{{selectedLabel}}</h4>
 <ul class="ap-agenda">
   {{#each dayItems}}
-  <li class="{{#if isEvent}}event{{/if}} {{#if done}}done{{/if}}">
-    {{#if isEvent}}<i class="fa-solid fa-flag"></i>{{else}}<button type="button" class="ap-tick" data-action="apToggleReminder" data-id="{{id}}"><i class="fa-{{#if done}}solid fa-circle-check{{else}}regular fa-circle{{/if}}"></i></button>{{/if}}
+  <li class="{{#if isEvent}}event{{/if}} {{#if isFestival}}festival{{/if}} {{#if isFounders}}founders{{/if}} {{#if done}}done{{/if}}">
+    {{#if isFestival}}<i class="fa-solid fa-champagne-glasses"></i>
+    {{else if isFounders}}<i class="fa-solid fa-city"></i>
+    {{else if isEvent}}<i class="fa-solid fa-flag"></i>
+    {{else}}<button type="button" class="ap-tick" data-action="apToggleReminder" data-id="{{id}}"><i class="fa-{{#if done}}solid fa-circle-check{{else}}regular fa-circle{{/if}}"></i></button>{{/if}}
     <span class="ap-what">{{text}}<small>{{when}}</small></span>
     {{#if isEvent}}{{#if @root.isGM}}<button type="button" class="ap-x" data-action="apDeleteEvent" data-id="{{id}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
+    {{else if isFestival}}{{else if isFounders}}
     {{else}}<button type="button" class="ap-x" data-action="apDeleteReminder" data-id="{{id}}"><i class="fa-solid fa-xmark"></i></button>{{/if}}
   </li>
   {{else}}

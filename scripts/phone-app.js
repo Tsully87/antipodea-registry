@@ -10,6 +10,7 @@ import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from 
 import { ShopWindow } from "./shop-app.js";
 import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt, addSpotAt } from "./paid-apps.js";
 import { dexContext, dexActions } from "./dex-app.js";
+import * as Cal from "./calendar.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const FormDataExt = foundry.applications.ux?.FormDataExtended ?? globalThis.FormDataExtended;
@@ -383,14 +384,34 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
     };
   }
 
+  /** Antipodea Calendar festivals/Founders' Days starting within this window, as agenda-shaped items (one entry per event, on its start day — a multi-day one notes its length rather than repeating). */
+  #calendarAgendaItems(fromStart, days) {
+    const spd = Time.secondsPerDay();
+    const startDate = Time.fromTime(fromStart);
+    if (!startDate) return [];
+    return Cal.upcomingEvents(startDate, Math.max(0, days - 1)).map(({ event, daysOut }) => ({
+      id: event.id,
+      text: event.duration ? `${event.name} (${Cal.durationDays(event)} days)` : event.name,
+      kind: event.kind === "major" ? "festival" : "founders",
+      due: fromStart + daysOut * spd
+    }));
+  }
+
   #agenda(phone, fromStart, days) {
     const spd = Time.secondsPerDay();
     const end = fromStart + days * spd;
     const items = [
       ...phone.reminders.filter((r) => r.due >= fromStart && r.due < end).map((r) => ({ ...r, kind: "reminder" })),
-      ...Data.events().filter((e) => e.due >= fromStart && e.due < end).map((e) => ({ ...e, text: e.title, kind: "event" }))
+      ...Data.events().filter((e) => e.due >= fromStart && e.due < end).map((e) => ({ ...e, text: e.title, kind: "event" })),
+      ...this.#calendarAgendaItems(fromStart, days)
     ].sort((a, b) => a.due - b.due);
-    return items.map((i) => ({ ...i, when: `${Time.dayLabel(i.due)}, ${Time.timeOfDay(i.due)}`, isEvent: i.kind === "event" }));
+    return items.map((i) => ({
+      ...i,
+      when: `${Time.dayLabel(i.due)}, ${Time.timeOfDay(i.due)}`,
+      isEvent: i.kind === "event",
+      isFestival: i.kind === "festival",
+      isFounders: i.kind === "founders"
+    }));
   }
 
   #calendarContext(phone, locked) {
@@ -404,7 +425,17 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       ...Data.events().map((e) => Time.dayStart(e.due))
     ]);
     if (grid) {
-      grid.cells = grid.cells.map((c) => ({ ...c, selected: c.start === selected, dot: busyDays.has(c.start) }));
+      grid.cells = grid.cells.map((c) => {
+        const date = Time.fromTime(c.start);
+        const calHere = date ? Cal.eventsOnDate(date) : [];
+        return {
+          ...c,
+          selected: c.start === selected,
+          dot: busyDays.has(c.start),
+          festDot: calHere.some((e) => e.kind === "major"),
+          founderDot: calHere.length > 0 && !calHere.some((e) => e.kind === "major")
+        };
+      });
     }
     const dayItems = this.#agenda(phone, selected, 1);
     return {

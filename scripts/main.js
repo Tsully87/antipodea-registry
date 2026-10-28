@@ -14,6 +14,8 @@ import * as DexJournal from "./dex-journal.js";
 import * as DexDiscord from "./dex-discord.js";
 import * as Surv from "./survival.js";
 import { CraftWindow, DropsWindow, EndOfDayWindow } from "./survival-app.js";
+import * as Cal from "./calendar.js";
+import * as CalDiscord from "./calendar-discord.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -539,6 +541,18 @@ Hooks.once("init", () => {
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
+  game.settings.register(MODULE_ID, "calendarDiscord", {
+    name: "Calendar: post festivals to Discord",
+    hint: "The 15 major Antipodea Calendar festivals post a day-of announcement and a weekly heads-up through the webhook below. Founders' Days never post here — phone calendar only.",
+    scope: "world", config: true, type: Boolean, default: true
+  });
+  game.settings.register(MODULE_ID, "calendarWebhookUrl", {
+    name: "Calendar: Discord webhook URL",
+    hint: "Stored on your user account only. Make a webhook in whichever channel you want calendar announcements in.",
+    scope: userScope, config: true, type: String, default: "",
+    restricted: true
+  });
+
   game.keybindings.register(MODULE_ID, "moveTrainers", {
     name: "Move trainers (GM)",
     hint: "Opens the Move Trainers window. With one trainer token selected, asks where just that trainer is.",
@@ -589,6 +603,9 @@ Hooks.once("ready", () => {
     /** GM: the End of Day tool (also pops up itself when the day changes, if anyone's out bush). */
     endOfDay: () => EndOfDayWindow.open(),
     survival: Surv,
+    calendar: Cal,
+    /** GM: (re)install the Antipodea Calendar into Seasons & Stars — real-world holidays out, homebrew events in. */
+    installCalendar: () => Cal.install(),
     /** GM: the quick phone picker (a selected trainer token opens straight away). */
     pickPhone: (app) => gmPhonePicker(app),
     getRecord: Registry.getRecord,
@@ -617,6 +634,7 @@ Hooks.once("ready", () => {
   game.socket.on(Data.SOCKET, Data.onSocket);
   startNetwork().catch((e) => console.error(`${MODULE_ID} | network start failed`, e));
   queueSweep();
+  if (Data.isActiveGM()) Cal.install().catch((e) => console.error(`${MODULE_ID} | calendar install failed`, e));
 });
 
 /* -------------------------------------------- */
@@ -655,6 +673,8 @@ async function autoEndOfDay(worldTime) {
   EndOfDayWindow.open();
 }
 
+let calendarTimer = null;
+
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
   if (Data.isActiveGM()) {
@@ -665,6 +685,11 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
     deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
     clearTimeout(endOfDayTimer);
     endOfDayTimer = setTimeout(() => autoEndOfDay(worldTime).catch((e) => console.error(`${MODULE_ID} | End of Day popup failed`, e)), 1500);
+    clearTimeout(calendarTimer);
+    calendarTimer = setTimeout(() => {
+      CalDiscord.checkDayOf(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar day-of post failed`, e));
+      CalDiscord.checkWeeklyHeadsUp(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar heads-up post failed`, e));
+    }, 1700);
   }
   Notify.onTimeChanged(worldTime, delta);
   RegistryPhone.refresh();
