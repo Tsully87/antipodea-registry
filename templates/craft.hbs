@@ -24,13 +24,13 @@
     {{#if craft}}
       <ul class="sh-rows cf-recipes">
         {{#each recipes}}
-        <li class="sh-row cf-recipe">
-          <span class="sh-name">{{name}}<small>{{makes}}</small></span>
+        <li class="sh-row cf-recipe {{#unless rankOk}}cf-locked{{/unless}}">
+          <span class="sh-name">{{name}}<small>{{makes}}</small>{{#if rankLabel}}<span class="cf-rank {{#unless rankOk}}bad{{/unless}}"><i class="fa-solid fa-ranking-star"></i> {{rankLabel}} Survival</span>{{/if}}</span>
           <span class="cf-need">
             {{#each need}}<span class="cf-mat {{#if short}}bad{{/if}}">{{has}}/{{qty}} {{mat}}</span>{{/each}}
             <span class="cf-dc">DC {{dc}}</span>
           </span>
-          <button type="button" class="sh-go" data-action="cfMake" data-recipe="{{id}}" {{#unless canMake}}disabled{{/unless}}>
+          <button type="button" class="sh-go" data-action="cfMake" data-recipe="{{id}}" {{#unless canMake}}disabled{{/unless}} title="{{#unless rankOk}}Needs {{rankLabel}} Survival{{/unless}}">
             <i class="fa-solid fa-hammer"></i> Craft
           </button>
         </li>

@@ -99,6 +99,8 @@ export class CraftWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         makes: r.makes,
         dc: r.dc - (status.survivalist ? 2 : 0),
         canMake: status.canMake,
+        rankLabel: status.rankLabel,
+        rankOk: status.rankOk,
         need: Object.entries(status.need).map(([mat, qty]) => ({ mat, qty, has: status.has[mat] ?? 0, short: (status.has[mat] ?? 0) < qty }))
       };
     });

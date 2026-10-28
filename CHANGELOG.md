@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.8.2
+- Crafting now gates recipes by Survival rank, per the signed-off design: Bush Shelter, Charcoal Filter, Bush Remedy and Splint need Novice; Hide Oilskin and Fur Layers need Adept; Bush Swag needs Expert. Checked against the trainer's actual `system.skills.survival.rank`. Recipes below your rank show the requirement, grey out, and Craft is disabled (with a tooltip) instead of silently letting anyone attempt anything.
+
 ## 1.8.1
 - Added the missing **Swag** item (Travel and Camping, $1,500) — the one-person weatherproof bedroll from the gear table that Bush Swag crafts. It existed in the rules but was never actually created in Foundry, so Bush Swag couldn't hand anything out. It can now be bought or crafted.
 

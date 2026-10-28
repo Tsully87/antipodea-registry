@@ -380,16 +380,31 @@ export const RECIPES = [
   { id: "dust-mask", name: "Dust Mask", materials: { "Plant Fibre": 1, Silk: 1 }, dc: 8, makes: "Dust Mask (1 day)", result: "Dust Mask (x3)" },
   { id: "fishing-line", name: "Fishing Line", materials: { Timber: 1, Silk: 1 }, dc: 8, makes: "fish for encounters (and a meal) at water" },
   { id: "crude-spear", name: "Crude Spear", materials: { Timber: 2, Stone: 1 }, dc: 8, makes: "a Crude Weapon (PTU)" },
-  { id: "bush-shelter", name: "Bush Shelter", materials: { Timber: 3, "Plant Fibre": 2 }, dc: 10, makes: "shelter for 2 for one night (not Severe Cold/Wet)" },
-  { id: "charcoal-filter", name: "Charcoal Filter", materials: { Timber: 1, Stone: 1, "Plant Fibre": 1 }, dc: 10, makes: "purifies 3 days of bush water" },
-  { id: "bush-remedy", name: "Bush Remedy", materials: { "Bush Herbs": 2 }, dc: 10, makes: "heals 15 HP (half on Pokémon)" },
-  { id: "splint", name: "Splint", materials: { Timber: 1, "Plant Fibre": 1 }, dc: 12, makes: "Bandages", result: "Bandages" },
-  { id: "hide-oilskin", name: "Hide Oilskin", materials: { Hide: 2, Silk: 1 }, dc: 14, makes: "Oilskin Coat", result: "Oilskin Coat" },
-  { id: "fur-layers", name: "Fur Layers", materials: { Hide: 2, Fluff: 2 }, dc: 14, makes: "Thermal Layers", result: "Thermal Layers" },
-  { id: "bush-swag", name: "Bush Swag", materials: { Hide: 3, Fluff: 2, "Plant Fibre": 2 }, dc: 16, makes: "Swag", result: "Swag" }
+  { id: "bush-shelter", name: "Bush Shelter", materials: { Timber: 3, "Plant Fibre": 2 }, dc: 10, rank: "novice", makes: "shelter for 2 for one night (not Severe Cold/Wet)" },
+  { id: "charcoal-filter", name: "Charcoal Filter", materials: { Timber: 1, Stone: 1, "Plant Fibre": 1 }, dc: 10, rank: "novice", makes: "purifies 3 days of bush water" },
+  { id: "bush-remedy", name: "Bush Remedy", materials: { "Bush Herbs": 2 }, dc: 10, rank: "novice", makes: "heals 15 HP (half on Pokémon)" },
+  { id: "splint", name: "Splint", materials: { Timber: 1, "Plant Fibre": 1 }, dc: 12, rank: "novice", makes: "Bandages", result: "Bandages" },
+  { id: "hide-oilskin", name: "Hide Oilskin", materials: { Hide: 2, Silk: 1 }, dc: 14, rank: "adept", makes: "Oilskin Coat", result: "Oilskin Coat" },
+  { id: "fur-layers", name: "Fur Layers", materials: { Hide: 2, Fluff: 2 }, dc: 14, rank: "adept", makes: "Thermal Layers", result: "Thermal Layers" },
+  { id: "bush-swag", name: "Bush Swag", materials: { Hide: 3, Fluff: 2, "Plant Fibre": 2 }, dc: 16, rank: "expert", makes: "Swag", result: "Swag" }
 ];
 
-/** What a trainer has vs needs for a recipe, with the Survivalist discount applied if they have it. */
+/** Skill rank order, lowest to highest, as this system's actors store it (actor.system.skills.<slug>.rank). */
+const RANK_ORDER = ["pathetic", "untrained", "novice", "adept", "expert", "master", "virtuoso"];
+const RANK_LABEL = { novice: "Novice", adept: "Adept", expert: "Expert" };
+
+/** Does this actor's Survival rank meet or beat the given minimum rank? No minimum always passes. */
+function meetsRank(actor, minRank) {
+  if (!minRank) return true;
+  const have = actor?.system?.skills?.survival?.rank ?? "untrained";
+  const haveIdx = RANK_ORDER.indexOf(have);
+  const needIdx = RANK_ORDER.indexOf(minRank);
+  if (needIdx < 0) return true;
+  return haveIdx >= needIdx;
+}
+
+/** What a trainer has vs needs for a recipe, with the Survivalist discount applied if they have it,
+ *  and whether their Survival rank is high enough to attempt it at all. */
 export function recipeStatus(actor, recipe) {
   const survivalist = !!actor.items.find((i) => /survivalist/i.test(i.name));
   const need = {};
@@ -397,8 +412,13 @@ export function recipeStatus(actor, recipe) {
     need[mat] = survivalist ? Math.max(1, qty - 1) : qty;
   }
   const has = Object.fromEntries(Object.keys(need).map((m) => [m, have(actor, m)]));
-  const canMake = Object.entries(need).every(([m, q]) => (has[m] ?? 0) >= q);
-  return { need, has, canMake, survivalist };
+  const hasMaterials = Object.entries(need).every(([m, q]) => (has[m] ?? 0) >= q);
+  const rankOk = meetsRank(actor, recipe.rank);
+  return {
+    need, has, survivalist, rankOk,
+    rankLabel: recipe.rank ? RANK_LABEL[recipe.rank] ?? recipe.rank : null,
+    canMake: hasMaterials && rankOk
+  };
 }
 
 /** Craft a recipe: rolls Survival, consumes materials on a pass, posts the result to chat. */
@@ -406,6 +426,7 @@ export async function craft(actor, recipeId) {
   const recipe = RECIPES.find((r) => r.id === recipeId);
   if (!recipe) return { ok: false, error: "No such recipe." };
   const status = recipeStatus(actor, recipe);
+  if (!status.rankOk) return { ok: false, error: `You need at least ${status.rankLabel} Survival to attempt this.` };
   if (!status.canMake) return { ok: false, error: "You don't have what this recipe needs." };
   const dc = recipe.dc - (status.survivalist ? 2 : 0);
   const r = await rollCheck(actor, "survival", dc, { flavor: `${actor.name} tries to craft a ${recipe.name}.` });

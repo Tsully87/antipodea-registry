@@ -1176,6 +1176,9 @@
 .antipodea-shop .cf-mat { padding: 2px 6px; border-radius: 999px; background: #e3efe7; color: var(--sh-gum-deep); }
 .antipodea-shop .cf-mat.bad { background: #f6e1dd; color: var(--sh-red); }
 .antipodea-shop .cf-dc { padding: 2px 6px; border-radius: 999px; background: rgba(0,0,0,.08); color: var(--sh-muted); font-weight: 600; }
+.antipodea-shop .cf-rank { display: inline-flex; align-items: center; gap: 3px; margin-left: 8px; font-size: 11px; font-weight: 600; color: var(--sh-gum-deep); }
+.antipodea-shop .cf-rank.bad { color: var(--sh-red); }
+.antipodea-shop .cf-recipe.cf-locked { opacity: .65; }
 .antipodea-shop .cf-forage { display: flex; flex-direction: column; gap: 10px; padding: 4px 2px; }
 
 /* Pokémon Drops (GM) */
