@@ -1207,3 +1207,22 @@
 }
 .antipodea-shop .ed-hazard.on { border-color: var(--sh-ochre); color: var(--sh-ink); background: #fbeecb; }
 .antipodea-shop .ed-hazard.on.severe { border-color: var(--sh-red); background: #f6e1dd; color: var(--sh-red); font-weight: 700; }
+
+/* Sales and seasonal sections (1.10.0) */
+.antipodea-shop .sh-sale { margin: 8px 14px 0; padding: 6px 10px; border-radius: 6px; background: var(--sh-red); color: #fff; font-size: 13px; }
+.antipodea-shop .sh-was { color: var(--sh-muted); font-weight: 400; margin-right: 4px; }
+.antipodea-shop .sm-sales { border: 1px solid var(--sh-line); border-radius: 8px; background: var(--sh-paper); padding: 6px 10px; margin-bottom: 10px; }
+.antipodea-shop .sm-sales summary { cursor: pointer; font-weight: 700; }
+.antipodea-shop .sm-sales summary small { font-weight: 400; color: var(--sh-muted); margin-left: 6px; }
+.antipodea-shop .sm-sale-table { width: 100%; border-collapse: collapse; margin: 6px 0; background: none; border: 0; }
+.antipodea-shop .sm-sale-table :where(thead, thead tr, th) { background: none; color: var(--sh-muted); text-shadow: none; }
+.antipodea-shop .sm-sale-table th { font-size: 11px; text-align: left; border: 0; padding: 2px 4px; }
+.antipodea-shop .sm-sale-table td { padding: 2px 4px; border-top: 1px solid var(--sh-line); background: none; }
+.antipodea-shop .sm-sale-table tr.live td { background: #f6e1dd; }
+.antipodea-shop .sm-sale-table :where(input[type=text], input[type=number]) { width: 100%; min-width: 60px; color: var(--sh-ink); background: #fff; }
+.antipodea-shop .sm-sale-btns { display: flex; gap: 8px; justify-content: flex-end; }
+.antipodea-shop .sm-rule { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; font-size: 12px; color: var(--sh-muted); margin: 2px 0 6px; }
+.antipodea-shop .sm-rule input[type=text] { width: 70px; color: var(--sh-ink); background: #fff; }
+.antipodea-shop .sm-rule label { display: flex; align-items: center; gap: 4px; }
+.antipodea-shop .sm-badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--sh-line); color: var(--sh-muted); }
+.antipodea-shop .sm-badge.open { background: var(--sh-gum); color: #fff; }

@@ -96,17 +96,87 @@ export function sections() {
   return [...new Set(stockList().map((i) => i.section))];
 }
 
-export function priceIn(shop, item) {
+/* -------------------------------------------- */
+/*  Seasonal sections and region-wide sales     */
+/* -------------------------------------------- */
+
+/**
+ * Dates are day and month only ({ d, m }), so they repeat every year off the world
+ * calendar. A window can wrap the new year (e.g. 20/12 to 10/01).
+ */
+export function today() {
+  const d = Time.fromTime(Time.now());
+  return d ? { d: d.day, m: d.month } : null;
+}
+
+const mdKey = (x) => (Number(x?.m) || 0) * 100 + (Number(x?.d) || 0);
+
+export function inWindow(from, to, date = today()) {
+  if (!from || !to || !date) return false;
+  const f = mdKey(from), t = mdKey(to), k = mdKey(date);
+  return f <= t ? k >= f && k <= t : k >= f || k <= t;
+}
+
+/** "15/12" -> { d: 15, m: 12 } (or null if it isn't a real day and month). */
+export function parseDM(text) {
+  const m = String(text ?? "").trim().match(/^(\d{1,2})\s*[/.-]\s*(\d{1,2})$/);
+  if (!m) return null;
+  const d = Number(m[1]), mo = Number(m[2]);
+  return d >= 1 && d <= 31 && mo >= 1 && mo <= 12 ? { d, m: mo } : null;
+}
+
+export const fmtDM = (x) => (x ? `${String(x.d).padStart(2, "0")}/${String(x.m).padStart(2, "0")}` : "");
+
+/** Section rules: { [section]: { from, to, everywhere } }. A section with dates is only on the shelves inside them. */
+export const sectionRules = () => data().sectionRules ?? {};
+
+export function sectionOpen(section, date = today()) {
+  const r = sectionRules()[section];
+  if (!r?.from || !r?.to) return true;
+  return inWindow(r.from, r.to, date);
+}
+
+/** Region-wide sales: [{ id, name, percent, from, to, on }]. `on` runs it now regardless of dates. */
+export const sales = () => data().sales ?? [];
+
+export function activeSale(date = today()) {
+  const live = sales().filter((s) => (Number(s.percent) || 0) > 0 && (s.on || inWindow(s.from, s.to, date)));
+  return live.sort((a, b) => b.percent - a.percent)[0] ?? null;
+}
+
+/** The shop's normal price, before any sale. */
+export function regularPrice(shop, item) {
   const set = Number(shop.prices?.[item.id]);
   if (set > 0) return Math.round(set);
   return Math.round(item.cost * (1 + (Number(shop.markup) || 0) / 100));
+}
+
+/** What it costs today, with any region-wide sale taken off. */
+export function priceIn(shop, item, sale = activeSale()) {
+  const base = regularPrice(shop, item);
+  const pct = Math.min(90, Math.max(0, Number(sale?.percent) || 0));
+  return pct ? Math.max(1, Math.round(base * (1 - pct / 100))) : base;
+}
+
+/** A fingerprint of what's open and on sale today, so shop posts can update when it changes. */
+export function shelfState(date = today()) {
+  const open = Object.keys(sectionRules()).filter((s) => sectionOpen(s, date)).sort();
+  return JSON.stringify({ sale: activeSale(date)?.id ?? null, open });
 }
 
 /** What a shop sells right now, grouped by section. */
 export function catalogue(shop) {
   if (!shop) return [];
   const on = new Set(shop.sections ?? []);
-  const items = stockList().filter((i) => on.has(i.section) && !shop.off?.[i.id]).map((i) => ({ ...i, price: priceIn(shop, i) }));
+  const rules = sectionRules();
+  const sale = activeSale();
+  const items = stockList()
+    .filter((i) => (on.has(i.section) || rules[i.section]?.everywhere) && sectionOpen(i.section) && !shop.off?.[i.id])
+    .map((i) => {
+      const price = priceIn(shop, i, sale);
+      const was = regularPrice(shop, i);
+      return { ...i, price, was: was !== price ? was : null };
+    });
   const groups = new Map();
   for (const i of items) {
     if (!groups.has(i.section)) groups.set(i.section, []);
@@ -344,10 +414,12 @@ function catalogueEmbeds(shop) {
   const groups = catalogue(shop);
   const fields = groups.map((g) => ({
     name: g.section,
-    value: g.items.map((i) => `${i.name} **${money(i.price)}**`).join("\n").slice(0, 1024),
+    value: g.items.map((i) => `${i.name} ${i.was ? `~~${money(i.was)}~~ ` : ""}**${money(i.price)}**`).join("\n").slice(0, 1024),
     inline: true
   }));
   const lines = [];
+  const sale = activeSale();
+  if (sale) lines.push(`🏷️ **${sale.name}: ${sale.percent}% off everything!**`);
   if (shop.keeper) lines.push(`Run by **${shop.keeper}**`);
   if (shop.blurb) lines.push(shop.blurb);
   lines.push(`Buys items back at **${Number(shop.sellRate ?? 50)}%** of their price.`);
@@ -385,6 +457,32 @@ export async function publishAll() {
   const out = [];
   for (const s of shops()) out.push(await publishCatalogue(s.id));
   return out;
+}
+
+/**
+ * Active GM, after the day changes: if a sale or a seasonal section has started or ended,
+ * update every shop post that's already on Discord. Returns true if the shelves changed.
+ */
+export async function checkShelves() {
+  if (!isActiveGM()) return false;
+  const now = shelfState();
+  if (data().shelfState === now) return false;
+  await saveMeta({ shelfState: now });
+  if (!webhook()) return true;
+  for (const s of shops()) {
+    if (!s.discord?.msg) continue;
+    const r = await publishCatalogue(s.id).catch((e) => ({ ok: false, error: e.message }));
+    if (!r.ok) console.warn(`${MODULE_ID} | shop post update failed for ${s.name}: ${r.error}`);
+  }
+  return true;
+}
+
+/** First run: set up the Stocktake Sale (15 to 21 December, 25% off) so there's one to edit. */
+export async function seedSales() {
+  if (!isActiveGM() || data().sales) return;
+  await saveMeta({
+    sales: [{ id: foundry.utils.randomID(), name: "Stocktake Sale", percent: 25, from: { d: 15, m: 12 }, to: { d: 21, m: 12 }, on: false }]
+  });
 }
 
 async function receiptsThread() {

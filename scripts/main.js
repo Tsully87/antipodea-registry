@@ -247,6 +247,8 @@ async function startNetwork() {
     await Data.processBacklog();
     await Data.prune();
     await seedShops();
+    await Shop.seedSales();
+    Shop.checkShelves().catch((e) => console.warn(`${MODULE_ID} | shop shelves`, e));
     DexJournal.seedMissing().catch((e) => console.warn(`${MODULE_ID} | dex journal seed`, e));
     Shop.processReceipts().catch((e) => console.warn(`${MODULE_ID} | receipts`, e));
     Data.refreshForecastCache(ZONES).catch((e) => console.warn(`${MODULE_ID} | forecast cache`, e));
@@ -674,6 +676,8 @@ async function autoEndOfDay(worldTime) {
 }
 
 let calendarTimer = null;
+let shelfTimer = null;
+let lastShelfDay = null;
 
 Hooks.on("updateWorldTime", (worldTime, delta) => {
   queueSweep();
@@ -690,7 +694,12 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
       CalDiscord.checkDayOf(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar day-of post failed`, e));
       CalDiscord.checkWeeklyHeadsUp(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar heads-up post failed`, e));
     }, 1700);
+    clearTimeout(shelfTimer);
+    shelfTimer = setTimeout(() => Shop.checkShelves().catch((e) => console.error(`${MODULE_ID} | shop shelves failed`, e)), 1900);
   }
+  // Seasonal stock and sales follow the calendar, so open shop windows redraw on a new day.
+  const shelfDay = dayOf(worldTime);
+  if (shelfDay !== lastShelfDay) { lastShelfDay = shelfDay; ShopWindow.refresh(); }
   Notify.onTimeChanged(worldTime, delta);
   RegistryPhone.refresh();
 });

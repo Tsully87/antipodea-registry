@@ -99,7 +99,7 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
         items: g.items.map((i) => {
           const qty = this.cart.get(i.id) ?? 0;
           if (this.mode === "buy") { total += qty * i.price; count += qty; }
-          return { ...i, priceLabel: fmt(i.price), qty, owned: ownedQty(actor, i.name) };
+          return { ...i, priceLabel: fmt(i.price), wasLabel: i.was ? fmt(i.was) : null, qty, owned: ownedQty(actor, i.name) };
         })
       }));
       sellRows = Shop.sellable(actor, shop).map((i) => {
@@ -115,8 +115,10 @@ export class ShopWindow extends HandlebarsApplicationMixin(ApplicationV2) {
     const after = this.mode === "buy" ? balance - total : balance + total;
     const msg = this.message;
     this.message = null;
+    const sale = shop ? Shop.activeSale() : null;
     return {
       isGM,
+      sale: sale ? { name: sale.name, percent: sale.percent } : null,
       trainers: trainers.map((a) => ({ id: a.id, name: a.name, selected: a.id === this.actorId })),
       many: trainers.length > 1,
       actor: actor ? { name: actor.name, img: actor.img } : null,
@@ -217,6 +219,7 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     ShopManager.current = this;
     this.shopId = Shop.shops()[0]?.id ?? null;
     this.draft = null;
+    this.metaDraft = null;
     this.busy = false;
   }
 
@@ -232,7 +235,10 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       smDelete: ShopManager.#onDelete,
       smPublish: ShopManager.#onPublish,
       smPublishAll: ShopManager.#onPublishAll,
-      smAll: ShopManager.#onAll
+      smAll: ShopManager.#onAll,
+      smSaleAdd: ShopManager.#onSaleAdd,
+      smSaleDel: ShopManager.#onSaleDel,
+      smSaveSales: ShopManager.#onSaveSales
     }
   };
 
@@ -247,7 +253,13 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static refresh() {
-    if (ShopManager.current?.rendered && !ShopManager.current.draft) ShopManager.current.render();
+    const m = ShopManager.current;
+    if (m?.rendered && !m.draft && !m.metaDraft) m.render();
+  }
+
+  /** Sales and section rules being edited (they're region-wide, not per shop). */
+  get meta() {
+    return this.metaDraft ?? { sales: foundry.utils.deepClone(Shop.sales()), sectionRules: foundry.utils.deepClone(Shop.sectionRules()) };
   }
 
   get shop() {
@@ -274,6 +286,16 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       folder: game.settings.get(MODULE_ID, "martFolder") || "Poké Mart",
       empty: !stock.length
     };
+    const meta = this.meta;
+    const live = Shop.activeSale();
+    const date = Shop.today();
+    ctx.today = date ? Shop.fmtDM(date) : "no calendar";
+    ctx.liveSale = live ? `${live.name} (${live.percent}% off) is on right now.` : "No sale on right now.";
+    ctx.sales = meta.sales.map((x) => ({
+      id: x.id, name: x.name, percent: x.percent, on: !!x.on,
+      from: Shop.fmtDM(x.from), to: Shop.fmtDM(x.to),
+      live: live?.id === x.id
+    }));
     if (!shop) return ctx;
     const on = new Set(shop.sections ?? []);
     ctx.shop = {
@@ -283,6 +305,13 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
       sections: sections.map((name) => ({
         name,
         on: on.has(name),
+        rule: {
+          from: Shop.fmtDM(meta.sectionRules[name]?.from),
+          to: Shop.fmtDM(meta.sectionRules[name]?.to),
+          everywhere: !!meta.sectionRules[name]?.everywhere,
+          seasonal: !!(meta.sectionRules[name]?.from && meta.sectionRules[name]?.to),
+          open: (() => { const r = meta.sectionRules[name]; return !(r?.from && r?.to) || Shop.inWindow(r.from, r.to); })()
+        },
         items: stock.filter((i) => i.section === name).map((i) => ({
           ...i,
           base: Store.fmtMoney(i.cost),
@@ -318,18 +347,78 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     return shop;
   }
 
+  /** Read the sales panel and section rules. Bad dates come back as null (and get flagged). */
+  #readMeta() {
+    const f = this.element;
+    const meta = this.meta;
+    let bad = 0;
+    const date = (v) => { if (!String(v ?? "").trim()) return null; const d = Shop.parseDM(v); if (!d) bad++; return d; };
+    meta.sales = [...f.querySelectorAll(".sm-sale[data-sale]")].map((row) => {
+      const q = (n) => row.querySelector(`[name="${n}"]`);
+      return {
+        id: row.dataset.sale,
+        name: q("saleName").value.trim() || "Sale",
+        percent: Math.max(0, Math.min(90, Math.round(Number(q("salePct").value) || 0))),
+        from: date(q("saleFrom").value),
+        to: date(q("saleTo").value),
+        on: q("saleOn").checked
+      };
+    });
+    for (const box of f.querySelectorAll(".sm-rule[data-section]")) {
+      const sec = box.dataset.section;
+      const from = date(box.querySelector('[name="ruleFrom"]').value);
+      const to = date(box.querySelector('[name="ruleTo"]').value);
+      const everywhere = box.querySelector('[name="ruleEvery"]').checked;
+      if (from || to || everywhere) meta.sectionRules[sec] = { from, to, everywhere };
+      else delete meta.sectionRules[sec];
+    }
+    if (bad) ui.notifications.warn("Some dates weren't day/month (like 15/12), so they were left blank.");
+    return meta;
+  }
+
+  async #saveMeta() {
+    const meta = this.#readMeta();
+    await Shop.saveMeta({ sales: meta.sales, sectionRules: meta.sectionRules });
+    this.metaDraft = null;
+    // Update any Discord posts if today's shelves just changed.
+    await Shop.checkShelves().catch(() => {});
+  }
+
   _onRender(context, options) {
     super._onRender?.(context, options);
     // Keep unsaved edits when a section is ticked on or off (it shows or hides its items).
     for (const box of this.element.querySelectorAll('input[name="section"]')) {
-      box.addEventListener("change", () => { this.draft = this.#readForm(); this.render(); });
+      box.addEventListener("change", () => { this.draft = this.#readForm(); this.metaDraft = this.#readMeta(); this.render(); });
     }
+  }
+
+  static #onSaleAdd() {
+    const meta = this.#readMeta();
+    meta.sales.push({ id: foundry.utils.randomID(), name: "New Sale", percent: 10, from: null, to: null, on: false });
+    if (this.shop) this.draft = this.#readForm();
+    this.metaDraft = meta;
+    this.render();
+  }
+
+  static #onSaleDel(event, target) {
+    const meta = this.#readMeta();
+    meta.sales = meta.sales.filter((x) => x.id !== target.dataset.sale);
+    if (this.shop) this.draft = this.#readForm();
+    this.metaDraft = meta;
+    this.render();
+  }
+
+  static async #onSaveSales() {
+    await this.#saveMeta();
+    ui.notifications.info("Saved sales and seasonal sections.");
+    this.render();
   }
 
   static async #onSubmit() {
     const shop = this.#readForm();
     if (!shop) return;
     await Shop.saveShop(shop);
+    await this.#saveMeta();
     this.draft = null;
     this.shopId = shop.id;
     ui.notifications.info(`Saved ${shop.name}.`);
@@ -341,12 +430,14 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
   }
 
   static #onPick(event, target) {
+    this.metaDraft = this.#readMeta();
     this.draft = null;
     this.shopId = target.dataset.shop;
     this.render();
   }
 
   static #onNew() {
+    this.metaDraft = this.#readMeta();
     this.draft = Shop.blankShop(Shop.shopById(this.shopId)?.pin ?? "bunya-city");
     this.shopId = this.draft.id;
     this.render();
@@ -371,6 +462,7 @@ export class ShopManager extends HandlebarsApplicationMixin(ApplicationV2) {
     const shop = this.#readForm();
     if (!shop) return;
     await Shop.saveShop(shop);
+    await this.#saveMeta();
     this.draft = null;
     this.shopId = shop.id;
     this.busy = true; this.render();

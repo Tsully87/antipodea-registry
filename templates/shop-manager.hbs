@@ -32,6 +32,32 @@
   </aside>
 
   <section class="sm-edit">
+    <details class="sm-sales" {{#if sales.length}}open{{/if}}>
+      <summary><i class="fa-solid fa-tags"></i> Region-wide sales <small>Today is {{today}}. {{liveSale}}</small></summary>
+      <p class="sm-hint">A sale takes its % off everything in every shop. It runs between its dates every year (day/month, like 15/12), or tick <strong>On now</strong> to run it straight away. If two overlap, the bigger one wins.</p>
+      <table class="sm-sale-table">
+        <thead><tr><th>Sale</th><th>% off</th><th>From</th><th>To</th><th>On now</th><th></th></tr></thead>
+        <tbody>
+          {{#each sales}}
+          <tr class="sm-sale {{#if live}}live{{/if}}" data-sale="{{id}}">
+            <td><input type="text" name="saleName" value="{{name}}" aria-label="Sale name"></td>
+            <td><input type="number" name="salePct" value="{{percent}}" min="0" max="90" step="5" aria-label="Percent off"></td>
+            <td><input type="text" name="saleFrom" value="{{from}}" placeholder="dd/mm" aria-label="Starts"></td>
+            <td><input type="text" name="saleTo" value="{{to}}" placeholder="dd/mm" aria-label="Ends"></td>
+            <td><input type="checkbox" name="saleOn" {{#if on}}checked{{/if}} aria-label="Run {{name}} now"></td>
+            <td><button type="button" class="sm-mini" data-action="smSaleDel" data-sale="{{id}}" aria-label="Delete {{name}}"><i class="fa-solid fa-trash"></i></button></td>
+          </tr>
+          {{else}}
+          <tr><td colspan="6" class="sm-hint">No sales set up.</td></tr>
+          {{/each}}
+        </tbody>
+      </table>
+      <div class="sm-sale-btns">
+        <button type="button" class="sh-ghost" data-action="smSaleAdd"><i class="fa-solid fa-plus"></i> Add sale</button>
+        <button type="button" class="sh-go" data-action="smSaveSales"><i class="fa-solid fa-floppy-disk"></i> Save sales</button>
+      </div>
+    </details>
+
     {{#if empty}}<p class="sh-msg bad">No items with a price in the "{{folder}}" Items folder. Put items in sub-folders there (one per section).</p>{{/if}}
     {{#if shop}}
     <div class="sm-fields">
@@ -46,14 +72,22 @@
     </div>
 
     <h3>What it sells</h3>
-    <p class="sm-hint">Tick a section to stock it, untick items that are out of stock. Leave Set price blank to use the item's price plus the markup.</p>
+    <p class="sm-hint">Tick a section to stock it, untick items that are out of stock. Leave Set price blank to use the item's price plus the markup. Give a section dates to make it seasonal, and tick <strong>Sold in every shop</strong> to stock it everywhere without ticking it in each shop. Sales and seasons apply to every shop.</p>
     <div class="sm-items">
       {{#each shop.sections}}
       <fieldset class="sm-sec {{#unless on}}off{{/unless}}">
         <legend>
           <label><input type="checkbox" name="section" value="{{name}}" {{#if on}}checked{{/if}}> {{name}}</label>
           {{#if on}}<button type="button" class="sm-mini" data-action="smAll" data-section="{{name}}">All / none</button>{{/if}}
+          {{#if rule.seasonal}}<span class="sm-badge {{#if rule.open}}open{{/if}}">{{#if rule.open}}In season{{else}}Out of season{{/if}}</span>{{/if}}
         </legend>
+        <div class="sm-rule" data-section="{{name}}">
+          <span>Only on the shelves from</span>
+          <input type="text" name="ruleFrom" value="{{rule.from}}" placeholder="dd/mm" aria-label="{{name}} on sale from">
+          <span>to</span>
+          <input type="text" name="ruleTo" value="{{rule.to}}" placeholder="dd/mm" aria-label="{{name}} on sale until">
+          <label><input type="checkbox" name="ruleEvery" {{#if rule.everywhere}}checked{{/if}}> Sold in every shop</label>
+        </div>
         {{#if on}}
         <table>
           <thead><tr><th>In stock</th><th>Item</th><th>Base</th><th>Set price</th><th>Sells for</th></tr></thead>

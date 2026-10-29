@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.10.0
+- New **region-wide sales** in the Shop Manager (top panel). A sale takes a % off everything in every shop, either between two dates every year (day/month, off the world calendar) or straight away with **On now**. If two overlap, the bigger one wins. The **Stocktake Sale** (15 to 21 December, 25% off) is set up on first load, ready to edit.
+- Players see a sale banner in the shop and the old price struck through. Sell-back prices don't change during a sale.
+- New **seasonal sections**: give any Poké Mart section an "only on the shelves from / to" window and it appears and disappears on its own every year. Tick **Sold in every shop** to stock it in every shop without ticking it shop by shop.
+- When a sale or a seasonal section starts or ends, any shop already posted to #poke-mart updates its post automatically (one GM window, on the day change). Open shop windows redraw on a new day.
+- New API: `shops.activeSale()`, `shops.sales()`, `shops.sectionRules()`, `shops.inWindow()`, `shops.checkShelves()`.
+
 ## 1.9.0
 - New **Antipodea Calendar**, per the signed-off vault note: a Seasons & Stars calendar that keeps the Gregorian month/weekday names and structure but carries none of the built-in real-world holidays (New Year's, Valentine's, Guy Fawkes, etc.) — only 50 homebrew events. Installs automatically for the GM on load, replacing the active calendar.
   - 15 major festivals (Turning Tide, Budgie Beach Carnival, Autumn Muster, Drop Bear Day, Lantern Night, Shearing Festival, Longest Night, Gym Circuit Kickoff, Frost Fair, Wattle Bloom, Grand Contest Festival, Founders' Day (Bunya City), Hatch Day, Elite Four Tournament, Stocktake Sale), seven of them running multiple days.

@@ -36,6 +36,7 @@
     </div>
   </div>
 
+  {{#if sale}}{{#if buying}}<p class="sh-sale"><i class="fa-solid fa-tags"></i> <strong>{{sale.name}}:</strong> {{sale.percent}}% off everything!</p>{{/if}}{{/if}}
   {{#if message}}<p class="sh-msg {{#if message.error}}bad{{/if}}">{{message.text}}</p>{{/if}}
 
   <div class="sh-shelves">
@@ -47,7 +48,7 @@
         <li class="sh-row {{#if qty}}picked{{/if}}">
           <img src="{{img}}" alt="">
           <span class="sh-name">{{name}}{{#if owned}}<small>You have {{owned}}</small>{{/if}}</span>
-          <span class="sh-price">{{priceLabel}}</span>
+          <span class="sh-price">{{#if wasLabel}}<s class="sh-was">{{wasLabel}}</s> {{/if}}{{priceLabel}}</span>
           <span class="sh-step">
             <button type="button" data-action="shStep" data-item="{{id}}" data-d="-1" aria-label="One less {{name}}" {{#unless qty}}disabled{{/unless}}><i class="fa-solid fa-minus"></i></button>
             <output>{{qty}}</output>
