@@ -367,7 +367,8 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   #contactsContext() {
     const contacts = Data.contactsFor(this.actor);
     const have = new Set(contacts.map((c) => c.id));
-    const directory = Data.directory()
+    // Players only see who they've swapped numbers with. The directory (and the swap button) is GM-only.
+    const directory = !game.user.isGM ? [] : Data.directory()
       .filter((a) => a.id !== this.actor.id && !have.has(a.id))
       .map((a) => ({ id: a.id, name: a.name, img: a.img }))
       .sort((a, b) => a.name.localeCompare(b.name));
@@ -727,10 +728,13 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
   static #onAttachPick(event, target) { this.attachImg = target.dataset.src; this.showAttach = false; this.render(); }
   static #onAttachClear() { this.attachImg = null; this.render(); }
 
+  /** GM only: swap numbers between this phone's trainer and someone from the directory (both ways). */
   static async #onAddContact(event, target) {
-    const id = target.dataset.id;
-    const contacts = [...new Set([...this.phone.contacts, id])];
-    await Data.setPhone(this.actor, "contacts", contacts);
+    if (!game.user.isGM) return;
+    const other = game.actors.get(target.dataset.id);
+    if (!other) return;
+    await Data.swapNumbers(this.actor, other);
+    ui.notifications.info(`${this.actor.name} and ${other.name} swapped numbers.`);
   }
 
   static async #onRemoveContact(event, target) {

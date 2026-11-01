@@ -1,5 +1,10 @@
 # Changelog
 
+## 1.12.0
+- **Contacts are now earned in play.** Players no longer see the Antipodea directory or an Add button, so a trainer's Contacts only shows people they've swapped numbers with (plus the default contacts and anyone who's texted them).
+- **Swap numbers (GM):** open any trainer's phone as GM, go to Contacts, and the directory shows a **Swap** button next to every player trainer and listed NPC. Swapping puts each person in the other's contacts.
+- Contacts players had already saved stay put, and players can still remove a contact themselves.
+
 ## 1.11.0
 - New **"Post as Organisation"** GM shortcut: right-click any NPC in the Actors sidebar and choose **Mark as Organisation** (a news outlet, a brand, a league office — anyone who isn't a real trainer) to flag it, then open the picker from the token controls (bullhorn icon), `Shift+O`, or `antipodea-registry.postAsOrg("pokegram" | "poketube" | "tiktogepi")`. Pick who to post as and which app, and it jumps straight to Compose with their most recent photo ready, or to Camera > Upload a picture first if they don't have one yet. Posts go out exactly like any other trainer's — everyone's in-game feed and, if a webhook's set, the matching Discord channel — no raw webhook calls needed.
 - The phone picker (`Shift+P` for a GM) now groups organisation-flagged NPCs into their own "Organisations" section instead of mixing them in by folder.

@@ -138,6 +138,15 @@ export function defaultContactIds() {
     .map((n) => game.actors.getName(n)?.id).filter(Boolean);
 }
 
+/** GM: two trainers swap numbers, so each one lands in the other's contacts. */
+export async function swapNumbers(a, b) {
+  if (!a || !b || a.id === b.id) return;
+  for (const [actor, other] of [[a, b], [b, a]]) {
+    const list = getPhone(actor).contacts;
+    if (!list.includes(other.id)) await setPhone(actor, "contacts", [...list, other.id]);
+  }
+}
+
 /** Contacts shown on a phone: saved ones, the defaults, and anyone they've texted. */
 export function contactsFor(actor) {
   const phone = getPhone(actor);

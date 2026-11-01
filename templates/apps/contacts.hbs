@@ -16,13 +16,13 @@
 </ul>
 
 {{#if directory.length}}
-<h4 class="ap-subhead">Antipodea directory</h4>
+<h4 class="ap-subhead">Swap numbers <small>(GM only)</small></h4>
 <ul class="ap-contacts ap-directory">
   {{#each directory}}
   <li>
     <img class="ap-avatar" src="{{img}}" alt="">
     <span class="ap-thread-text"><strong>{{name}}</strong></span>
-    <button type="button" class="ap-pill small" data-action="apAddContact" data-id="{{id}}"><i class="fa-solid fa-user-plus"></i> Add</button>
+    <button type="button" class="ap-pill small" data-action="apAddContact" data-id="{{id}}"><i class="fa-solid fa-right-left"></i> Swap</button>
   </li>
   {{/each}}
 </ul>

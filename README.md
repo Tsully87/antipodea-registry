@@ -5,7 +5,7 @@ The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13. (Modu
 ## Apps
 
 - **Messages:** text other trainers. Open an NPC's phone to text as them. Attach photos.
-- **Contacts:** everyone's number, plus the Antipodea directory (player trainers and NPCs you mark as listed).
+- **Contacts:** only people a trainer has swapped numbers with, plus the default contacts and anyone who's texted them. The GM swaps numbers from Contacts on any trainer's phone (the directory of player trainers and listed NPCs is GM-only).
 - **PokéGram, PokéTube, TikTogepi:** social apps with profiles, follows, likes, comments, reposts, DMs, @mentions, #hashtags and Trending. Fan engagement grows on the world clock. Each can mirror new posts to its own Discord channel.
 - **Camera:** snap what you can see on the map, or upload a picture.
 - **Gallery:** view, post, send or delete photos.
