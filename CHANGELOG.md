@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.11.0
+- New **"Post as Organisation"** GM shortcut: right-click any NPC in the Actors sidebar and choose **Mark as Organisation** (a news outlet, a brand, a league office — anyone who isn't a real trainer) to flag it, then open the picker from the token controls (bullhorn icon), `Shift+O`, or `antipodea-registry.postAsOrg("pokegram" | "poketube" | "tiktogepi")`. Pick who to post as and which app, and it jumps straight to Compose with their most recent photo ready, or to Camera > Upload a picture first if they don't have one yet. Posts go out exactly like any other trainer's — everyone's in-game feed and, if a webhook's set, the matching Discord channel — no raw webhook calls needed.
+- The phone picker (`Shift+P` for a GM) now groups organisation-flagged NPCs into their own "Organisations" section instead of mixing them in by folder.
+
 ## 1.10.0
 - New **region-wide sales** in the Shop Manager (top panel). A sale takes a % off everything in every shop, either between two dates every year (day/month, off the world calendar) or straight away with **On now**. If two overlap, the bigger one wins. The **Stocktake Sale** (15 to 21 December, 25% off) is set up on first load, ready to edit.
 - Players see a sale banner in the shop and the old price struck through. Sell-back prices don't change during a sale.

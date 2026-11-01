@@ -50,6 +50,7 @@ export function defaultPhone() {
     rotom: false,
     rotomName: "Rotom",
     listed: false,
+    org: false,
     contacts: [],
     gallery: [],
     reminders: [],
@@ -119,6 +120,16 @@ export function who(key, fallback = {}) {
 /** Every trainer anyone can text: player trainers plus NPCs the GM has listed. */
 export function directory() {
   return game.actors.filter((a) => a.type !== "pokemon" && (a.hasPlayerOwner || getPhone(a).listed));
+}
+
+/** True for an NPC actor the GM has flagged as an in-game organisation (a news outlet, a brand, a league office). */
+export function isOrg(actor) {
+  return !!actor && actor.type !== "pokemon" && !actor.hasPlayerOwner && getPhone(actor).org;
+}
+
+/** Every actor flagged as an organisation, alphabetical. */
+export function orgActors() {
+  return game.actors.filter(isOrg).sort((a, b) => a.name.localeCompare(b.name));
 }
 
 export function defaultContactIds() {

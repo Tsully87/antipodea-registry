@@ -1,6 +1,7 @@
 import { MODULE_ID, DEFAULT_BADGES } from "./constants.js";
 import * as Registry from "./registry.js";
 import * as Time from "./time.js";
+import * as Social from "./social.js";
 import { RegistryPhone, APP_PARTIALS, TEMPLATE_ROOT } from "./phone-app.js";
 import { postToDiscord } from "./discord.js";
 import * as Data from "./phone-data.js";
@@ -161,7 +162,9 @@ async function gmPhonePicker(tab) {
   const groups = [];
   if (recent.length) groups.push(["Recent", recent]);
   groups.push(["Players", all.filter((a) => a.hasPlayerOwner)]);
-  const npcs = all.filter((a) => !a.hasPlayerOwner);
+  const orgs = all.filter((a) => Data.isOrg(a));
+  if (orgs.length) groups.push(["Organisations", orgs]);
+  const npcs = all.filter((a) => !a.hasPlayerOwner && !Data.isOrg(a));
   const byFolder = new Map();
   // Each NPC usually sits in a folder of its own name (with its Pokémon), so group by the
   // first folder above that, e.g. "The Croc Shed" or "Police". Top-level ones go in "Other".
@@ -217,6 +220,60 @@ async function gmPhonePicker(tab) {
   if (!actor) return;
   rememberPhone(actor);
   RegistryPhone.open(actor, { tab });
+}
+
+/**
+ * GM shortcut: pick an in-game organisation (a news outlet, a brand, a league office — any
+ * NPC right-clicked and marked "Organisation" in the Actors sidebar) and jump straight into
+ * posting as them on PokéGram, PokéTube or TikTogepi, instead of Open Phone -> Home -> app -> Compose.
+ */
+async function gmPostAsOrg(platform) {
+  if (!game.user.isGM) return;
+  const esc = (t) => foundry.utils.escapeHTML(String(t ?? ""));
+  let orgs = Data.orgActors();
+  if (!orgs.length) {
+    const useAll = await foundry.applications.api.DialogV2.confirm({
+      window: { title: "No organisations marked yet" },
+      content: `<p>No NPC is flagged as an organisation yet. Right-click an NPC in the Actors sidebar and choose
+        <b>Mark as Organisation</b> so it shows up here from now on.</p><p>Pick from every NPC this once instead?</p>`,
+      rejectClose: false
+    });
+    if (!useAll) return;
+    orgs = game.actors.filter((a) => a.type !== "pokemon" && !a.hasPlayerOwner).sort((a, b) => a.name.localeCompare(b.name));
+    if (!orgs.length) return ui.notifications.warn("No NPC actors exist to post as yet.");
+  }
+
+  const platforms = Object.values(Social.PLATFORMS);
+  const orgOpt = (a) => `<option value="${a.id}">${esc(a.name)}</option>`;
+  const platOpt = (p) => `<option value="${p.key}" ${p.key === platform ? "selected" : ""}>${esc(p.name)}</option>`;
+  const content = `
+    <div class="form-group"><label>Post as</label><select name="actor">${orgs.map(orgOpt).join("")}</select></div>
+    <div class="form-group"><label>Platform</label><select name="platform">${platforms.map(platOpt).join("")}</select></div>`;
+
+  const picked = await foundry.applications.api.DialogV2.prompt({
+    window: { title: "Post as Organisation", icon: "fa-solid fa-bullhorn" },
+    position: { width: 340 },
+    content,
+    ok: {
+      label: "Open",
+      icon: "fa-solid fa-mobile-screen-button",
+      callback: (event, button) => ({ actorId: button.form.elements.actor.value, platform: button.form.elements.platform.value })
+    },
+    rejectClose: false
+  });
+  if (!picked) return;
+  const actor = game.actors.get(picked.actorId);
+  if (!actor) return;
+
+  const app = RegistryPhone.open(actor, { app: "home" });
+  const img = Data.getPhone(actor).gallery[0]?.src ?? null;
+  // Straight to Compose with their newest photo ready to go, or to Camera > Upload a picture
+  // first if they haven't got one yet.
+  if (img) app.go(picked.platform, { sv: { platform: picked.platform, view: "compose", img } });
+  else {
+    ui.notifications.info(`${actor.name} has no photos yet — use "Upload a picture" to add one, then Share to ${Social.PLATFORMS[picked.platform].name}.`);
+    app.go("camera");
+  }
 }
 
 function resolveActor(a) {
@@ -574,6 +631,13 @@ Hooks.once("init", () => {
     editable: [{ key: "KeyP", modifiers: ["Shift"] }],
     onDown: () => { openMine(); return true; }
   });
+  game.keybindings.register(MODULE_ID, "postAsOrg", {
+    name: "Post as Organisation (GM)",
+    hint: "Pick an in-game organisation (a news outlet, a brand, a league office) and jump straight to Compose on PokéGram, PokéTube or TikTogepi.",
+    editable: [{ key: "KeyO", modifiers: ["Shift"] }],
+    restricted: true,
+    onDown: () => { gmPostAsOrg(); return true; }
+  });
 
   const load = foundry.applications.handlebars?.loadTemplates ?? globalThis.loadTemplates;
   load([`${TEMPLATE_ROOT}/phone.hbs`, ...APP_PARTIALS]);
@@ -610,6 +674,8 @@ Hooks.once("ready", () => {
     installCalendar: () => Cal.install(),
     /** GM: the quick phone picker (a selected trainer token opens straight away). */
     pickPhone: (app) => gmPhonePicker(app),
+    /** GM: pick an in-game organisation and jump straight to Compose on PokéGram, PokéTube or TikTogepi. */
+    postAsOrg: (platform) => gmPostAsOrg(platform),
     getRecord: Registry.getRecord,
     issueOffence: Registry.issueOffence,
     setEndorsement: Registry.setEndorsement,
@@ -783,6 +849,24 @@ Hooks.on("getActorContextOptions", (app, options) => {
     },
     callback: (li) => RegistryPhone.open(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId))
   });
+  options.push({
+    name: "Mark as Organisation",
+    icon: '<i class="fa-solid fa-bullhorn"></i>',
+    condition: (li) => {
+      const actor = game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId);
+      return game.user.isGM && isTrainer(actor) && !actor.hasPlayerOwner && !Data.getPhone(actor).org;
+    },
+    callback: (li) => Data.setPhone(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId), "org", true)
+  });
+  options.push({
+    name: "Unmark as Organisation",
+    icon: '<i class="fa-solid fa-bullhorn"></i>',
+    condition: (li) => {
+      const actor = game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId);
+      return game.user.isGM && isTrainer(actor) && Data.getPhone(actor).org;
+    },
+    callback: (li) => Data.setPhone(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId), "org", false)
+  });
 });
 
 // A phone button in the token controls for everyone.
@@ -842,5 +926,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: game.user.isGM,
     onChange: () => EndOfDayWindow.open()
+  };
+  tokens.tools.antipodeaPostAsOrg = {
+    name: "antipodeaPostAsOrg",
+    title: "Post as Organisation",
+    icon: "fa-solid fa-bullhorn",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => gmPostAsOrg()
   };
 });
