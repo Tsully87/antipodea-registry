@@ -1,5 +1,13 @@
 # Changelog
 
+## 1.13.0
+- New **Tickets** app (free on every phone): buy fast-travel tickets for Swellow Air, the Rhyhorn Express, the Wailord Line and the Mantine Line, matching the fares and routes in `Antipodea.md`'s Fast Travel section exactly.
+- A **simple weekly timetable**: the Tasman flights, the Rhyhorn Express and the Wailord Line's overnight crossings only run certain days a week; the short hub routes, the Strait crossing and the Mantine Line run daily.
+- **Time-of-day fares**: where a route has more than one departure a day, the early and late departures are a little cheaper and the midday one a little dearer, same as real transport. Overnight and single-daily-departure crossings don't vary.
+- Tickets only show routes that actually depart from wherever the trainer's phone says they currently are (same location used by PokéMaps).
+- Buying a ticket pays immediately (queued like Mart Express if no GM is online) and schedules the trainer's arrival for departure time plus journey length — travel takes real world-clock time, and a trainer can't book another ticket while mid-journey. A new GM background job lands them automatically on arrival, alongside the existing Mart Express delivery job.
+- New API: `fast-travel.js` exports `legsFrom(pinId)` and `findLeg(fromPin, service, toPin)` for anything else that needs to know what fast-travel options exist from a given place.
+
 ## 1.12.0
 - **Contacts are now earned in play.** Players no longer see the Antipodea directory or an Add button, so a trainer's Contacts only shows people they've swapped numbers with (plus the default contacts and anyone who's texted them).
 - **Swap numbers (GM):** open any trainer's phone as GM, go to Contacts, and the directory shows a **Swap** button next to every player trainer and listed NPC. Swapping puts each person in the other's contacts.

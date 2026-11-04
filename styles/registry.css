@@ -916,6 +916,27 @@
 .antipodea-phone .ap-mart-item input { width: 46px; flex: 0 0 46px; }
 .antipodea-phone .ap-mart .ap-pill { background: #1098ad; }
 
+.antipodea-phone .ap-ticket-current {
+  display: flex; align-items: center; gap: 10px; padding: 10px 12px; margin-bottom: 10px; border-radius: 10px;
+  background: linear-gradient(135deg, #0c8599, #0b5394); color: #fff;
+}
+.antipodea-phone .ap-ticket-current i { font-size: 20px; }
+.antipodea-phone .ap-ticket-current small { display: block; color: rgba(255,255,255,.85); font-size: 11px; }
+.antipodea-phone .ap-ticket-route { padding: 6px 8px; margin-bottom: 6px; border-radius: 10px; background: #fff; }
+.antipodea-phone .ap-ticket-route-head { display: flex; justify-content: space-between; align-items: baseline; font-size: 13px; margin-bottom: 4px; }
+.antipodea-phone .ap-ticket-route-head span { color: #777; font-size: 11px; }
+.antipodea-phone .ap-ticket-deps { display: flex; flex-wrap: wrap; gap: 6px; }
+.antipodea-phone .ap-ticket-dep {
+  display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 5px 9px; border-radius: 8px;
+  border: none; background: #e9ecef; color: var(--ap-ink); font-size: 11px; min-width: 64px;
+}
+.antipodea-phone .ap-ticket-dep .ap-ticket-when { font-size: 10px; color: #777; }
+.antipodea-phone .ap-ticket-dep .ap-ticket-fare { font-weight: 700; }
+.antipodea-phone .ap-ticket-dep .ap-ticket-fare small { display: block; font-weight: 400; font-size: 9px; color: #777; }
+.antipodea-phone .ap-ticket-dep.cheap { background: #d3f9d8; }
+.antipodea-phone .ap-ticket-dep.pricey { background: #ffe8cc; }
+.antipodea-phone .ap-ticket-dep[disabled] { opacity: .4; }
+
 .antipodea-phone .ap-viewfinder.pro { box-shadow: inset 0 0 0 2px #fab005; }
 .antipodea-phone .ap-pro-badge { position: absolute; top: 14px; left: 50%; transform: translateX(-50%); padding: 1px 8px; border-radius: 6px; background: #fab005; color: #000; font-weight: 900; font-size: 11px; }
 .antipodea-phone .ap-filters { display: flex; gap: 6px; overflow-x: auto; width: 100%; }

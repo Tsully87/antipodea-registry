@@ -10,6 +10,7 @@ The in-game phone for the Antipodea Pokémon Westmarch in Foundry VTT v13. (Modu
 - **Camera:** snap what you can see on the map, or upload a picture.
 - **Gallery:** view, post, send or delete photos.
 - **Calendar:** month view on the world clock, reminders, and GM public events.
+- **Tickets:** free on every phone. Buy fast-travel tickets for Swellow Air, the Rhyhorn Express, the Wailord Line and the Mantine Line — see "Fast travel (Tickets)" below.
 - **Trainer Card** and **Licence** (below).
 - **App Store** (Rotom Phones only): buy paid apps with the trainer's money.
 - **Registry:** GM only. Card, licence, fines and the phone settings for that trainer.
@@ -41,6 +42,19 @@ if (scope?.forecast) {
 ```
 
 
+## Fast travel (Tickets)
+
+The Tickets app sells tickets for Antipodea's four fast-travel services, matching the "Fast Travel" section of `Antipodea.md` exactly (routes and fares live in `scripts/fast-travel.js`, not settings, so the game and the lore doc can't drift apart):
+
+- **Swellow Air:** hub-and-spoke flights out of Bunya City to every other Gym/Contest city. The two Tasman flights (Kauri City, Stoked City) only run four days a week.
+- **The Rhyhorn Express:** the cross-continent railway, Bunya City to Paperbark City, running four days a week on a fixed timetable.
+- **The Wailord Line:** the four big open-water crossings (Tasman, Strait, Inter-island, Southern). The three overnight ones run two or three nights a week; the short Strait crossing runs daily.
+- **The Mantine Line:** short east-coast hops between Bunya City, Budgie Beach and Waratah City, running daily.
+
+A trainer needs their location set (Registry tab, or PokéMaps' **Put them here**) before Tickets shows any routes — it only offers services that actually depart from wherever they currently are. Each route lists its next few real departures on the world clock; early and late departures are a little cheaper, the busiest midday departure a little dearer, same as real transport.
+
+Buying a ticket pays immediately (queued like Mart Express if no GM is online) and schedules the trainer's arrival for departure time plus the journey length — they don't teleport, and can't book another ticket while one is still in transit. A GM background job (next to the Mart Express delivery job) lands them automatically once the world clock reaches the arrival time.
+
 ### Rotom Phones
 Tick **Rotom Phone** in a trainer's Registry tab. Their phone glows orange, their Rotom sits on the home screen, and you can type in **Rotom says** to pop a message up on their screen. Their replies come to you.
 
@@ -48,7 +62,7 @@ Tick **Rotom Phone** in a trainer's Registry tab. Their phone glows orange, thei
 Texts, DMs, all three social apps, follows, reminders, App Store purchases and the Weather app work with nobody else logged in. They're saved in the **📱 Pokémon Phone Network** journal, which every player owns. Don't delete or edit it.
 
 - **Photos:** turn on **Upload New Files** for Players (Game Settings > Configure Permissions) so phones can upload them directly. Without it, photos wait for a GM.
-- **PokéPay and Mart Express:** queue while no GM is on and go through when one logs in.
+- **PokéPay, Mart Express and Tickets:** queue while no GM is on and go through when one logs in.
 - **Discord posts:** sent when a GM next logs in.
 - **Weather:** the GM's browser saves a week of forecasts each time it's on.
 

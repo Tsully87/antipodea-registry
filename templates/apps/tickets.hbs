@@ -1,0 +1,53 @@
+<div class="ap-tickets">
+  <div class="ap-balance"><span>Balance</span><strong>{{balance}}</strong></div>
+
+  {{#if current}}
+  <div class="ap-ticket-current">
+    <i class="fa-solid fa-plane-departure"></i>
+    <div>
+      <strong>{{current.serviceLabel}} to {{current.toName}}</strong>
+      <small>Departed {{current.departureLabel}} &middot; arriving {{current.arrivalLabel}}</small>
+    </div>
+  </div>
+  {{else if noLocation}}
+  <p class="ap-warn">The GM hasn't set your location on the map yet, so there's nowhere to book a ticket from.</p>
+  {{else}}
+  <p class="ap-hint">Currently in <strong>{{hereName}}</strong>.</p>
+  {{#unless gmOnline}}<p class="ap-hint"><i class="fa-solid fa-clock"></i> No ticket office GM online right now. Tickets queue and are booked (and paid) when the GM's next online.</p>{{/unless}}
+
+  {{#each services}}
+  <div class="ap-mart-section"><i class="fa-solid {{icon}}"></i> {{label}}</div>
+  {{#each routes}}
+  <div class="ap-ticket-route">
+    <div class="ap-ticket-route-head">
+      <strong>{{toName}}</strong>
+      <span>{{baseFare}} &middot; {{hoursLabel}}{{#if note}} ({{note}}){{/if}}</span>
+    </div>
+    {{#if departures.length}}
+    <div class="ap-ticket-deps">
+      {{#each departures}}
+      <button type="button" class="ap-ticket-dep {{#if cheap}}cheap{{/if}} {{#if pricey}}pricey{{/if}}"
+        data-action="apBuyTicket" data-service="{{../service}}" data-to-pin="{{../toPin}}" data-departure="{{time}}"
+        {{#unless @root.signal}}disabled{{/unless}}>
+        <span class="ap-ticket-when">{{dayLabel}} {{clock}}</span>
+        <span class="ap-ticket-fare">{{fare}}{{#if tag}}<small>{{tag}}</small>{{/if}}</span>
+      </button>
+      {{/each}}
+    </div>
+    {{else}}
+    <p class="ap-hint">No departures in the next three weeks.</p>
+    {{/if}}
+  </div>
+  {{/each}}
+  {{else}}
+  <p class="ap-warn">No fast-travel service runs from here. You'll need to travel overland first.</p>
+  {{/each}}
+  {{/if}}
+
+  {{#if history.length}}
+  <h4 class="ap-subhead">Past trips</h4>
+  <ul class="ap-orders">
+    {{#each history}}<li><span class="ap-what">{{serviceLabel}} to {{toName}}<small>{{when}}</small></span><em>{{fare}}</em></li>{{/each}}
+  </ul>
+  {{/if}}
+</div>

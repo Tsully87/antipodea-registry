@@ -10,6 +10,7 @@ import { SOCIAL_APPS, isSocial, socialContext, socialActions, socialBack } from 
 import { ShopWindow } from "./shop-app.js";
 import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsContext, payContext, martContext, paidActions, addPinAt, addSpotAt } from "./paid-apps.js";
 import { dexContext, dexActions } from "./dex-app.js";
+import { ticketsContext, ticketActions } from "./ticket-app.js";
 import * as Cal from "./calendar.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
@@ -19,7 +20,7 @@ const esc = (s) => foundry.utils.escapeHTML(String(s ?? ""));
 
 export const TEMPLATE_ROOT = `modules/${MODULE_ID}/templates`;
 export const APP_PARTIALS = ["home", "card", "licence", "admin", "messages", "thread", "contacts", "social", "camera", "gallery", "photo", "calendar",
-  "store", "translator", "weather", "pokemaps", "pokepay", "mart", "dex"]
+  "store", "translator", "weather", "pokemaps", "pokepay", "mart", "dex", "tickets"]
   .map((n) => `${TEMPLATE_ROOT}/apps/${n}.hbs`);
 
 /** App icons on the home screen, in order. */
@@ -32,6 +33,7 @@ const HOME_APPS = [
   { app: "camera", label: "Camera", icon: "fa-camera", color: "#3d3f44", lock: "camera" },
   { app: "gallery", label: "Gallery", icon: "fa-images", color: "#f08c00" },
   { app: "calendar", label: "Calendar", icon: "fa-calendar-days", color: "#e03131" },
+  { app: "tickets", label: "Tickets", icon: "fa-ticket", color: "#0c8599" },
   { app: "dex", label: "Pokédex", icon: "fa-book-open", color: "#2b6cb0" },
   { app: "card", label: "Trainer Card", icon: "fa-id-badge", color: "#c4622d" },
   { app: "licence", label: "Licence", icon: "fa-id-card", color: "#1f7a7a" },
@@ -42,7 +44,7 @@ const HOME_APPS = [
 const APP_TITLES = {
   messages: "Messages", thread: "", contacts: "Contacts", pokegram: "PokéGram", poketube: "PokéTube", tiktogepi: "TikTogepi",
   store: "App Store", translator: "Translator", weather: "Weather", pokemaps: "PokéMaps", pokepay: "PokéPay", mart: "Mart Express",
-  camera: "Camera", gallery: "Gallery", photo: "Photo", calendar: "Calendar",
+  camera: "Camera", gallery: "Gallery", photo: "Photo", calendar: "Calendar", tickets: "Tickets",
   card: "Trainer Card", licence: "Riding Licence", admin: "Registry", dex: "Pokédex"
 };
 
@@ -113,6 +115,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       ...socialActions,
       ...paidActions,
       ...dexActions,
+      ...ticketActions,
       apCamFilter: RegistryPhone.#onCamFilter,
       // Camera and Gallery
       apSnap: RegistryPhone.#onSnap,
@@ -269,6 +272,7 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
       case "pokemaps": Object.assign(ctx, mapsContext.call(this, phone)); break;
       case "pokepay": Object.assign(ctx, payContext.call(this, phone)); break;
       case "mart": Object.assign(ctx, martContext.call(this, phone)); break;
+      case "tickets": Object.assign(ctx, ticketsContext.call(this, phone)); break;
       case "dex": Object.assign(ctx, await dexContext.call(this, phone)); break;
       case "camera": {
         ctx.canSnap = !!canvas?.ready && !!canvas.scene;

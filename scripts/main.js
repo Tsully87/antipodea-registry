@@ -710,6 +710,7 @@ Hooks.once("ready", () => {
 /* -------------------------------------------- */
 
 let deliverTimer = null;
+let ticketTimer = null;
 let weatherTimer = null;
 const dayOf = (t) => {
   const d = game.seasonsStars?.api?.worldTimeToDate?.(t);
@@ -753,6 +754,8 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
     Data.refreshForecastCache(ZONES).catch(() => {});
     clearTimeout(deliverTimer);
     deliverTimer = setTimeout(() => Data.deliverOrders().catch((e) => console.error(`${MODULE_ID} | deliveries failed`, e)), 900);
+    clearTimeout(ticketTimer);
+    ticketTimer = setTimeout(() => Data.deliverTickets().catch((e) => console.error(`${MODULE_ID} | ticket arrivals failed`, e)), 1000);
     clearTimeout(endOfDayTimer);
     endOfDayTimer = setTimeout(() => autoEndOfDay(worldTime).catch((e) => console.error(`${MODULE_ID} | End of Day popup failed`, e)), 1500);
     clearTimeout(calendarTimer);

@@ -3,6 +3,7 @@ import * as Time from "./time.js";
 import * as Social from "./social.js";
 import * as Store from "./store.js";
 import * as Net from "./network.js";
+import * as FastTravel from "./fast-travel.js";
 
 /**
  * Phone data.
@@ -59,6 +60,7 @@ export function defaultPhone() {
     purchases: [],
     ledger: [],
     orders: [],
+    tickets: [],
     location: null,
     visited: []
   };
@@ -262,7 +264,7 @@ export function hasSignal() {
 /** Things players' phones do themselves, straight into the network journal. */
 const NETWORK_OPS = new Set(["message", "post", "like", "comment", "deletePost", "profile", "follow"]);
 /** Things only a GM can do. If no GM is on, these wait in a queue. */
-const QUEUE_OPS = new Set(["pay", "order", "photo"]);
+const QUEUE_OPS = new Set(["pay", "order", "ticket", "photo"]);
 
 const pending = new Map();
 
@@ -356,6 +358,7 @@ async function handle(op, data, userId) {
     case "photo": return relayPhoto(user, data);
     case "pay": return relayPay(user, data);
     case "order": return relayOrder(user, data);
+    case "ticket": return relayTicket(user, data);
     case "forecast": return relayForecast(user, data);
     default: return false;
   }
@@ -574,6 +577,59 @@ export async function deliverOrders() {
       o.delivered = ok ? true : "failed";
     }
     await setPhone(actor, "orders", orders);
+  }
+}
+
+/* -------------------------------------------- */
+/*  Fast travel tickets (GM side)               */
+/* -------------------------------------------- */
+
+/** Buy a fast-travel ticket. The fare, duration and departure are all re-derived here from the
+ *  actor's current location — a client never gets to hand over its own price. */
+async function relayTicket(user, { actorId, service, toPin, departure }) {
+  const actor = game.actors.get(actorId);
+  if (!actor || !canAct(user, actorId)) return { ok: false, error: "That's not your phone." };
+  const phone = getPhone(actor);
+  if (phone.tickets.some((tk) => !tk.delivered && tk.arrival > Time.now())) {
+    return { ok: false, error: "You're still travelling — wait until you arrive." };
+  }
+  const fromPin = phone.location;
+  if (!fromPin) return { ok: false, error: "The GM needs to set your current location first." };
+  const leg = FastTravel.findLeg(fromPin, service, toPin);
+  if (!leg) return { ok: false, error: "That route isn't available from here." };
+  const dep = leg.departures.find((d) => d.time === Number(departure));
+  if (!dep) return { ok: false, error: "That departure's gone. Check the timetable again." };
+  const fare = Math.round(leg.baseFare * (dep.mult ?? 1));
+  if (Store.money(actor) < fare) return { ok: false, error: `Not enough money. That's ${Store.fmtMoney(fare)}.` };
+  const arrival = dep.time + leg.hours * 3600;
+  const ticket = {
+    id: foundry.utils.randomID(), service, serviceLabel: leg.label, fromPin, toPin,
+    fare, departure: dep.time, arrival, delivered: false
+  };
+  await actor.update({
+    "system.money": Store.money(actor) - fare,
+    [`flags.${MODULE_ID}.phone.tickets`]: [ticket, ...phone.tickets].slice(0, 50),
+    [`flags.${MODULE_ID}.phone.ledger`]: [ledgerEntry(service, -fare, `${leg.label} ticket`), ...phone.ledger].slice(0, MAX_LEDGER)
+  });
+  return { ok: true, departure: dep.time, arrival };
+}
+
+/** GM side: land any trainers whose ticket's arrival time has passed. */
+export async function deliverTickets() {
+  const t = Time.now();
+  for (const actor of game.actors) {
+    if (actor.type === "pokemon") continue;
+    const phone = getPhone(actor);
+    if (!phone.tickets.some((tk) => !tk.delivered && tk.arrival <= t)) continue;
+    const tickets = foundry.utils.deepClone(phone.tickets);
+    let landed = null;
+    for (const tk of tickets) {
+      if (tk.delivered || tk.arrival > t) continue;
+      tk.delivered = true;
+      landed = tk;
+    }
+    if (landed) await setLocation(actor, landed.toPin);
+    await setPhone(actor, "tickets", tickets);
   }
 }
 
