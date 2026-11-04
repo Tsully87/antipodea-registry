@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.13.1
+- Fix: the new Tickets app showed as a blank screen — `phone.hbs` was never wired up to actually render the Tickets partial. No other changes.
+
 ## 1.13.0
 - New **Tickets** app (free on every phone): buy fast-travel tickets for Swellow Air, the Rhyhorn Express, the Wailord Line and the Mantine Line, matching the fares and routes in `Antipodea.md`'s Fast Travel section exactly.
 - A **simple weekly timetable**: the Tasman flights, the Rhyhorn Express and the Wailord Line's overnight crossings only run certain days a week; the short hub routes, the Strait crossing and the Mantine Line run daily.
