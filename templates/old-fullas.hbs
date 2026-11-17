@@ -1,0 +1,57 @@
+<div class="sh-wrap of-wrap">
+  <p class="sh-hint of-top">A very small chance of running into one of the Old Fullas where the stories put them. Rolls once per place for everyone there. Hits are whispered to you only.</p>
+
+  {{#if message}}<p class="sh-msg {{#if message.hit}}of-hit{{/if}}">{{message.text}}</p>{{/if}}
+
+  <div class="of-scroll">
+    <section class="of-section">
+      <h3>Check now</h3>
+      <div class="of-chance">
+        <label>Chance per Old Fulla (%) <input type="number" name="chance" value="{{chance}}" min="0" max="100" step="0.1"></label>
+        <button type="button" class="sh-go" data-action="ofRollAll"><i class="fa-solid fa-dice-d20"></i> Check everywhere</button>
+      </div>
+      {{#if places.length}}
+      <ul class="sh-rows">
+        {{#each places}}
+        <li class="sh-row of-place">
+          <i class="fa-solid fa-location-dot"></i>
+          <span class="sh-name">
+            <strong>{{name}}</strong>
+            <small>{{trainers}}</small>
+            <small>{{#if none}}No Old Fullas here.{{else}}{{#each fullas}}<span class="of-fulla {{#if outsider}}outsider{{/if}}">{{name}} ({{species}})</span>{{/each}}{{/if}}</small>
+          </span>
+          <button type="button" class="sh-ghost" data-action="ofRoll" data-pin="{{id}}" {{#if none}}disabled{{/if}}><i class="fa-solid fa-dice-d20"></i> Check</button>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="sh-empty">No player trainers have a location set.</p>
+      {{/if}}
+      {{#if nowhere}}<p class="sh-hint">No location set: {{nowhere}}</p>{{/if}}
+    </section>
+
+    <section class="of-section">
+      <h3>Automatic on arrival</h3>
+      <label class="of-row"><input type="checkbox" name="autoOn" {{#if autoOn}}checked{{/if}}> Check when trainers arrive somewhere (once per in-game day per Old Fulla)</label>
+      <label class="of-row">Chance per Old Fulla (%) <input type="number" name="autoChance" value="{{autoChance}}" min="0" max="100" step="0.1"></label>
+    </section>
+
+    <section class="of-section">
+      <h3>Recent checks <small>GM only</small></h3>
+      <button type="button" class="sh-ghost" data-action="ofOpenLog"><i class="fa-solid fa-book"></i> Open log journal</button>
+      {{#if recent.length}}
+      <ul class="sh-rows of-log">
+        {{#each recent}}
+        <li class="sh-row {{#if hit}}of-hitrow{{/if}}">
+          <i class="fa-solid {{#if hit}}fa-star{{else}}fa-circle-minus{{/if}}"></i>
+          <span class="sh-name">{{name}} <small>{{place}} · {{trainers}} · {{when}} · {{#if auto}}auto{{else}}manual{{/if}}</small></span>
+          <span class="of-roll">{{roll}} / {{chance}}%</span>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="sh-empty">No checks yet.</p>
+      {{/if}}
+    </section>
+  </div>
+</div>

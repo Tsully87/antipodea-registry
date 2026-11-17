@@ -8,6 +8,7 @@ import * as Data from "./phone-data.js";
 import * as Notify from "./notify.js";
 import * as Net from "./network.js";
 import { ZONES } from "./maps.js";
+import * as Maps from "./maps.js";
 import * as Shop from "./shop.js";
 import { ShopWindow, ShopManager } from "./shop-app.js";
 import * as Loc from "./location.js";
@@ -19,6 +20,8 @@ import * as Cal from "./calendar.js";
 import * as CalDiscord from "./calendar-discord.js";
 import * as DC from "./dead-channel.js";
 import { DeadChannelWindow } from "./dead-channel-app.js";
+import * as OF from "./old-fullas.js";
+import { OldFullasWindow } from "./old-fullas-app.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -298,6 +301,7 @@ async function startNetwork() {
     await Net.ensureJournal();
     await Data.migrateFromSettings();
     await DC.ensureJournal().catch((e) => console.warn(`${MODULE_ID} | dead channel journal`, e));
+    await OF.ensureJournal().catch((e) => console.warn(`${MODULE_ID} | old fullas journal`, e));
   }
   Net.invalidate();
   Notify.init(RegistryPhone);
@@ -605,6 +609,24 @@ Hooks.once("init", () => {
     scope: "world", config: false, type: Array, default: [],
     onChange: () => { RegistryPhone.refresh(); DeadChannelWindow.refresh(); }
   });
+  game.settings.register(MODULE_ID, "oldFullasAuto", {
+    name: "Old Fullas: check automatically on arrival",
+    hint: "When trainers are moved somewhere an Old Fulla lives, roll once for the group (at most once per in-game day per trainer per Old Fulla). Hits are whispered to the GM.",
+    scope: "world", config: true, type: Boolean, default: true,
+    onChange: () => OldFullasWindow.refresh()
+  });
+  game.settings.register(MODULE_ID, "oldFullasAutoChance", {
+    name: "Old Fullas: automatic check chance (%)",
+    hint: "Chance per Old Fulla per arrival. 1 means a 1 in 100 chance.",
+    scope: "world", config: true, type: Number, default: 1,
+    onChange: () => OldFullasWindow.refresh()
+  });
+  game.settings.register(MODULE_ID, "oldFullasManualChance", {
+    name: "Old Fullas: manual check chance (%)",
+    hint: "The starting chance in the Old Fullas window. You can change it for any single check there.",
+    scope: "world", config: true, type: Number, default: 1,
+    onChange: () => OldFullasWindow.refresh()
+  });
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
@@ -645,6 +667,13 @@ Hooks.once("init", () => {
     editable: [],
     restricted: true,
     onDown: () => { DeadChannelWindow.open(); return true; }
+  });
+  game.keybindings.register(MODULE_ID, "oldFullas", {
+    name: "Old Fullas check (GM)",
+    hint: "Opens the Old Fullas window to roll for a sighting wherever the trainers are.",
+    editable: [],
+    restricted: true,
+    onDown: () => { OldFullasWindow.open(); return true; }
   });
   game.keybindings.register(MODULE_ID, "postAsOrg", {
     name: "Post as Organisation (GM)",
@@ -724,6 +753,17 @@ Hooks.once("ready", () => {
       preview: (kind, actor) => DC.preview(kind, resolveActor(actor)),
       zones: DC.zones,
       log: DC.log
+    },
+    /**
+     * Old Fulla sightings. open() is the GM window; check(actors, chance) rolls for those
+     * trainers where they are; candidatesAt(pinId) lists who could turn up there.
+     */
+    oldFullas: {
+      open: () => OldFullasWindow.open(),
+      check: (actors, chance) => OF.manualCheck([].concat(actors ?? game.actors.filter((a) => a.type !== "pokemon" && a.hasPlayerOwner)).map(resolveActor).filter(Boolean), chance),
+      candidatesAt: (pinId) => OF.candidatesAt(Maps.pinById(pinId)),
+      list: OF.OLD_FULLAS,
+      log: OF.log
     }
   };
   game.socket.on(Data.SOCKET, Data.onSocket);
@@ -832,7 +872,11 @@ Hooks.on("preUpdateActor", (actor, changes, options) => {
 });
 
 Hooks.on("updateActor", (actor, changes, options) => {
-  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone.location`)) Loc.MoveParty.refresh();
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone.location`)) {
+    Loc.MoveParty.refresh();
+    OF.onLocationChanged(actor);
+    if (game.user.isGM) OldFullasWindow.refresh();
+  }
   if (ShopWindow.current?.actorId === actor.id) ShopWindow.refresh();
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}`) || "name" in changes || "img" in changes || foundry.utils.hasProperty(changes, "system.money") || foundry.utils.hasProperty(changes, "system.dex")) {
     RegistryPhone.refresh(actor.id);
@@ -885,6 +929,7 @@ Hooks.on("getHeaderControlsActorSheetV2", (sheet, controls) => {
 // The GM-only Dead Channel journal changed: redraw the window.
 Hooks.on("updateJournalEntry", (journal) => {
   if (game.user.isGM && journal.getFlag(MODULE_ID, "deadChannel")) DeadChannelWindow.refresh();
+  if (game.user.isGM && journal.getFlag(MODULE_ID, "oldFullas")) OldFullasWindow.refresh();
 });
 
 // Right-click an actor in the sidebar.
@@ -1023,5 +1068,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: game.user.isGM,
     onChange: () => DeadChannelWindow.open()
+  };
+  tokens.tools.antipodeaOldFullas = {
+    name: "antipodeaOldFullas",
+    title: "Old Fullas check",
+    icon: "fa-solid fa-feather-pointed",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => OldFullasWindow.open()
   };
 });

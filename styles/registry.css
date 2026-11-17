@@ -1400,3 +1400,26 @@
 .antipodea-dead-channel .dc-tag { font-size: 10px; padding: 0 5px; border-radius: 4px; background: #5e4b8b; color: #fff; font-style: normal; }
 .antipodea-dead-channel .dc-seen { font-size: 11px; white-space: nowrap; color: #2f7a4a; }
 .antipodea-dead-channel .dc-seen.waiting { color: #8a6d00; }
+
+/* -------------------------------------------- */
+/*  Old Fullas (GM)                             */
+/* -------------------------------------------- */
+.antipodea-old-fullas .of-top { margin: 10px 14px 0; }
+.antipodea-old-fullas .of-scroll { flex: 1; overflow-y: auto; padding: 4px 14px 14px; }
+.antipodea-old-fullas .of-section { margin-top: 12px; }
+.antipodea-old-fullas .of-section h3 { margin: 0 0 6px; font-size: 15px; border-bottom: 1px solid rgba(0,0,0,.15); padding-bottom: 3px; }
+.antipodea-old-fullas .of-section h3 small { font-weight: 400; font-size: 11px; opacity: .7; }
+.antipodea-old-fullas .of-chance { display: flex; align-items: flex-end; justify-content: space-between; gap: 10px; margin-bottom: 8px; }
+.antipodea-old-fullas .of-chance label { display: flex; flex-direction: column; font-size: 12px; gap: 2px; }
+.antipodea-old-fullas .of-chance .sh-go { height: auto; padding: 6px 12px; }
+.antipodea-old-fullas .of-row { display: flex; align-items: center; gap: 6px; font-size: 13px; margin: 4px 0; }
+.antipodea-old-fullas .of-row input[type=number] { width: 80px; }
+.antipodea-old-fullas .of-place,
+.antipodea-old-fullas .of-log .sh-row { display: flex; align-items: center; gap: 8px; }
+.antipodea-old-fullas .of-place .sh-name,
+.antipodea-old-fullas .of-log .sh-name { flex: 1; }
+.antipodea-old-fullas .of-fulla { display: inline-block; margin: 2px 4px 0 0; padding: 0 6px; border-radius: 999px; background: #e3efe7; color: #2f5b3e; }
+.antipodea-old-fullas .of-fulla.outsider { background: #ece7f7; color: #4b3a78; }
+.antipodea-old-fullas .sh-msg.of-hit { background: #fff3cd; color: #7a5200; font-weight: 700; }
+.antipodea-old-fullas .of-hitrow { border-color: #d9a441; box-shadow: inset 3px 0 0 #d9a441; }
+.antipodea-old-fullas .of-roll { font-size: 11px; font-variant-numeric: tabular-nums; opacity: .8; white-space: nowrap; }

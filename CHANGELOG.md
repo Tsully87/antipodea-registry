@@ -1,5 +1,12 @@
 # Changelog
 
+## 1.15.0
+- New **Old Fullas** sightings (GM only): a very small chance that trainers run into one of the Lower Pantheon or the Outsiders where the stories put them. Old Frostbite above Silver Fern Plateau, the Bunya Ghost around Bunya City, the Reef Mother off Bonza Bay and so on, plus Mewtwo anywhere in The Red Heart, Deoxys at Black Stump City, Genesect in Rainforest Reach and Huon Isle, and MissingNo only inside a Dead Channel dead zone.
+- **Automatic on arrival**: when trainers are moved somewhere an Old Fulla lives (Move Trainers, tagged scenes, tickets, anything that sets their location), the group that arrived together gets one roll per Old Fulla, at most once per in-game day per trainer per Old Fulla. Default 1%, set in module settings or the window.
+- **Manual check**: the Old Fullas window (token controls, feather icon) shows where every player trainer is and who could turn up there, with a Check button per place and a Check everywhere button. The chance (default 1%) can be changed for any single check.
+- Hits are whispered to the GM only, with the Old Fulla, where, who, and the local legend. Every check, hit or miss, goes in a new GM-only journal, **🌿 Old Fullas Log**.
+- New API: `api.oldFullas.open()`, `api.oldFullas.check(actors, chance)`, `api.oldFullas.candidatesAt(pinId)`.
+
 ## 1.14.1
 - Fix: the Fire buttons in the Dead Channel window were squashed to 24px tall by Foundry's own button styling.
 

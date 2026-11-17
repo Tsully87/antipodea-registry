@@ -132,6 +132,14 @@ MissingNo, "the Dead Channel": seven phone glitches you can fire by hand or leav
 - Random is off until you tick it in the window. It rolls when the world clock moves forward.
 - Everything is logged to the GM-only journal **📼 Dead Channel Log**, including whether the player has actually seen it.
 
+## Old Fullas (GM)
+
+A very small chance of trainers running into a Lower Pantheon Old Fulla or an Outsider where the lore puts them (see `OLD_FULLAS` in `scripts/old-fullas.js` for every place). MissingNo only turns up inside a Dead Channel dead zone.
+
+- **Automatic**: when trainers arrive somewhere, the group rolls once per Old Fulla living there, at most once per in-game day each. Turn it off or change the chance in settings or the window.
+- **Manual**: token controls, feather icon. Check one place or everywhere, at whatever chance you set for that check.
+- Hits are whispered to the GM only. Everything is logged in the GM-only journal **🌿 Old Fullas Log**.
+
 ## Registry
 
 - **Trainer Card:** photo, Trainer ID, Home Town, Tier and 12 badge slots.
