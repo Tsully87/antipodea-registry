@@ -1,7 +1,7 @@
 {{#if photo404}}
 <p class="ap-hint-center">That photo's gone.</p>
 {{else}}
-<img class="ap-photo-full" src="{{shot.src}}" alt="" data-action="apPhotoFull" data-src="{{shot.src}}">
+<img class="ap-photo-full{{#if shot.dcGlitch}} ap-dc-glitched v{{shot.dcGlitch}}{{/if}}" src="{{shot.src}}" alt="" data-action="apPhotoFull" data-src="{{shot.src}}">
 <p class="ap-hint-center">{{shot.label}}</p>
 <div class="ap-photo-actions">
   {{#if shareTo.length}}

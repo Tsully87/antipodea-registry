@@ -17,6 +17,8 @@ import * as Surv from "./survival.js";
 import { CraftWindow, DropsWindow, EndOfDayWindow } from "./survival-app.js";
 import * as Cal from "./calendar.js";
 import * as CalDiscord from "./calendar-discord.js";
+import * as DC from "./dead-channel.js";
+import { DeadChannelWindow } from "./dead-channel-app.js";
 
 /* -------------------------------------------- */
 /*  Helpers                                     */
@@ -295,6 +297,7 @@ async function startNetwork() {
   if (game.user.isGM) {
     await Net.ensureJournal();
     await Data.migrateFromSettings();
+    await DC.ensureJournal().catch((e) => console.warn(`${MODULE_ID} | dead channel journal`, e));
   }
   Net.invalidate();
   Notify.init(RegistryPhone);
@@ -597,6 +600,11 @@ Hooks.once("init", () => {
     hint: "Only opens if at least one trainer is tagged Out Bush in Move Trainers. Turn off to run End of Day manually from the token controls.",
     scope: "world", config: true, type: Boolean, default: true
   });
+  game.settings.register(MODULE_ID, "deadZones", {
+    // Dead Channel dead zones on PokéMaps: [{ id, x, y, r, near, until, source }]. Everyone reads these to draw them.
+    scope: "world", config: false, type: Array, default: [],
+    onChange: () => { RegistryPhone.refresh(); DeadChannelWindow.refresh(); }
+  });
   game.settings.register(MODULE_ID, "lastTown", { scope: "world", config: false, type: String, default: "" });
   game.settings.register(MODULE_ID, "lastOfficer", { scope: "world", config: false, type: String, default: "" });
 
@@ -630,6 +638,13 @@ Hooks.once("init", () => {
     hint: "Opens your trainer's phone.",
     editable: [{ key: "KeyP", modifiers: ["Shift"] }],
     onDown: () => { openMine(); return true; }
+  });
+  game.keybindings.register(MODULE_ID, "deadChannel", {
+    name: "Dead Channel (GM)",
+    hint: "Opens the Dead Channel window: fire MissingNo glitches at a trainer's phone, set up random ones, and read the GM-only log.",
+    editable: [],
+    restricted: true,
+    onDown: () => { DeadChannelWindow.open(); return true; }
   });
   game.keybindings.register(MODULE_ID, "postAsOrg", {
     name: "Post as Organisation (GM)",
@@ -697,9 +712,25 @@ Hooks.once("ready", () => {
       const a = resolveActor(actor);
       return a ? Data.request("message", { from: Data.rotomKey(a.id), to: a.id, text }) : false;
     },
-    time: Time
+    time: Time,
+    /**
+     * The Dead Channel (MissingNo). open() is the GM window. fire(kind, actor, opts) makes one
+     * happen: kind is call, photo, weather, deadzone, dex, glitch or social. preview(kind, actor)
+     * plays it on the GM's own screen only.
+     */
+    deadChannel: {
+      open: () => DeadChannelWindow.open(),
+      fire: (kind, actor, opts) => DC.fire(kind, resolveActor(actor), opts),
+      preview: (kind, actor) => DC.preview(kind, resolveActor(actor)),
+      zones: DC.zones,
+      log: DC.log
+    }
   };
   game.socket.on(Data.SOCKET, Data.onSocket);
+  game.socket.on(Data.SOCKET, DC.onSocket);
+  DC.init(RegistryPhone);
+  DC.setLogListener(() => DeadChannelWindow.refresh());
+  DC.onReady();
   startNetwork().catch((e) => console.error(`${MODULE_ID} | network start failed`, e));
   queueSweep();
   if (Data.isActiveGM()) Cal.install().catch((e) => console.error(`${MODULE_ID} | calendar install failed`, e));
@@ -743,6 +774,8 @@ async function autoEndOfDay(worldTime) {
 }
 
 let calendarTimer = null;
+let dcTimer = null;
+let dcDelta = 0;
 let shelfTimer = null;
 let lastShelfDay = null;
 
@@ -763,6 +796,16 @@ Hooks.on("updateWorldTime", (worldTime, delta) => {
       CalDiscord.checkDayOf(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar day-of post failed`, e));
       CalDiscord.checkWeeklyHeadsUp(worldTime).catch((e) => console.error(`${MODULE_ID} | calendar heads-up post failed`, e));
     }, 1700);
+    clearTimeout(dcTimer);
+    if (delta > 0) dcDelta += delta;
+    dcTimer = setTimeout(async () => {
+      const total = dcDelta;
+      dcDelta = 0;
+      try {
+        await DC.pruneZones();
+        if (total > 0 && DC.config().random && await Data.claim(`deadchannel:${worldTime}`)) await DC.rollRandom(total);
+      } catch (e) { console.error(`${MODULE_ID} | Dead Channel roll failed`, e); }
+    }, 2100);
     clearTimeout(shelfTimer);
     shelfTimer = setTimeout(() => Shop.checkShelves().catch((e) => console.error(`${MODULE_ID} | shop shelves failed`, e)), 1900);
   }
@@ -795,6 +838,10 @@ Hooks.on("updateActor", (actor, changes, options) => {
     RegistryPhone.refresh(actor.id);
   }
   if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.phone`)) Notify.onPhoneChanged(actor);
+  if (foundry.utils.hasProperty(changes, `flags.${MODULE_ID}.deadchannel`)) {
+    DC.onActorUpdate(actor, changes);
+    if (game.user.isGM) DeadChannelWindow.refresh();
+  }
   if (options.antipodeaDexBefore) {
     DexDiscord.announceDexChanges(actor, options.antipodeaDexBefore, actor.system.dex ?? {})
       .catch((e) => console.warn(`${MODULE_ID} | dex discord`, e));
@@ -835,6 +882,11 @@ Hooks.on("getHeaderControlsActorSheetV2", (sheet, controls) => {
   });
 });
 
+// The GM-only Dead Channel journal changed: redraw the window.
+Hooks.on("updateJournalEntry", (journal) => {
+  if (game.user.isGM && journal.getFlag(MODULE_ID, "deadChannel")) DeadChannelWindow.refresh();
+});
+
 // Right-click an actor in the sidebar.
 Hooks.on("getActorContextOptions", (app, options) => {
   options.push({
@@ -869,6 +921,30 @@ Hooks.on("getActorContextOptions", (app, options) => {
       return game.user.isGM && isTrainer(actor) && Data.getPhone(actor).org;
     },
     callback: (li) => Data.setPhone(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId), "org", false)
+  });
+  options.push({
+    name: "Mark as Dead Channel account",
+    icon: '<i class="fa-solid fa-hashtag"></i>',
+    condition: (li) => {
+      const actor = game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId);
+      return game.user.isGM && isTrainer(actor) && !actor.hasPlayerOwner && !Data.getPhone(actor).dcAccount;
+    },
+    callback: async (li) => {
+      await Data.setPhone(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId), "dcAccount", true);
+      DeadChannelWindow.refresh();
+    }
+  });
+  options.push({
+    name: "Unmark as Dead Channel account",
+    icon: '<i class="fa-solid fa-hashtag"></i>',
+    condition: (li) => {
+      const actor = game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId);
+      return game.user.isGM && isTrainer(actor) && Data.getPhone(actor).dcAccount;
+    },
+    callback: async (li) => {
+      await Data.setPhone(game.actors.get(li.dataset?.entryId ?? li.dataset?.documentId), "dcAccount", false);
+      DeadChannelWindow.refresh();
+    }
   });
 });
 
@@ -938,5 +1014,14 @@ Hooks.on("getSceneControlButtons", (controls) => {
     button: true,
     visible: game.user.isGM,
     onChange: () => gmPostAsOrg()
+  };
+  tokens.tools.antipodeaDeadChannel = {
+    name: "antipodeaDeadChannel",
+    title: "Dead Channel",
+    icon: "fa-solid fa-tower-broadcast",
+    order: Object.keys(tokens.tools).length,
+    button: true,
+    visible: game.user.isGM,
+    onChange: () => DeadChannelWindow.open()
   };
 });

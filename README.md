@@ -112,6 +112,26 @@ reg.endOfDay();    // GM: End of Day
 reg.survival;       // the survival.js module (recipes, drop table, checks, etc.)
 ```
 
+## Dead Channel (GM)
+
+MissingNo, "the Dead Channel": seven phone glitches you can fire by hand or leave to chance. Open the window from the token controls (broadcast-tower icon) or `game.modules.get("antipodea-registry").api.deadChannel.open()`.
+
+| Effect | What the player sees |
+|---|---|
+| Call | A call from "???", silent, cuts out at 0:08. Rings even with the phone closed. Not saved anywhere on the phone. |
+| Glitched photo | A recent Gallery photo corrupts. Baked into the image, so sharing it spreads it. |
+| Impossible weather | The Weather app shows an impossible reading for about five seconds. Needs the Weather app. |
+| Dead zone | Static over part of PokéMaps. Phones inside show SOS and get glitched more often. |
+| Pokédex #000 | A #000 tile flickers into the Pokédex and vanishes when tapped. |
+| Screen glitch | Scrambled text and static for a few seconds, sometimes an app opens by itself. |
+| #deadchannel post | A marked conspiracy account posts static with a rumour caption. |
+
+- Call, Weather, Dex #000 and Glitch wait on that trainer's phone and play when their player next looks at it (a call rings within a few seconds if they're online, or shortly after they log in).
+- **Preview only** plays the effect on your screen only. Nothing is sent or logged.
+- Mark posters by right-clicking an NPC in Actors: **Mark as Dead Channel account**.
+- Random is off until you tick it in the window. It rolls when the world clock moves forward.
+- Everything is logged to the GM-only journal **📼 Dead Channel Log**, including whether the player has actually seen it.
+
 ## Registry
 
 - **Trainer Card:** photo, Trainer ID, Home Town, Tier and 12 badge slots.

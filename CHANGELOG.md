@@ -1,5 +1,19 @@
 # Changelog
 
+## 1.14.0
+- New **Dead Channel** (MissingNo), GM only. Seven phone glitches you can fire at a trainer, or let happen at random:
+  - **Call**: an incoming call from "???" (No Caller ID). Answer it and it's dead silence that cuts out at exactly 0:08. It rings even if the phone's closed, and nothing goes in their call log.
+  - **Glitched photo**: one of their recent Gallery photos corrupts (torn slices, split colours, a blocky shape that wasn't there). It's baked into the actual picture, so if they share it to PokéGram the proof ends up on Discord too. If the browser won't let the picture be redrawn, the glitch is drawn over it on the phone instead.
+  - **Impossible weather**: the Weather app shows something like -273°C or "?????" for a few seconds, then fixes itself. Only on phones with the Weather app (it waits until they have it).
+  - **Dead zone**: a patch of static on PokéMaps, either where you pick or somewhere random, for a set number of days or until removed. Phones inside one show SOS instead of signal bars, and random glitches are more likely there.
+  - **Pokédex #000**: a garbled #000 entry flickers into the Pokédex list and vanishes when tapped. It's never actually registered.
+  - **Screen glitch**: the phone scrambles and fills with static for a few seconds, and sometimes opens an app by itself after.
+  - **#deadchannel post**: a conspiracy account posts generated static with a rumour caption on PokéGram, PokéTube or TikTogepi (mirrored to Discord like any post). Right-click an NPC in the Actors sidebar and choose **Mark as Dead Channel account** to make it one.
+- **Dead Channel window** (token controls, broadcast-tower icon; or set a key in Configure Controls): pick a trainer and fire any of the seven, with a **Preview only** switch to play Call, Weather, Dex #000 and Glitch on your own screen without sending or logging anything.
+- **Random**: off by default. Turn it on in the window and set the chance per trainer per in-game day, the dead zone multiplier, a cooldown, and the daily chance of a new dead zone or account post, plus which of the seven random can pick. Rolled when the world clock moves forward, from one GM window only.
+- **GM-only log**: everything that happens (GM-fired or random) is recorded in a new journal, **📼 Dead Channel Log**, which players can't open. It shows who's been touched and how many times, what happened, where, and whether they've actually seen it yet (calls also record answered, declined or missed). Photos can be put back from the log, and dead zones removed.
+- New API: `api.deadChannel.open()`, `api.deadChannel.fire(kind, actor, opts)`, `api.deadChannel.preview(kind, actor)`, `api.deadChannel.zones()`, `api.deadChannel.log()`.
+
 ## 1.13.1
 - Fix: the new Tickets app showed as a blank screen — `phone.hbs` was never wired up to actually render the Tickets partial. No other changes.
 

@@ -1,6 +1,6 @@
 {{#if gallery.length}}
 <div class="ap-gallery">
-  {{#each gallery}}<button type="button" data-action="apViewPhoto" data-id="{{id}}"><img src="{{src}}" alt=""></button>{{/each}}
+  {{#each gallery}}<button type="button" data-action="apViewPhoto" data-id="{{id}}"><img src="{{src}}" alt="" {{#if dcGlitch}}class="ap-dc-glitched v{{dcGlitch}}"{{/if}}></button>{{/each}}
 </div>
 {{else}}
 <div class="ap-emptystate">

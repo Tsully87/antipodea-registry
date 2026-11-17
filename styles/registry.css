@@ -1247,3 +1247,155 @@
 .antipodea-shop .sm-rule label { display: flex; align-items: center; gap: 4px; }
 .antipodea-shop .sm-badge { font-size: 11px; font-weight: 600; padding: 1px 8px; border-radius: 999px; background: var(--sh-line); color: var(--sh-muted); }
 .antipodea-shop .sm-badge.open { background: var(--sh-gum); color: #fff; }
+
+/* -------------------------------------------- */
+/*  Dead Channel (MissingNo)                    */
+/* -------------------------------------------- */
+
+/* The window-level layer calls and static sit on, so they survive the phone redrawing. */
+.antipodea-phone .window-content.ap-dc-host { position: relative; }
+
+/* Incoming call from ??? */
+.antipodea-phone .ap-dc-call {
+  position: absolute; inset: 10px; z-index: 50;
+  border-radius: 30px; overflow: hidden;
+  display: flex; flex-direction: column; justify-content: space-between; align-items: center;
+  padding: 70px 24px 56px;
+  background: radial-gradient(circle at 50% 30%, #2a2140, #0b0b0f 70%);
+  color: #e8e0ff; text-align: center; font-family: "Signika", system-ui, sans-serif;
+  animation: ap-dc-fade-in .3s ease-out;
+  transition: opacity .5s;
+}
+.antipodea-phone .ap-dc-call :where(strong, small, span, i) { color: inherit; }
+.antipodea-phone .ap-dc-call.gone { opacity: 0; }
+.antipodea-phone .ap-dc-call-top { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.antipodea-phone .ap-dc-call-face {
+  width: 96px; height: 96px; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 46px; font-weight: 700; color: #0b0b0f;
+  background: repeating-linear-gradient(0deg, #8f86a8 0 3px, #5e4b8b 3px 6px);
+  margin-bottom: 10px;
+}
+.antipodea-phone .ap-dc-call.ringing .ap-dc-call-face { animation: ap-dc-pulse 1.6s ease-in-out infinite; }
+.antipodea-phone .ap-dc-call-name { font-size: 28px; letter-spacing: 4px; }
+.antipodea-phone .ap-dc-call-sub { opacity: .7; font-size: 13px; }
+.antipodea-phone .ap-dc-call-time { font-family: monospace; font-size: 16px; margin-top: 8px; opacity: .85; }
+.antipodea-phone .ap-dc-call.cut .ap-dc-call-time { color: #ff6b6b; }
+.antipodea-phone .ap-dc-flat { width: 70%; height: 2px; background: #e8e0ff; opacity: 0; }
+.antipodea-phone .ap-dc-call.live .ap-dc-flat { opacity: .6; box-shadow: 0 0 8px #e8e0ff; }
+.antipodea-phone .ap-dc-call-btns { display: flex; gap: 70px; }
+.antipodea-phone .ap-dc-call-btns button {
+  width: 64px; height: 64px; border-radius: 50%; border: 0; font-size: 24px; color: #fff; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+}
+.antipodea-phone .ap-dc-decline { background: #e03131; }
+.antipodea-phone .ap-dc-answer { background: #2fb34a; animation: ap-dc-pulse 1.6s ease-in-out infinite; }
+.antipodea-phone.ap-dc-buzz { animation: ap-dc-buzz .4s linear infinite; }
+
+/* Screen glitch */
+.antipodea-phone .ap-dc-static {
+  position: absolute; inset: 10px; z-index: 60; pointer-events: none;
+  border-radius: 30px; mix-blend-mode: hard-light; opacity: .55;
+  background:
+    repeating-linear-gradient(0deg, rgba(0,0,0,.35) 0 1px, transparent 1px 3px),
+    repeating-radial-gradient(circle at 17% 33%, #fff 0 1px, #222 1px 2px, #888 2px 3px);
+  background-size: 100% 100%, 7px 5px;
+  animation: ap-dc-snow .12s steps(3) infinite;
+}
+.antipodea-phone .ap-dc-static.short { opacity: .8; animation-duration: .08s; }
+.antipodea-phone .ap-dc-glitching .ap-screen { animation: ap-dc-jitter .18s steps(2) infinite; }
+
+/* Impossible weather */
+.antipodea-phone .ap-dc-weather {
+  margin: 0 0 10px; padding: 16px; border-radius: 16px; text-align: center;
+  background: #0b0b0f; color: #e8e0ff;
+  animation: ap-dc-flicker .9s steps(4) infinite;
+}
+.antipodea-phone .ap-dc-weather :where(div, small) { color: inherit; }
+.antipodea-phone .ap-dc-temp { font-size: 46px; font-weight: 700; font-family: monospace; letter-spacing: 2px; }
+.antipodea-phone .ap-dc-cond { font-size: 18px; letter-spacing: 3px; text-transform: uppercase; }
+.antipodea-phone .ap-dc-weather small { opacity: .75; }
+
+/* Pokédex #000 */
+.antipodea-phone .ap-dc-tile { position: relative; animation: ap-dc-flicker 1.2s steps(5) infinite; }
+.antipodea-phone .ap-dc-tile.gone { animation: ap-dc-vanish .4s forwards; }
+.antipodea-phone .ap-dc-sprite {
+  display: block; width: 44px; height: 44px; margin: 0 auto;
+  background:
+    linear-gradient(90deg, transparent 30%, #2a2140 30% 50%, #e8e0ff 50% 60%, #5e4b8b 60% 80%, transparent 80%) 0 0 / 100% 12px no-repeat,
+    repeating-linear-gradient(0deg, #0b0b0f 0 6px, #5e4b8b 6px 9px, #e8e0ff 9px 11px, #2a2140 11px 15px);
+  clip-path: polygon(30% 0, 70% 0, 70% 30%, 100% 30%, 100% 100%, 15% 100%, 15% 60%, 0 60%, 0 30%, 30% 30%);
+}
+.antipodea-phone .ap-dc-count { color: #5e4b8b; font-weight: 700; }
+
+/* PokéMaps dead zones */
+.antipodea-phone .ap-dc-zone {
+  position: absolute; transform: translate(-50%, -50%); pointer-events: none;
+  border-radius: 50%;
+  background:
+    repeating-radial-gradient(circle at 40% 60%, rgba(255,255,255,.85) 0 1px, rgba(30,30,30,.8) 1px 2px, rgba(140,140,140,.75) 2px 3px);
+  background-size: 6px 5px;
+  box-shadow: 0 0 10px 4px rgba(20,20,20,.55);
+  opacity: .8;
+  animation: ap-dc-snow .15s steps(3) infinite;
+}
+
+/* No signal inside a dead zone */
+.antipodea-phone .ap-dc-nosig { animation: ap-dc-flicker 1.4s steps(3) infinite; }
+.antipodea-phone .ap-dc-sos { font-size: 10px; font-weight: 800; letter-spacing: 1px; color: #ff6b6b; }
+
+/* Photos that couldn't be baked: drawn on top instead */
+.antipodea-phone img.ap-dc-glitched { filter: contrast(1.3) drop-shadow(3px 0 #ff00c8) drop-shadow(-3px 0 #00ffd5); }
+.antipodea-phone img.ap-dc-glitched.v2 { filter: hue-rotate(160deg) contrast(1.5) drop-shadow(4px 0 #00ffd5); }
+.antipodea-phone img.ap-dc-glitched.v3 { filter: grayscale(.6) contrast(1.8) drop-shadow(-5px 0 #ff00c8); }
+.antipodea-phone img.ap-dc-glitched.v4 { filter: invert(.85) hue-rotate(200deg) contrast(1.2); }
+.antipodea-phone img.ap-dc-glitched { animation: ap-dc-shake 2.5s steps(1) infinite; }
+
+@keyframes ap-dc-fade-in { from { opacity: 0; } to { opacity: 1; } }
+@keyframes ap-dc-pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.08); } }
+@keyframes ap-dc-buzz { 0%, 100% { translate: 0 0; } 25% { translate: -2px 0; } 75% { translate: 2px 0; } }
+@keyframes ap-dc-snow { 0% { background-position: 0 0, 0 0; } 33% { background-position: 0 1px, 3px 2px; } 66% { background-position: 0 2px, -2px 1px; } 100% { background-position: 0 0, 1px -3px; } }
+@keyframes ap-dc-jitter {
+  0% { transform: translate(0, 0); filter: none; }
+  25% { transform: translate(-3px, 1px); filter: hue-rotate(90deg) contrast(1.4); }
+  50% { transform: translate(2px, -1px) skewX(2deg); }
+  75% { transform: translate(-1px, 2px); filter: invert(.15); }
+  97% { transform: translate(4px, 0); }
+}
+@keyframes ap-dc-shake { 0%, 90% { transform: none; } 92% { transform: translate(-3px, 1px); } 95% { transform: translate(3px, -1px) skewX(3deg); } }
+@keyframes ap-dc-flicker { 0%, 100% { opacity: 1; } 40% { opacity: .55; } 60% { opacity: .9; } 80% { opacity: .3; } }
+@keyframes ap-dc-vanish { 0% { opacity: 1; transform: scale(1); filter: none; } 60% { filter: invert(1) contrast(3); transform: scale(1.15, .2); } 100% { opacity: 0; transform: scale(0, .05); } }
+
+/* GM window */
+.antipodea-dead-channel .dc-head { display: flex; align-items: center; gap: 10px; padding: 10px 14px; background: linear-gradient(90deg, #0b0b0f, #2a2140); color: #fff; }
+.antipodea-dead-channel .dc-head-icon { font-size: 26px; color: #b9a6ff; }
+.antipodea-dead-channel .dc-preview { display: flex; align-items: center; gap: 4px; font-size: 12px; white-space: nowrap; color: #fff; }
+.antipodea-dead-channel .dc-scroll { flex: 1; overflow-y: auto; padding: 4px 14px 14px; }
+.antipodea-dead-channel .dc-section { margin-top: 12px; }
+.antipodea-dead-channel .dc-section h3 { margin: 0 0 6px; font-size: 15px; border-bottom: 1px solid rgba(0,0,0,.15); padding-bottom: 3px; }
+.antipodea-dead-channel .dc-section h3 small { font-weight: 400; font-size: 11px; opacity: .7; }
+.antipodea-dead-channel .dc-fire { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
+.antipodea-dead-channel .dc-btn {
+  position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 10px 4px; border-radius: 10px; border: 1px solid #5e4b8b;
+  background: #2a2140; color: #e8e0ff; font-size: 12px;
+}
+.antipodea-dead-channel .dc-btn :where(span, i, small) { color: inherit; }
+.antipodea-dead-channel .dc-btn i { font-size: 18px; }
+.antipodea-dead-channel .dc-btn:hover:not(:disabled) { background: #5e4b8b; }
+.antipodea-dead-channel .dc-warn { position: absolute; top: 3px; right: 5px; color: #ffd27a; font-size: 10px; }
+.antipodea-dead-channel .dc-row { display: flex; align-items: center; gap: 6px; }
+.antipodea-dead-channel .dc-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 6px 12px; margin: 6px 0; }
+.antipodea-dead-channel .dc-grid label { display: flex; flex-direction: column; gap: 2px; font-size: 12px; }
+.antipodea-dead-channel .dc-toggles { display: flex; flex-wrap: wrap; gap: 4px; }
+.antipodea-dead-channel .dc-chip { display: flex; align-items: center; gap: 4px; font-size: 12px; padding: 2px 8px; border-radius: 999px; background: rgba(94,75,139,.12); }
+.antipodea-dead-channel .dc-accounts { display: flex; flex-wrap: wrap; gap: 6px; margin: 0; }
+.antipodea-dead-channel .dc-acc { padding: 2px 8px; border-radius: 999px; background: rgba(94,75,139,.12); font-size: 12px; }
+.antipodea-dead-channel .dc-logtools { display: flex; gap: 6px; margin-bottom: 6px; }
+.antipodea-dead-channel .dc-log .sh-row,
+.antipodea-dead-channel .dc-zone-row { display: flex; align-items: center; gap: 8px; }
+.antipodea-dead-channel .dc-log .sh-name { flex: 1; }
+.antipodea-dead-channel .dc-zone-row .sh-name { flex: 1; }
+.antipodea-dead-channel .dc-tag { font-size: 10px; padding: 0 5px; border-radius: 4px; background: #5e4b8b; color: #fff; font-style: normal; }
+.antipodea-dead-channel .dc-seen { font-size: 11px; white-space: nowrap; color: #2f7a4a; }
+.antipodea-dead-channel .dc-seen.waiting { color: #8a6d00; }

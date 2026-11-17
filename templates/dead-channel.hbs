@@ -1,0 +1,104 @@
+<div class="sh-wrap dc-wrap">
+  <header class="sh-head dc-head">
+    <i class="fa-solid fa-tower-broadcast dc-head-icon"></i>
+    <div class="sh-who">
+      <strong>Dead Channel</strong>
+      {{#if noTrainers}}
+      <small>No player trainers yet.</small>
+      {{else}}
+      <select name="trainer">{{#each trainers}}<option value="{{id}}" {{#if selected}}selected{{/if}}>{{name}}{{#if count}} ({{count}}){{/if}}</option>{{/each}}</select>
+      {{/if}}
+    </div>
+    <label class="dc-preview" data-tooltip="Play it on your own screen, on their phone. Nothing is sent or logged.">
+      <input type="checkbox" name="preview" {{#if previewMode}}checked{{/if}}> Preview only
+    </label>
+  </header>
+
+  {{#if message}}<p class="sh-msg {{#if message.error}}bad{{/if}}">{{message.text}}</p>{{/if}}
+
+  <div class="dc-scroll">
+    <section class="dc-section">
+      <h3>Fire</h3>
+      {{#if pending}}<p class="sh-hint">Waiting on their phone: {{pending}}</p>{{/if}}
+      {{#if inZone}}<p class="sh-hint"><i class="fa-solid fa-tower-broadcast"></i> Their phone is inside a dead zone right now.</p>{{/if}}
+      <div class="dc-fire">
+        {{#each effects}}
+        <button type="button" class="dc-btn" data-action="dcFire" data-kind="{{key}}" {{#if disabled}}disabled{{/if}} {{#if ../busy}}disabled{{/if}} data-tooltip="{{#if warn}}{{warn}}{{else}}{{label}}{{/if}}">
+          <i class="fa-solid {{icon}}"></i><span>{{short}}</span>{{#if warn}}<small class="dc-warn"><i class="fa-solid fa-triangle-exclamation"></i></small>{{/if}}
+        </button>
+        {{/each}}
+      </div>
+      <p class="sh-hint">Call, Weather, Dex #000 and Glitch wait on that trainer's phone and play when their player next looks at it. Photo, Dead zone and Post happen straight away.</p>
+    </section>
+
+    <section class="dc-section">
+      <h3>Random</h3>
+      <label class="dc-row"><input type="checkbox" name="random" {{#if cfg.random}}checked{{/if}}> <strong>Let the Dead Channel happen on its own</strong></label>
+      <p class="sh-hint">Rolled whenever you move the world clock forward. Only one GM window rolls.</p>
+      <div class="dc-grid">
+        <label>Chance per trainer per day (%)<input type="number" name="chance" value="{{cfg.chance}}" min="0" max="100" step="0.5"></label>
+        <label>Inside a dead zone, chance x<input type="number" name="zoneMult" value="{{cfg.zoneMult}}" min="1" step="0.5"></label>
+        <label>Leave a trainer alone for (days)<input type="number" name="cooldownDays" value="{{cfg.cooldownDays}}" min="0" step="1"></label>
+        <label>New dead zone per day (%)<input type="number" name="zoneChance" value="{{cfg.zoneChance}}" min="0" max="100" step="0.5"></label>
+        <label>Account posts per day (%)<input type="number" name="socialChance" value="{{cfg.socialChance}}" min="0" max="100" step="0.5"></label>
+      </div>
+      <div class="dc-toggles">
+        {{#each effects}}
+        <label class="dc-chip"><input type="checkbox" data-effect-random="{{key}}" {{#if random}}checked{{/if}}> <i class="fa-solid {{icon}}"></i> {{short}}</label>
+        {{/each}}
+      </div>
+    </section>
+
+    <section class="dc-section">
+      <h3>Dead zones</h3>
+      {{#if zones.length}}
+      <ul class="sh-rows">
+        {{#each zones}}
+        <li class="sh-row dc-zone-row">
+          <i class="fa-solid fa-tower-broadcast"></i>
+          <span class="sh-name">Near {{near}}<small>About {{km}} km across · {{until}}{{#if random}} · random{{/if}}</small></span>
+          <button type="button" class="sh-ghost danger" data-action="dcRemoveZone" data-id="{{id}}">Remove</button>
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="sh-empty">No dead zones open.</p>
+      {{/if}}
+    </section>
+
+    <section class="dc-section">
+      <h3>Dead Channel accounts</h3>
+      {{#if accounts.length}}
+      <p class="dc-accounts">{{#each accounts}}<span class="dc-acc">{{name}} <small>@{{handle}}</small></span>{{/each}}</p>
+      {{else}}
+      <p class="sh-empty">None yet. Right-click an NPC in the Actors sidebar and choose <strong>Mark as Dead Channel account</strong>. Random posts only come from these.</p>
+      {{/if}}
+    </section>
+
+    <section class="dc-section">
+      <h3>Log <small>GM only · {{logCount}} entries</small></h3>
+      <div class="dc-logtools">
+        <button type="button" class="sh-ghost" data-action="dcOpenLog"><i class="fa-solid fa-book"></i> Open log journal</button>
+        <button type="button" class="sh-ghost danger" data-action="dcClearLog"><i class="fa-solid fa-trash"></i> Clear</button>
+      </div>
+      {{#if log.length}}
+      <ul class="sh-rows dc-log">
+        {{#each log}}
+        <li class="sh-row">
+          <i class="fa-solid {{icon}}"></i>
+          <span class="sh-name">
+            <span>{{#if actorName}}{{actorName}}: {{/if}}{{what}}{{#if random}} <em class="dc-tag">random</em>{{/if}}</span>
+            <small>{{when}}{{#if place}} · {{place}}{{/if}} · {{detail}}</small>
+          </span>
+          <span class="dc-seen {{#if waiting}}waiting{{/if}}">{{seenLabel}}</span>
+          {{#if canRestore}}<button type="button" class="sh-ghost" data-action="dcRestore" data-id="{{id}}" data-tooltip="Put the photo back">Undo</button>{{/if}}
+          {{#if canRemoveZone}}<button type="button" class="sh-ghost danger" data-action="dcRemoveZone" data-id="{{zoneId}}">Remove</button>{{/if}}
+        </li>
+        {{/each}}
+      </ul>
+      {{else}}
+      <p class="sh-empty">Nothing yet.</p>
+      {{/if}}
+    </section>
+  </div>
+</div>

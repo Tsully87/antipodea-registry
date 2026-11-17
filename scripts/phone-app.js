@@ -12,6 +12,7 @@ import { PAID_SCREENS, storeContext, translatorContext, weatherContext, mapsCont
 import { dexContext, dexActions } from "./dex-app.js";
 import { ticketsContext, ticketActions } from "./ticket-app.js";
 import * as Cal from "./calendar.js";
+import * as DC from "./dead-channel.js";
 
 const { ApplicationV2, HandlebarsApplicationMixin, DialogV2 } = foundry.applications.api;
 const FormDataExt = foundry.applications.ux?.FormDataExtended ?? globalThis.FormDataExtended;
@@ -621,6 +622,9 @@ export class RegistryPhone extends HandlebarsApplicationMixin(ApplicationV2) {
         if (id) { this.citySpot = id; this.render(); }
       });
     }
+
+    // The Dead Channel draws over whatever's on screen (calls, glitches, dead zones, #000).
+    try { DC.onPhoneRender(this); } catch (e) { console.warn(`${MODULE_ID} | Dead Channel`, e); }
 
     if (!game.user.isGM) return;
     html.querySelectorAll("[data-app-grant]").forEach((el) => el.addEventListener("change", async () => {
