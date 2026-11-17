@@ -1,5 +1,9 @@
 # Changelog
 
+## 1.16.0
+- **8 new Old Fulla days** on the Antipodea Calendar, folk customs tied to the pantheon: Lovebirds' Crossing (7 Feb), Feather Morning (21 Mar), Mender's Day (24 May), Weathermakers' Truce (28 Sep), Clearwater Day (8 Oct), Old Victor's Night (31 Oct, the eve of the Elite Four Tournament), Reef Mother's Blessing (20 Nov) and Shooting Star Night (14 Dec). They're full festivals: on the phone calendar, a day-of Discord post and in the weekly heads-up.
+- Lantern Night, Longest Night and Wattle Bloom now mention their Old Fulla tie-ins (the Other Side, the Falling Star and the Mender).
+
 ## 1.15.0
 - New **Old Fullas** sightings (GM only): a very small chance that trainers run into one of the Lower Pantheon or the Outsiders where the stories put them. Old Frostbite above Silver Fern Plateau, the Bunya Ghost around Bunya City, the Reef Mother off Bonza Bay and so on, plus Mewtwo anywhere in The Red Heart, Deoxys at Black Stump City, Genesect in Rainforest Reach and Huon Isle, and MissingNo only inside a Dead Channel dead zone.
 - **Automatic on arrival**: when trainers are moved somewhere an Old Fulla lives (Move Trainers, tagged scenes, tickets, anything that sets their location), the group that arrived together gets one roll per Old Fulla, at most once per in-game day per trainer per Old Fulla. Default 1%, set in module settings or the window.

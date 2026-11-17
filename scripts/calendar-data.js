@@ -2,7 +2,7 @@
  * The Antipodea Calendar: homebrew events for the Seasons & Stars "antipodea-gregorian"
  * calendar (calendar.js). Keeps the Gregorian month/weekday names and structure, but
  * carries none of S&S's built-in real-world holidays — this is the full replacement list,
- * locked 29 Oct 2026 (see the vault's "Antipodea Calendar.md" for the design writeup).
+ * locked 29 Oct 2026, plus 8 Old Fulla days added 17 Nov 2026 (see the vault's "Antipodea Calendar.md").
  *
  * kind: "major" -> gets the full treatment (Discord day-of post, upcoming heads-up, phone
  *       calendar). kind: "founders" -> phone calendar only, no Discord post, so the channel
@@ -37,7 +37,7 @@ export const ANTIPODEA_EVENTS = [
   },
   {
     id: "lantern-night", name: "Lantern Night", kind: "major",
-    description: "Autumn evening festival, paper lanterns shaped like Pokémon floated on rivers and harbours. Quiet, reflective, popular with couples and families.",
+    description: "Autumn evening festival, paper lanterns shaped like Pokémon floated on rivers and harbours. Quiet, reflective, popular with couples and families. Older families float one extra plain lantern for anyone who's \"gone to the Other Side\" that year, and nobody fishes it back out.",
     recurrence: { type: "fixed", month: 4, day: 14 },
     visibility: "player-visible", color: "#f4a261", icon: "fa-solid fa-lightbulb"
   },
@@ -49,7 +49,7 @@ export const ANTIPODEA_EVENTS = [
   },
   {
     id: "longest-night", name: "Longest Night", kind: "major",
-    description: "Winter solstice. Bonfires, hot food stalls, and in the far south (Snowgum High Country, Tussock Plains) an actual aurora-watching tradition — \"Southern Lights.\"",
+    description: "Winter solstice. Bonfires, hot food stalls, and in the far south (Snowgum High Country, Tussock Plains) an actual aurora-watching tradition, \"Southern Lights.\" Out past Black Stump City, the aurora crowd swaps Falling Star stories and someone always swears they saw the lights move on their own.",
     recurrence: { type: "fixed", month: 6, day: 21 },
     visibility: "player-visible", color: "#355c7d", icon: "fa-solid fa-star"
   },
@@ -67,7 +67,7 @@ export const ANTIPODEA_EVENTS = [
   },
   {
     id: "wattle-bloom", name: "Wattle Bloom", kind: "major",
-    description: "Spring wildflower festival as the wattle comes into bloom region-wide. Flower crowns, Grass/Fairy-type showcases, picnic culture.",
+    description: "Spring wildflower festival as the wattle comes into bloom region-wide. Flower crowns, Grass/Fairy-type showcases, picnic culture. Along the Range, the first wattle out on burnt ground is credited to the Mender, and pickers leave that bush alone.",
     recurrence: { type: "fixed", month: 9, day: 1 },
     visibility: "player-visible", color: "#e9c46a", icon: "fa-solid fa-seedling"
   },
@@ -100,6 +100,56 @@ export const ANTIPODEA_EVENTS = [
     description: "End-of-year sales across every Poké Mart in the region — discounted gear, old stock cleared out before the new year. More a shopping event than a festival, but popular.",
     recurrence: { type: "fixed", month: 12, day: 15 }, duration: "7d",
     visibility: "player-visible", color: "#588157", icon: "fa-solid fa-tags"
+  },
+
+  /* ---------------- 8 Old Fulla days (folk custom, see the vault's Religion notes) ---------------- */
+  {
+    id: "lovebirds-crossing", name: "Lovebirds' Crossing", kind: "major", oldFulla: true,
+    description: "Engaged and newly-wed couples take boats out to the twin sea stacks off Miro Sound for luck from the Lovebirds. A calm crossing is the best omen going; a rough one gets laughed off at the pub after.",
+    recurrence: { type: "fixed", month: 2, day: 7 },
+    visibility: "player-visible", color: "#e5989b", icon: "fa-solid fa-heart"
+  },
+  {
+    id: "feather-morning", name: "Feather Morning", kind: "major", oldFulla: true,
+    description: "After the storm season, coastal and alpine towns go out at dawn hunting for feathers on the beaches and ridgelines. A feather from Old Frostbite, the Sparkie or Old Scorcher is the luckiest find there is, and the traditional way to propose. Nobody's found a real one in years, which never stops anyone looking.",
+    recurrence: { type: "fixed", month: 3, day: 21 },
+    visibility: "player-visible", color: "#90be6d", icon: "fa-solid fa-feather"
+  },
+  {
+    id: "menders-day", name: "Mender's Day", kind: "major", oldFulla: true,
+    description: "Tree-planting day along the Great Dividing Range once fire season's done. Families plant seedlings on burnt ground and leave a patch untouched for the Mender. Early regrowth on that patch means she's been through.",
+    recurrence: { type: "fixed", month: 5, day: 24 },
+    visibility: "player-visible", color: "#52b788", icon: "fa-solid fa-leaf"
+  },
+  {
+    id: "weathermakers-truce", name: "Weathermakers' Truce", kind: "major", oldFulla: true,
+    description: "Tōtara Ridge's spring storm-season custom. Locals hang wind chimes and leave three small offerings on the slopes below Mount Kahikatea, one for each of the Weathermakers, and ask them to keep the peace so Old Grumbler stays quiet. Calm weather that week is taken as a yes.",
+    recurrence: { type: "fixed", month: 9, day: 28 },
+    visibility: "player-visible", color: "#577590", icon: "fa-solid fa-wind"
+  },
+  {
+    id: "clearwater-day", name: "Clearwater Day", kind: "major", oldFulla: true,
+    description: "River clean-up day up and down the East Coast, biggest around Lilly Pilly Town. Volunteers pull rubbish from the rivers, and if the water runs clear by sundown it's said Old Clearwater has walked it again.",
+    recurrence: { type: "fixed", month: 10, day: 8 },
+    visibility: "player-visible", color: "#48cae4", icon: "fa-solid fa-water"
+  },
+  {
+    id: "old-victors-night", name: "Old Victor's Night", kind: "major", oldFulla: true,
+    description: "The eve of the Elite Four Tournament. Every pub with a screen is packed, and the whole region touches wood and says a quiet one to Old Victor for their favourite. It's jokey, mostly, though the Champion is rumoured to have done it every year since he was a kid.",
+    recurrence: { type: "fixed", month: 10, day: 31 },
+    visibility: "player-visible", color: "#ffb703", icon: "fa-solid fa-clover"
+  },
+  {
+    id: "reef-mothers-blessing", name: "Reef Mother's Blessing", kind: "major", oldFulla: true,
+    description: "Bonza Bay's fishing fleet is blessed for the season around coral-spawning time. Boats are decked in flowers, crews take a vow never to harm the Reef Mother or her kin, and nobody fishes the inner reef that week, just in case.",
+    recurrence: { type: "fixed", month: 11, day: 20 },
+    visibility: "player-visible", color: "#00b4d8", icon: "fa-solid fa-fish"
+  },
+  {
+    id: "shooting-star-night", name: "Shooting Star Night", kind: "major", oldFulla: true,
+    description: "On the clearest night of early summer, families leave a window open and something nice on the sill in case the Shooting Star wakes and wants to listen. Matai Isle makes the biggest night of it, with a picnic at the old meteor paddock.",
+    recurrence: { type: "fixed", month: 12, day: 14 },
+    visibility: "player-visible", color: "#bdb2ff", icon: "fa-solid fa-meteor"
   },
 
   /* ---------------- 35 city and town Founders' Days ---------------- */
