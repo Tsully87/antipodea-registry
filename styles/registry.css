@@ -1377,6 +1377,7 @@
 .antipodea-dead-channel .dc-fire { display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px; }
 .antipodea-dead-channel .dc-btn {
   position: relative; display: flex; flex-direction: column; align-items: center; gap: 4px;
+  height: auto; min-height: 58px; line-height: 1.2;
   padding: 10px 4px; border-radius: 10px; border: 1px solid #5e4b8b;
   background: #2a2140; color: #e8e0ff; font-size: 12px;
 }

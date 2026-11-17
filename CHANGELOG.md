@@ -1,5 +1,8 @@
 # Changelog
 
+## 1.14.1
+- Fix: the Fire buttons in the Dead Channel window were squashed to 24px tall by Foundry's own button styling.
+
 ## 1.14.0
 - New **Dead Channel** (MissingNo), GM only. Seven phone glitches you can fire at a trainer, or let happen at random:
   - **Call**: an incoming call from "???" (No Caller ID). Answer it and it's dead silence that cuts out at exactly 0:08. It rings even if the phone's closed, and nothing goes in their call log.
